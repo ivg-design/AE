@@ -196,121 +196,121 @@ function main() {
 		 *
 		 * @example
 		 * createControls(comp, 'Shape 1', { vertex: true, inTangent: false, outTangent: true });
-		 */
-	function createControls(comp, shapeName, options) {
-		app.beginUndoGroup("Create Controls");
+			*/
+		function createControls(comp, shapeName, options) {
+			app.beginUndoGroup("Create Controls");
 
-		var nullLayer, inTanLayer, outTanLayer;
+			var nullLayer, inTanLayer, outTanLayer;
 
-		// Function to add position expression to vertex and tangent nulls
-		var addPositionExpression = function (layer, type) {
-			var positionExpression = [
-				'var controlFollow = thisComp.layer("' + shapeName + ' Vertex 1").effect("Control/Follow")("Checkbox").value;',
-				'if (controlFollow == 1) {',
-				'    var shapeLayer = thisComp.layer("' + shapeName + '");',
-				'    var vertexIndex = thisComp.layer("' + shapeName + ' Vertex 1").effect("Vertex Control")("Slider");',
-				'    var pathProperty = shapeLayer.' + options.pathToPropertyChain + ';',
-				'    var points = pathProperty.points();',
-				'    var point = points[vertexIndex - 1];',
-				'    if (type === "vertex") {',
-				'        fromCompToSurface(shapeLayer.toComp(point));',
-				'    } else if (type === "inTangent" || type === "outTangent") {',
-				'        var tangents = type === "inTangent" ? pathProperty.inTangents() : pathProperty.outTangents();',
-				'        var tangent = tangents[vertexIndex - 1];',
-				'        fromCompToSurface(shapeLayer.toComp([point[0] + tangent[0], point[1] + tangent[1]]));',
+			// Function to add position expression to vertex and tangent nulls
+			var addPositionExpression = function (layer, type) {
+				var positionExpression = [
+					'var controlFollow = thisComp.layer("' + shapeName + ' Vertex 1").effect("Control/Follow")("Checkbox").value;',
+					'if (controlFollow == 1) {',
+					'    var shapeLayer = thisComp.layer("' + shapeName + '");',
+					'    var vertexIndex = thisComp.layer("' + shapeName + ' Vertex 1").effect("Vertex Control")("Slider");',
+					'    var pathProperty = shapeLayer.' + options.pathToPropertyChain + ';',
+					'    var points = pathProperty.points();',
+					'    var point = points[vertexIndex - 1];',
+					'    if (type === "vertex") {',
+					'        fromCompToSurface(shapeLayer.toComp(point));',
+					'    } else if (type === "inTangent" || type === "outTangent") {',
+					'        var tangents = type === "inTangent" ? pathProperty.inTangents() : pathProperty.outTangents();',
+					'        var tangent = tangents[vertexIndex - 1];',
+					'        fromCompToSurface(shapeLayer.toComp([point[0] + tangent[0], point[1] + tangent[1]]));',
+					'    }',
+					'} else {',
+					'    value;',
+					'}'
+				].join('\n');
+
+				layer.position.expression = positionExpression;
+			};
+
+			if (options.vertex) {
+				nullLayer = comp.layers.addNull();
+				nullLayer.name = shapeName + " Vertex 1";
+				nullLayer.effect.addProperty("ADBE Slider Control").name = "Vertex Control";
+				nullLayer.effect.addProperty("ADBE Checkbox Control").name = "Control/Follow";
+				addPositionExpression(nullLayer, "vertex");
+			}
+
+			if (options.inTangent) {
+				inTanLayer = comp.layers.addNull();
+				inTanLayer.name = shapeName + " inTangent for Vertex 1";
+				addPositionExpression(inTanLayer, "inTangent");
+			}
+
+			if (options.outTangent) {
+				outTanLayer = comp.layers.addNull();
+				outTanLayer.name = shapeName + " outTangent for Vertex 1";
+				addPositionExpression(outTanLayer, "outTangent");
+			}
+
+			app.endUndoGroup();
+		}
+
+
+			/**
+			 * Generates a new After Effects expression for manipulating path vertices based on user options.
+			 * 
+			 * @param {string[]} propertyChain - An array representing the chain of properties to navigate through in the shape layer.
+			 * @param {Object} options - User-defined options for vertex and tangent control.
+			 * @param {boolean} options.vertex - Specifies whether to enable vertex control.
+			 * @param {boolean} options.inTangent - Specifies whether to enable in-tangent control.
+			 * @param {boolean} options.outTangent - Specifies whether to enable out-tangent control.
+			 * 
+			 * @returns {string} The generated After Effects expression as a string.
+			 */
+		function createExpression(propertyChain, options) {
+			// Initialize the expression string with common parts
+			var expressionString = 'var shapeLayer = thisLayer;\n';
+
+			// Dynamically build the currentGroup part of the expression
+			var currentGroupString = 'var currentGroup = shapeLayer';
+			for (var i = 0; i < propertyChain.length; i++) {
+				currentGroupString += '.content("' + propertyChain[i] + '")';
+			}
+			currentGroupString += ';\n';
+			expressionString += currentGroupString;
+
+			// Add the rest of the common expression parts
+			expressionString += [
+				'if (currentGroup) {',
+				'    var pathProperty = currentGroup.content("Path 1").path;',
+				'    var pathPoints = pathProperty.points();',
+				'    var inTangents = pathProperty.inTangents();',
+				'    var outTangents = pathProperty.outTangents();',
+				'    for (var i = 1; i <= thisComp.numLayers; i++) {',
+				'        var layer = thisComp.layer(i);',
+				'        if (layer.name.startsWith(currentGroup.name + " Vertex")) {',
+				'            var controlFollow = layer.effect("Control/Follow") ? layer.effect("Control/Follow")("Checkbox").value : 0;',
+				'            if (!controlFollow) {',
+				'                var vertexControl = layer.effect("Vertex Control")("Slider");',
+				'                if (vertexControl && vertexControl.value > 0) {',
+				'                    var vertexIndex = Math.floor(vertexControl) - 1;',
+				'                    var vertexPosition = fromComp(layer.toComp([0,0]));',
+				'                    pathPoints[vertexIndex] = vertexPosition;',
+				'                    var inTangentLayer = thisComp.layer(currentGroup.name + " inTangent for Vertex " + (vertexIndex + 1));',
+				'                    var outTangentLayer = thisComp.layer(currentGroup.name + " outTangent for Vertex " + (vertexIndex + 1));',
+				'                    if (inTangentLayer) {',
+				'                        var inTangentPosition = fromComp(inTangentLayer.toComp([0,0]));',
+				'                        inTangents[vertexIndex] = [inTangentPosition[0] - vertexPosition[0], inTangentPosition[1] - vertexPosition[1]]; ',
+				'                    }',
+				'                    if (outTangentLayer) {',
+				'                        var outTangentPosition = fromComp(outTangentLayer.toComp([0,0]));',
+				'                        outTangents[vertexIndex] = [outTangentPosition[0] - vertexPosition[0], outTangentPosition[1] - vertexPosition[1]]; ',
+				'                    }',
+				'                }',
+				'            }',
+				'        }',
 				'    }',
-				'} else {',
-				'    value;',
+				'    createPath(pathPoints, inTangents, outTangents, false);',
 				'}'
 			].join('\n');
 
-			layer.position.expression = positionExpression;
-		};
-
-		if (options.vertex) {
-			nullLayer = comp.layers.addNull();
-			nullLayer.name = shapeName + " Vertex 1";
-			nullLayer.effect.addProperty("ADBE Slider Control").name = "Vertex Control";
-			nullLayer.effect.addProperty("ADBE Checkbox Control").name = "Control/Follow";
-			addPositionExpression(nullLayer, "vertex");
+			return expressionString;
 		}
-
-		if (options.inTangent) {
-			inTanLayer = comp.layers.addNull();
-			inTanLayer.name = shapeName + " inTangent for Vertex 1";
-			addPositionExpression(inTanLayer, "inTangent");
-		}
-
-		if (options.outTangent) {
-			outTanLayer = comp.layers.addNull();
-			outTanLayer.name = shapeName + " outTangent for Vertex 1";
-			addPositionExpression(outTanLayer, "outTangent");
-		}
-
-		app.endUndoGroup();
-	}
-
-
-		/**
-		 * Generates a new After Effects expression for manipulating path vertices based on user options.
-		 * 
-		 * @param {string[]} propertyChain - An array representing the chain of properties to navigate through in the shape layer.
-		 * @param {Object} options - User-defined options for vertex and tangent control.
-		 * @param {boolean} options.vertex - Specifies whether to enable vertex control.
-		 * @param {boolean} options.inTangent - Specifies whether to enable in-tangent control.
-		 * @param {boolean} options.outTangent - Specifies whether to enable out-tangent control.
-		 * 
-		 * @returns {string} The generated After Effects expression as a string.
-		 */
-	function createExpression(propertyChain, options) {
-		// Initialize the expression string with common parts
-		var expressionString = 'var shapeLayer = thisLayer;\n';
-
-		// Dynamically build the currentGroup part of the expression
-		var currentGroupString = 'var currentGroup = shapeLayer';
-		for (var i = 0; i < propertyChain.length; i++) {
-			currentGroupString += '.content("' + propertyChain[i] + '")';
-		}
-		currentGroupString += ';\n';
-		expressionString += currentGroupString;
-
-		// Add the rest of the common expression parts
-		expressionString += [
-			'if (currentGroup) {',
-			'    var pathProperty = currentGroup.content("Path 1").path;',
-			'    var pathPoints = pathProperty.points();',
-			'    var inTangents = pathProperty.inTangents();',
-			'    var outTangents = pathProperty.outTangents();',
-			'    for (var i = 1; i <= thisComp.numLayers; i++) {',
-			'        var layer = thisComp.layer(i);',
-			'        if (layer.name.startsWith(currentGroup.name + " Vertex")) {',
-			'            var controlFollow = layer.effect("Control/Follow") ? layer.effect("Control/Follow")("Checkbox").value : 0;',
-			'            if (!controlFollow) {',
-			'                var vertexControl = layer.effect("Vertex Control")("Slider");',
-			'                if (vertexControl && vertexControl.value > 0) {',
-			'                    var vertexIndex = Math.floor(vertexControl) - 1;',
-			'                    var vertexPosition = fromComp(layer.toComp([0,0]));',
-			'                    pathPoints[vertexIndex] = vertexPosition;',
-			'                    var inTangentLayer = thisComp.layer(currentGroup.name + " inTangent for Vertex " + (vertexIndex + 1));',
-			'                    var outTangentLayer = thisComp.layer(currentGroup.name + " outTangent for Vertex " + (vertexIndex + 1));',
-			'                    if (inTangentLayer) {',
-			'                        var inTangentPosition = fromComp(inTangentLayer.toComp([0,0]));',
-			'                        inTangents[vertexIndex] = [inTangentPosition[0] - vertexPosition[0], inTangentPosition[1] - vertexPosition[1]]; ',
-			'                    }',
-			'                    if (outTangentLayer) {',
-			'                        var outTangentPosition = fromComp(outTangentLayer.toComp([0,0]));',
-			'                        outTangents[vertexIndex] = [outTangentPosition[0] - vertexPosition[0], outTangentPosition[1] - vertexPosition[1]]; ',
-			'                    }',
-			'                }',
-			'            }',
-			'        }',
-			'    }',
-			'    createPath(pathPoints, inTangents, outTangents, false);',
-			'}'
-		].join('\n');
-
-		return expressionString;
-	}
 
 
 
