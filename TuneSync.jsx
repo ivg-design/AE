@@ -52,6 +52,7 @@ refreshButton.onClick = function () {
 
 // Add functionality to the TuneSync button (this is where you'll add the main logic of your script)
 tuneSyncButton.onClick = function () {
+    app.beginUndoGroup("Create Controls");
     var comp = app.project.activeItem;
     if (!comp || !(comp instanceof CompItem)) {
         alert("No composition is active.");
@@ -99,12 +100,13 @@ tuneSyncButton.onClick = function () {
             break;
         default:
             // Handle 1D property as you normally would
-            var prop = layer.property(propName); // assuming the property can be accessed like this
-            handle1DProperty(layer, prop, audioReactorName);
+            var propAddress = getSelectedProperty();
+            var propName = getSelectedPropertyName();
+            handle1DProperty(layer, propName, audioReactorName, propAddress)
             break;
     }
 };
-
+app.endUndoGroup();
 
 // Show the window
 mainWindow.center();
@@ -126,58 +128,59 @@ mainWindow.show();
  * handle1DProperty(myLayer, myLayer.property("Opacity"), "AudioReactorComp");
  * // This will add controls for easing, min, and max output and apply an expression to the "Opacity" property.
  */
-function handle1DProperty(layer, prop, audioReactorName) {
+function handle1DProperty(layer, propName, audioReactorName, propAddress) {
     // Create Easing dropdown
+    var dropDownParams = ["Linear", "EaseIn", "EaseOut", "EaseInOut"];
     var easingDropdown = layer.Effects.addProperty("ADBE Dropdown Control");
-    easingDropdown.name = prop.name + "_Easing Type";
-    easingDropdown.property("ADBE Dropdown-0001").addItems(["Linear", "EaseIn", "EaseOut", "EaseInOut"]);
+    var setDropDownParams = easingDropdown.property(1).setPropertyParameters(dropDownParams);
+    setDropDownParams.propertyGroup(1).name = propName + "_Easing Type";
 
     // Create Min and Max sliders
     var minSlider = layer.Effects.addProperty("ADBE Slider Control");
-    minSlider.name = prop.name + "_Min Output";
+    minSlider.name = propName + "_Min Output";
     var maxSlider = layer.Effects.addProperty("ADBE Slider Control");
-    maxSlider.name = prop.name + "_Max Output";
-
+    maxSlider.name = propName + "_Max Output";
+    var expressionString = build1DExpression(audioReactorName, propName);
+    propAddress.expression = expressionString;
+    
+}
+function build1DExpression( audioReactorName, propName){
     // Create the expression
     var expressionString = 'd = comp("' + audioReactorName + '").layer("Select Frequency").effect("Audio Reactor")("Output Power");' + "\n"
         + 'iMin = 0;' + "\n"
         + 'iMax = 100;' + "\n"
         + 'ctrlLayer = thisLayer;' + "\n"
-        + 'easeType = ctrlLayer.effect("' + prop.name + '_Easing Type")("Menu").value;' + "\n"
-        + 'outMin = ctrlLayer.effect("' + prop.name + '_Min Output")("Slider");' + "\n"
-        + 'outMax = ctrlLayer.effect("' + prop.name + '_Max Output")("Slider");' + "\n"
-        + 'if (easeType == 1) ease(d, iMin, iMax, outMin, outMax);' + "\n"
+        + 'easeType = ctrlLayer.effect("' + propName + '_Easing Type")("Menu").value;' + "\n"
+        + 'outMin = ctrlLayer.effect("' + propName + '_Min Output")("Slider");' + "\n"
+        + 'outMax = ctrlLayer.effect("' + propName + '_Max Output")("Slider");' + "\n"
+        + 'if (easeType == 1) linear(d, iMin, iMax, outMin, outMax);' + "\n"
         + 'else if (easeType == 2) easeIn(d, iMin, iMax, outMin, outMax);' + "\n"
         + 'else if (easeType == 3) easeOut(d, iMin, iMax, outMin, outMax);' + "\n"
-        + 'else easeInOut(d, iMin, iMax, outMin, outMax);';
-
-    prop.expression = expressionString;
+        + 'else ease(d, iMin, iMax, outMin, outMax);';
 }
+
 /**
- * Sets up a 2D property on a given layer with effect controls and an audio-reactive expression 
- * for manipulation in After Effects. Adds easing dropdown and output sliders.
- * 
- * @param {Layer} layer - The After Effects layer where the property resides.
- * @param {boolean} xSelected - Determines if the x-axis is affected by the expression.
- * @param {boolean} ySelected - Determines if the y-axis is affected by the expression.
- * @param {boolean} isUnified - Determines if the effect should be applied uniformly to both axes.
- * @param {string} propName - The name of the 2D property being affected (e.g., "Position", "Scale").
- * @param {string} audioReactorName - The name of the composition that contains the audio reactor.
- * 
- * @returns {void}
+ * Adds controls and an expression to a given 2D property layer in After Effects.
+ *
+ * @param {Object} layer - The After Effects layer the property belongs to.
+ * @param {boolean} xSelected - Whether the x-axis is selected for modification.
+ * @param {boolean} ySelected - Whether the y-axis is selected for modification.
+ * @param {boolean} isUnified - Determines if controls for X and Y axis should be unified.
+ * @param {string} propName - The name of the property being modified.
+ * @param {string} audioReactorName - The name of the audio reactor layer in the composition.
+ * @param {Object} selectedProp - The After Effects property to apply the expression to.
  * 
  * @example
- * // Given a layer and its position property
- * handle2DProperty(myLayer, true, true, true, "Position", "AudioReactorComp");
- * // This will add controls for easing and min-max output, and apply an expression to the "Position" property.
+ * // Adds a dropdown control, sliders, and an expression to a position property in layer `myLayer`.
+ * handle2DProperty(myLayer, true, false, true, "Position", "AudioReactorLayer", myLayer.property("Position"));
  */
-function handle2DProperty(layer, xSelected, ySelected, isUnified, propName, audioReactorName) {
+function handle2DProperty(layer, xSelected, ySelected, isUnified, propName, audioReactorName, selectedProp) {
     // Add Easing dropdown
+    var dropDownParams = ["Linear", "EaseIn", "EaseOut", "EaseInOut"];
     var dropdown = layer.Effects.addProperty("ADBE Dropdown Control");
-    dropdown.name = propName + "_Easing Type";
-    dropdown.property("ADBE Dropdown-0001").addItems(["Linear", "EaseIn", "EaseOut", "EaseInOut"]);
+    var setDropDownParams = dropdown.property(1).setPropertyParameters(dropDownParams);
+    setDropDownParams.propertyGroup(1).name = propName + "_Easing Type";
 
-    // Create Sliders based on whether it's unified or individual
     if (isUnified) {
         // Unified sliders for Min and Max Output
         var outMinSlider = layer.Effects.addProperty("ADBE Slider Control");
@@ -186,51 +189,128 @@ function handle2DProperty(layer, xSelected, ySelected, isUnified, propName, audi
         var outMaxSlider = layer.Effects.addProperty("ADBE Slider Control");
         outMaxSlider.name = propName + "_Max Output";
     } else {
-        // Individual sliders for X and Y Min and Max Output
-        var outMinXSlider = layer.Effects.addProperty("ADBE Slider Control");
-        outMinXSlider.name = propName + "_Min Output X";
+        if (!xSelected && !ySelected) {
+            // Create individual sliders for X and Y Min and Max Output
+            var outMinXSlider = layer.Effects.addProperty("ADBE Slider Control");
+            outMinXSlider.name = propName + "_Min Output X";
 
-        var outMaxXSlider = layer.Effects.addProperty("ADBE Slider Control");
-        outMaxXSlider.name = propName + "_Max Output X";
+            var outMaxXSlider = layer.Effects.addProperty("ADBE Slider Control");
+            outMaxXSlider.name = propName + "_Max Output X";
 
-        var outMinYSlider = layer.Effects.addProperty("ADBE Slider Control");
-        outMinYSlider.name = propName + "_Min Output Y";
+            var outMinYSlider = layer.Effects.addProperty("ADBE Slider Control");
+            outMinYSlider.name = propName + "_Min Output Y";
 
-        var outMaxYSlider = layer.Effects.addProperty("ADBE Slider Control");
-        outMaxYSlider.name = propName + "_Max Output Y";
+            var outMaxYSlider = layer.Effects.addProperty("ADBE Slider Control");
+            outMaxYSlider.name = propName + "_Max Output Y";
+        } else {
+            // Individual sliders for X and Y Min and Max Output
+            if (xSelected) {
+                var outMinXSlider = layer.Effects.addProperty("ADBE Slider Control");
+                outMinXSlider.name = propName + "_Min Output X";
+
+                var outMaxXSlider = layer.Effects.addProperty("ADBE Slider Control");
+                outMaxXSlider.name = propName + "_Max Output X";
+            }
+
+            if (ySelected) {
+                var outMinYSlider = layer.Effects.addProperty("ADBE Slider Control");
+                outMinYSlider.name = propName + "_Min Output Y";
+
+                var outMaxYSlider = layer.Effects.addProperty("ADBE Slider Control");
+                outMaxYSlider.name = propName + "_Max Output Y";
+            }
+        }
     }
 
-    // Build the expression
+    // Build the expression based on the selections
     var expression = build2DExpression(xSelected, ySelected, isUnified, propName, audioReactorName);
 
-    // Apply the expression to the property
-    // Assuming `prop` is the property you're applying the expression to
-    layer.property("Effects").property(propName).expression = expression;
+    // Apply the expression to the selected property
+    selectedProp.expression = expression;
 }
+
 /**
- * Configures a 3D property on a given layer with effect controls and an audio-reactive expression
- * for dynamic manipulation in After Effects. Adds easing dropdown and output sliders for each axis.
+ * Generates a 2D expression string based on the provided parameters.
+ * This expression string is used to manipulate 2D properties like position, scale, etc., 
+ * in an After Effects composition.
  * 
- * @param {Layer} layer - The After Effects layer where the property resides.
  * @param {boolean} xSelected - Determines if the x-axis is affected by the expression.
  * @param {boolean} ySelected - Determines if the y-axis is affected by the expression.
- * @param {boolean} zSelected - Determines if the z-axis is affected by the expression.
- * @param {boolean} isUnified - Determines if the effect should be applied uniformly to all axes.
- * @param {string} propName - The name of the 3D property being affected (e.g., "Position", "Scale").
+ * @param {boolean} isUnified - Determines if the effect should be applied uniformly to both axes.
+ * @param {string} propName - The name of the property being affected (e.g., "Position", "Scale").
  * @param {string} audioReactorName - The name of the composition that contains the audio reactor.
  * 
- * @returns {void}
+ * @returns {string} A string containing the complete expression for After Effects.
  * 
  * @example
- * // Given a layer and its position property
- * handle3DProperty(myLayer, true, true, true, true, "Position", "AudioReactorComp");
- * // This will add controls for easing, min, and max output, and apply an expression to the "Position" property.
+ * const expr = build2DExpression(true, true, true, "Position", "AudioReactorComp");
+ * // This will return an expression string that can be applied to the "Position" property in After Effects.
  */
-function handle3DProperty(layer, xSelected, ySelected, zSelected, isUnified, propName, audioReactorName) {
+
+function build2DExpression(xSelected, ySelected, isUnified, propName, audioReactorName) {
+    var expressionBase = 'd = comp("' + audioReactorName + '").layer("Select Frequency").effect("Audio Reactor")("Output Power");\n' +
+        'iMin = 0;\n' +
+        'iMax = 100;\n' +
+        'originalValue = value;\n';
+
+    var easingExpressionBase = 'ctrlLayer = thisLayer;\n' +
+        'easeType = ctrlLayer.effect("' + propName + '_Easing Type")("Menu").value;\n';
+
+    var commonEasingLogic = '(easeType == 1 ? linear(d, iMin, iMax, outMin, outMax) : ' +
+        '(easeType == 2 ? easeIn(d, iMin, iMax, outMin, outMax) : ' +
+        '(easeType == 3 ? easeOut(d, iMin, iMax, outMin, outMax) : ' +
+        'ease(d, iMin, iMax, outMin, outMax))))';
+
+    var finalExpression = expressionBase + easingExpressionBase;
+
+    if (isUnified || (!xSelected && !ySelected) || (xSelected && ySelected)) {
+        finalExpression += 'outMin = ctrlLayer.effect("' + propName + '_Min Output")("Slider");\n';
+        finalExpression += 'outMax = ctrlLayer.effect("' + propName + '_Max Output")("Slider");\n';
+        finalExpression += 'xResult = yResult = ' + commonEasingLogic + ';\n';
+    } else {
+        if (xSelected) {
+            finalExpression += 'outMin = ctrlLayer.effect("' + propName + '_Min Output X")("Slider");\n';
+            finalExpression += 'outMax = ctrlLayer.effect("' + propName + '_Max Output X")("Slider");\n';
+            finalExpression += 'xResult = ' + commonEasingLogic + ';\n';
+            finalExpression += 'yResult = originalValue[1];\n';
+        }
+
+        if (ySelected) {
+            finalExpression += 'outMin = ctrlLayer.effect("' + propName + '_Min Output Y")("Slider");\n';
+            finalExpression += 'outMax = ctrlLayer.effect("' + propName + '_Max Output Y")("Slider");\n';
+            finalExpression += 'yResult = ' + commonEasingLogic + ';\n';
+            finalExpression += 'xResult = originalValue[0];\n';
+        }
+    }
+
+    finalExpression += '[xResult, yResult];';
+    return finalExpression;
+}
+
+
+
+/**
+ * Adds controls and an expression to a given 3D property layer in After Effects.
+ *
+ * @param {Object} layer - The After Effects layer the property belongs to.
+ * @param {boolean} xSelected - Whether the x-axis is selected for modification.
+ * @param {boolean} ySelected - Whether the y-axis is selected for modification.
+ * @param {boolean} zSelected - Whether the z-axis is selected for modification.
+ * @param {boolean} isUnified - Determines if controls for X, Y, and Z axes should be unified.
+ * @param {string} propName - The name of the property being modified.
+ * @param {string} audioReactorName - The name of the audio reactor layer in the composition.
+ * @param {Object} selectedProp - The After Effects property to apply the expression to.
+ *
+ * @example
+ * // Adds a dropdown control, sliders, and an expression to a 3D position property in layer `myLayer`.
+ * handle3DProperty(myLayer, true, true, false, true, "Position", "AudioReactorLayer", myLayer.property("Position"));
+ */
+function handle3DProperty(layer, xSelected, ySelected, zSelected, isUnified, propName, audioReactorName, selectedProp) {
     // Add Easing dropdown
+    var dropDownParams = ["Linear", "EaseIn", "EaseOut", "EaseInOut"];
     var dropdown = layer.Effects.addProperty("ADBE Dropdown Control");
-    dropdown.name = propName + "_Easing Type";
-    dropdown.property("ADBE Dropdown-0001").addItems(["Linear", "EaseIn", "EaseOut", "EaseInOut"]);
+    var setDropDownParams = dropdown.property(1).setPropertyParameters(dropDownParams);
+    setDropDownParams.propertyGroup(1).name = propName + "_Easing Type";
 
     // Create Sliders based on whether it's unified or individual
     if (isUnified) {
@@ -263,66 +343,10 @@ function handle3DProperty(layer, xSelected, ySelected, zSelected, isUnified, pro
     var expression = build3DExpression(xSelected, ySelected, zSelected, isUnified, propName, audioReactorName);
 
     // Apply the expression to the property
-    // Assuming `prop` is the property you're applying the expression to
-    layer.property("Effects").property(propName).expression = expression;
+    
+    selectedProp.expression = expression;
 }
-/**
- * Generates a 2D expression string based on the provided parameters.
- * This expression string is used to manipulate 2D properties like position, scale, etc., 
- * in an After Effects composition.
- * 
- * @param {boolean} xSelected - Determines if the x-axis is affected by the expression.
- * @param {boolean} ySelected - Determines if the y-axis is affected by the expression.
- * @param {boolean} isUnified - Determines if the effect should be applied uniformly to both axes.
- * @param {string} propName - The name of the property being affected (e.g., "Position", "Scale").
- * @param {string} audioReactorName - The name of the composition that contains the audio reactor.
- * 
- * @returns {string} A string containing the complete expression for After Effects.
- * 
- * @example
- * const expr = build2DExpression(true, true, true, "Position", "AudioReactorComp");
- * // This will return an expression string that can be applied to the "Position" property in After Effects.
- */
-function build2DExpression(xSelected, ySelected, isUnified, propName, audioReactorName) {
-    var expressionBase = 'd = comp("' + audioReactorName + '").layer("Select Frequency").effect("Audio Reactor")("Output Power");\n' +
-        'iMin = 0;\n' +
-        'iMax = 100;\n' +
-        'originalValue = value;\n';
 
-    var easingExpressionBase = 'ctrlLayer = thisLayer;\n' +
-        'easeType = ctrlLayer.effect("' + propName + '_Easing Type")("Menu").value;\n';
-
-    var easingExpressionUnified = 'outMin = ctrlLayer.effect("' + propName + '_Min Output")("Slider");\n' +
-        'outMax = ctrlLayer.effect("' + propName + '_Max Output")("Slider");\n';
-
-    var easingExpressionIndividual = 'outMinX = ctrlLayer.effect("' + propName + '_Min Output X")("Slider");\n' +
-        'outMaxX = ctrlLayer.effect("' + propName + '_Max Output X")("Slider");\n' +
-        'outMinY = ctrlLayer.effect("' + propName + '_Min Output Y")("Slider");\n' +
-        'outMaxY = ctrlLayer.effect("' + propName + '_Max Output Y")("Slider");\n';
-
-    var easingCalculation = 'if (easeType == 1) ease(d, iMin, iMax, outMin, outMax)\n' +
-        'else if (easeType == 2) easeIn(d, iMin, iMax, outMin, outMax)\n' +
-        'else if (easeType == 3) easeOut(d, iMin, iMax, outMin, outMax)\n' +
-        'else easeInOut(d, iMin, iMax, outMin, outMax);\n';
-
-    var xExpression = xSelected ? easingCalculation : 'originalValue[0];\n';
-    var yExpression = ySelected ? easingCalculation : 'originalValue[1];\n';
-
-    var finalExpression = expressionBase + easingExpressionBase;
-
-    if (isUnified) {
-        finalExpression += easingExpressionUnified;
-    } else {
-        finalExpression += easingExpressionIndividual;
-    }
-
-    finalExpression += 'xResult = ' + xExpression;
-    finalExpression += 'yResult = ' + yExpression;
-
-    finalExpression += '[xResult, yResult];';
-
-    return finalExpression;
-}
 /**
  * Generates a 3D expression string based on the provided parameters.
  * This expression string is used to manipulate 3D properties like position, scale, etc., 
@@ -411,6 +435,31 @@ function getSelectedLayer() {
         return null;
     }
 }
+
+/**
+ * Gets the the first selected property from the first selected layer in the active composition.
+ * 
+ * @returns {object} The name of the first selected property if one exists, otherwise null.
+ * 
+ * @example
+ * const prop = getSelectedProperty();
+ * if (prop !== null) {
+ *   // Do something with the property name
+ * } else {
+ *   // No property is selected or no composition/layer is active
+ * }
+ */
+function getSelectedProperty() {
+    var comp = app.project.activeItem;
+    if (comp && comp instanceof CompItem && comp.selectedLayers.length > 0) {
+        var layer = comp.selectedLayers[0];
+        if (layer.selectedProperties.length > 0) {
+            return layer.selectedProperties[0];
+        }
+    }
+    return null;
+}
+
 /**
  * Gets the name of the first selected property from the first selected layer in the active composition.
  * 
@@ -434,6 +483,7 @@ function getSelectedPropertyName() {
     }
     return null;
 }
+
 /**
  * Gets the name of the selected audio reactor from the main dialog's dropdown.
  * 
@@ -456,51 +506,92 @@ function getAudioReactorName() {
 }
 
 /**
- * Determines the type of the first selected property from the first selected layer in the active composition.
+ * Gets the property value type ('1D', '2D', '3D') based on the selected layer and property in the active composition.
  *
- * @returns {string|null} Returns '1D', '2D', or '3D' based on the type of the selected property, otherwise null.
+ * @typedef {'1D'|'2D'|'3D'} PropertyValueType
  * 
+ * @returns {string} The type of the property value: '1D', '2D', '3D', or 'Unknown' if unable to determine.
+ *
  * @example
- * const propertyType = getPropertyType();
- * if (propertyType !== null) {
- *   // Do something based on the property type
- * } else {
- *   // No property is selected or no composition/layer is active
- * }
+ * var type = getPropertyType();
+ * console.log(type); // Output might be '1D', '2D', '3D', or 'Unknown'
  */
+
 function getPropertyType() {
+    /**
+     * @typedef {'1D'|'2D'|'3D'} PropertyValueType
+     */
+
     var comp = app.project.activeItem;
     if (comp && comp instanceof CompItem && comp.selectedLayers.length > 0) {
         var layer = comp.selectedLayers[0];
         if (layer.selectedProperties.length > 0) {
             var prop = layer.selectedProperties[0];
-            switch (prop.propertyType) {
-                case PropertyType.OneD:
-                    return '1D';
-                case PropertyType.TwoD:
-                    return '2D';
-                case PropertyType.ThreeD:
-                    return '3D';
-                default:
-                    return null;
+            if (prop.propertyValueType !== undefined) {
+                var layerType = layer.threeDLayer ? '3D' : '2D';
+                var valueType = '';
+
+                switch (prop.propertyValueType) {
+                    case PropertyValueType.OneD:
+                        valueType = '1D';
+                        break;
+                    case PropertyValueType.TwoD_SPATIAL:
+                    case PropertyValueType.TwoD:
+                    case PropertyValueType.ThreeD_SPATIAL:
+                    case PropertyValueType.ThreeD:
+                        valueType = layerType;
+                        break;
+                    default:
+                        valueType = 'Unknown';
+                }
+
+                return valueType;
             }
         }
     }
-    return null;
+
+    return 'Unknown';
 }
 
 function XYUnifyDialog(layer, propName, audioReactorName) {
     var dialog = new Window('dialog', 'XY Unify');
-    var xCheckBox = dialog.add('checkbox', undefined, 'X');
-    var yCheckBox = dialog.add('checkbox', undefined, 'Y');
-    var unifiedCheckBox = dialog.add('checkbox', undefined, 'Individual/Unified');
 
-    dialog.add('button', undefined, 'OK').onClick = function () {
-        handle2DProperty(layer, xCheckBox.value, yCheckBox.value, unifiedCheckBox.value, propName, audioReactorName);
+    // Parent group with row alignment
+    var parentGroup = dialog.add('group');
+    parentGroup.orientation = 'row';
+    parentGroup.alignment = 'center';
+
+    // First column for X
+    var xGroup = parentGroup.add('group');
+    xGroup.orientation = 'column';
+    xGroup.alignment = 'center';
+    var xCheckBox = xGroup.add('checkbox', undefined, '');
+    xGroup.add('statictext', undefined, 'X').justify = 'center';
+
+    // Second column for Y
+    var yGroup = parentGroup.add('group');
+    yGroup.orientation = 'column';
+    yGroup.alignment = 'center';
+    var yCheckBox = yGroup.add('checkbox', undefined, '');
+    yGroup.add('statictext', undefined, 'Y').justify = 'center';
+
+    // Third column for Unified
+    var unifiedGroup = parentGroup.add('group');
+    unifiedGroup.orientation = 'column';
+    unifiedGroup.alignment = 'center';
+    var unifiedCheckBox = unifiedGroup.add('checkbox', undefined, '');
+    var unifiedLabel = unifiedGroup.add('statictext', undefined, 'Unify Properties');
+    unifiedLabel.justify = 'center';
+    unifiedLabel.multiline = true;  // Set to multiline
+
+    // Fourth Line: OK/Cancel buttons
+    var buttonGroup = dialog.add('group');
+    buttonGroup.add('button', undefined, 'OK').onClick = function () {
+        var prop = getSelectedProperty();
+        handle2DProperty(layer, xCheckBox.value, yCheckBox.value, unifiedCheckBox.value, propName, audioReactorName, prop);
         dialog.close();
     };
-
-    dialog.add('button', undefined, 'Cancel').onClick = function () {
+    buttonGroup.add('button', undefined, 'Cancel').onClick = function () {
         dialog.close();
     };
 
@@ -513,10 +604,11 @@ function XYZUnifyDialog(layer, propName, audioReactorName) {
     var xCheckBox = dialog.add('checkbox', undefined, 'X');
     var yCheckBox = dialog.add('checkbox', undefined, 'Y');
     var zCheckBox = dialog.add('checkbox', undefined, 'Z');
-    var unifiedCheckBox = dialog.add('checkbox', undefined, 'Individual/Unified');
+    var unifiedCheckBox = dialog.add('checkbox', undefined, 'Unified/Individual');
 
     dialog.add('button', undefined, 'OK').onClick = function () {
-        handle3DProperty(layer, xCheckBox.value, yCheckBox.value, zCheckBox.value, unifiedCheckBox.value, propName, audioReactorName);
+        var prop = getSelectedProperty();
+        handle3DProperty(layer, xCheckBox.value, yCheckBox.value, zCheckBox.value, unifiedCheckBox.value, propName, audioReactorName, prop);
         dialog.close();
     };
 
