@@ -4,7 +4,7 @@
 		{
 			"label": "Run Bundler",
 			"type": "shell",
-			"command": "file=$(osascript -e 'POSIX path of (choose file)'); node \"${workspaceFolder}/bundler.js\" \"$file\"",
+			"command": "file=$(osascript -e 'POSIX path of (choose file)'); filename=$(basename \"$file\" .jsx); bundled_filename=\"${filename}_Bundled.jsx\"; node \"${workspaceFolder}/bundler.js\" \"$file\"; read -p 'Would you like to add the bundled script to the ScriptUI folder? (y/n): ' answer; if [[ \"$answer\" == 'y' || \"$answer\" == 'Y' ]]; then dest=$(osascript -e 'POSIX path of (choose folder)'); cp \"${workspaceFolder}/dist/$bundled_filename\" \"$dest/\"; echo 'Copied the bundled script to the selected folder.'; else echo 'Skipped copying the bundled script.'; fi",
 			"problemMatcher": [],
 			"options": {
 				"shell": {

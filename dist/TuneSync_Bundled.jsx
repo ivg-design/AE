@@ -102,8 +102,6 @@ var Ae = (function() {
 })();
 //========== END OF INCLUDED FUNCTIONS ============//
 
-// @include 'modules/Ae.js'
-// @include 'modules/ArrayEx.js'
 
 // Create a dockable panel
 var mainWindow = new Window("palette", "TuneSync", undefined);
