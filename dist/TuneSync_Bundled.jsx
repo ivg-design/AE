@@ -1,3 +1,107 @@
+//========== INCLUDED FUNCTIONS ============//
+var Ae = (function() {
+ var module = {};
+/**
+ * Retrieves the first selected property from the currently active composition and layer.
+ * @returns {(Object|null)} - The first selected property object, or null if not found.
+ */
+	module.retrieveProp = function () {
+		var comp = app.project.activeItem;
+		if (comp !== null && (comp instanceof CompItem)) {
+			var layers = comp.selectedLayers;
+			if (layers.length > 0) {
+				var selectedLayer = layers[0];
+				var selectedProperties = selectedLayer.selectedProperties;
+				if (selectedProperties.length > 0) {
+					return selectedProperties[selectedProperties.length - 1];
+				}
+			}
+		}
+		return null;  // Return null if no property is selected
+	};
+	
+	/**
+	 * Finds properties that match the specified criteria within the base property.
+	 *
+	 * @param {PropertyGroup} baseProperty - The base property to search within.
+	 * @param {boolean} recursion - Flag indicating whether to recursively search within nested groups.
+	 * @param {Function} callback - The callback function to determine if a property matches the criteria.
+	 * @param {Property[]} properties - An array to store the found properties (optional).
+	 * @return {Property[]} - An array of properties that match the specified criteria.
+	 */
+	module.findProperties = function (baseProperty, recursion, callback, properties) {
+		properties = properties || [];
+		module.forEachProperty(baseProperty, function (property) {
+			if (callback(property)) {
+				properties.push(property);
+			}
+
+			if (recursion && module.isGroup(property)) {
+				module.findProperties(property, recursion, callback, properties);
+			}
+		});
+
+		return properties;
+	};
+	/**
+	 * Retrieves the name(s) from an array of property objects.
+	 * If the array contains two properties, it concatenates both names with '_'.
+	 * Otherwise, it returns the name of the first property.
+	 *
+	 * @param {Array} properties - An array of property objects, each having a 'name' property.
+	 * @returns {string} - The concatenated property name(s).
+	 * 
+	 * @example
+	 * var singleProp = [{name: 'Width'}];
+	 * console.log(getPropertyName(singleProp)); // Output: "Width"
+	 *
+	 * var doubleProp = [{name: 'Width'}, {name: 'Height'}];
+	 * console.log(getPropertyName(doubleProp)); // Output: "Width - Height"
+	 */
+	module.getPropName  = function (properties) {
+		if (properties.length === 2) {
+			return properties[0].name + "_" + properties[1].name;
+		} else {
+			return properties[0].name;
+		}
+	}
+	/**
+	 * Finds an item within the base folder that matches the specified criteria.
+	 *
+	 * @param {FolderItem} baseFolder - The base folder to search within.
+	 * @param {Function} callback - The callback function to determine if an item matches the criteria.
+	 * @return {Item} - The found item that matches the specified criteria.
+	 */
+	module.findItem = function (baseFolder, callback) {
+		for (var i = 1, il = baseFolder.numItems; i <= il; i++) {
+			if (callback(baseFolder.item(i))) {
+				return baseFolder.item(i);
+			}
+		}
+	};
+/**
+ * Retrieves the first selected property from the currently active composition and layer.
+ * @returns {(Object|null)} - The first selected property object, or null if not found.
+ */
+	module.retrieveProp = function () {
+		var comp = app.project.activeItem;
+		if (comp !== null && (comp instanceof CompItem)) {
+			var layers = comp.selectedLayers;
+			if (layers.length > 0) {
+				var selectedLayer = layers[0];
+				var selectedProperties = selectedLayer.selectedProperties;
+				if (selectedProperties.length > 0) {
+					return selectedProperties[selectedProperties.length - 1];
+				}
+			}
+		}
+		return null;  // Return null if no property is selected
+	};
+
+ return module;
+})();
+//========== END OF INCLUDED FUNCTIONS ============//
+
 // @include 'modules/Ae.js'
 // @include 'modules/ArrayEx.js'
 

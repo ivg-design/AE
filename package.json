@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "rollup": "^3.29.4"
+  },
+  "dependencies": {
+    "@nodegui/nodegui": "^0.62.0",
+    "electron": "^26.2.4",
+    "inquirer": "^9.2.11"
+  },
+  "scripts": {
+    "start": "electron bundlerElectron.js"
+  }
+}

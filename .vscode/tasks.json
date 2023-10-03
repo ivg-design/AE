@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Bundler",
+			"type": "shell",
+			"command": "file=$(osascript -e 'POSIX path of (choose file)'); node \"${workspaceFolder}/bundler.js\" \"$file\"",
+			"problemMatcher": [],
+			"options": {
+				"shell": {
+					"executable": "bash",
+					"args": ["-c"]
+				}
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}

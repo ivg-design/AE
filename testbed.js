@@ -1,43 +1,5 @@
 // @include 'modules/Ae.js'
 // @include 'modules/ArrayEx.js'
-
-
-Ae.
-// Utility function to get layer from a property
-function getLayerFromProperty(property) {
-    var layer = property;
-    while (layer.parentProperty) {
-        layer = layer.parentProperty;
-    }
-    return layer;
-}
-
-// Function to retrieve the property name
-function getPropertyName(properties) {
-    if (properties.length === 2) {
-        return properties[0].name + " - " + properties[1].name;
-    } else {
-        return properties[0].name;
-    }
-}
-
-// Function to retrieve the property address for setting expressions
-function getPropertyAddress(property) {
-    var hierarchy = [];
-    var layer = getLayerFromProperty(property);
-    var layerName = layer.name;
-
-    while (property !== null && property !== undefined) {
-        if (property instanceof PropertyGroup || property instanceof Property) {
-            hierarchy.unshift('property("' + property.name + '")');
-        }
-        property = property.parentProperty;
-    }
-
-    var address = 'layer("' + layerName + '").' + hierarchy.join('.');
-    return address;
-}
-
 // Main function
 function main() {
     var comp = app.project.activeItem;
@@ -47,10 +9,10 @@ function main() {
             var selectedLayer = layers[0];
             var selectedProperties = selectedLayer.selectedProperties;
             if (selectedProperties.length > 0) {
-                var selectedProperty = selectedProperties[selectedProperties.length - 1];
-                var propName = getPropertyName(selectedProperties);
-                var propAddress = getPropertyAddress(selectedProperty);
-                alert("Property Name: " + propName + "\nProperty Address: " + propAddress);
+                var propName = Ae.getPropName(selectedProperties);
+                var propAddress = Ae.retrieveProp();
+                propAddress.expression = "loopOut()"
+                alert(propName)
             } else {
                 alert("No property is selected in the layer.");
             }
