@@ -1,6 +1,7 @@
-var errorLogging = (function () {
-    var module = {};// Create a variable to control the start of a new debug session
+var ErrorLogging = (function (scriptName) {
+    var module = {}; // Create a variable to control the start of a new debug session
     var isNewDebugSession = true;
+    var filepath = scriptName ? scriptName + "_Log.txt" : "Log.txt"; // Generate file name based on script name
 
     /**
      * Writes debug information to a file with a timestamp.
@@ -8,13 +9,10 @@ var errorLogging = (function () {
      * @param {string} info - The information to be written to the file.
      */
     function writeDebugToFile(info) {
-        var filepath = "Log.txt";  // You can update this path
-        var outfile = File(filepath);
+        var outfile = new File(filepath);
 
         // Open the file for appending
-        outfile.open('a');
-
-        if (outfile !== '') {
+        if (outfile.open('a')) { // Check if file opened successfully
             // If this is the start of a new debug session, add session headers
             if (isNewDebugSession) {
                 outfile.writeln("============================");
@@ -25,6 +23,11 @@ var errorLogging = (function () {
 
             outfile.writeln(new Date().toLocaleTimeString() + " - " + info);
             outfile.close();
+        } else {
+            // Handle file opening failure
+            if (typeof writeLn === "function") {
+                writeLn("Failed to open file: " + filepath);
+            }
         }
     }
 
@@ -34,7 +37,9 @@ var errorLogging = (function () {
      * @param {string} message - The debug message to be written.
      */
     module.debugWrite = function (message) {
-        writeLn(message); // Write to the Info Panel (only 3 last lines are visible)
+        if (typeof writeLn === "function") {
+            writeLn(message); // Write to the Info Panel (only 3 last lines are visible)
+        }
         writeDebugToFile(message);
     };
 
@@ -42,4 +47,5 @@ var errorLogging = (function () {
     module.debugWrite("Debug Starting");
 
     return module;
-})();
+});
+
