@@ -1,9 +1,184 @@
 var Ae = (function () {
-	var module = {};
+	var module = {};	
+	
 	/**
- * Retrieves the first selected property from the currently active composition and layer.
- * @returns {(Object|null)} - The first selected property object, or null if not found.
- */
+	 * Finds a property in a given layer by its match name.
+	 * The function searches recursively through property groups.
+	 * 
+	 * @param {PropertyGroup|Layer} propGroup - The After Effects Layer or PropertyGroup object in which to find the property.
+	 * @param {string} matchName - The match name of the property to find.
+	 * @returns {Property|PropertyGroup|null} - The found property or property group, or null if not found.
+	 * 
+	 * @example
+	 * var layer = app.project.item(1).layer(1);
+	 * var matchName = "ADBE Position";
+	 * var property = Ae.findPropByMatchName(layer, matchName);
+	 */
+	module.findPropByMatchName = function (propGroup, matchName) {
+		for (var i = 1; i <= propGroup.numProperties; i++) {
+			var prop = propGroup.property(i);
+			if (prop.matchName === matchName) {
+				return prop;
+			}
+			if (prop.propertyType === PropertyType.INDEXED_GROUP || prop.propertyType === PropertyType.NAMED_GROUP) {
+				var foundProp = module.findPropByMatchName(prop, matchName);
+				if (foundProp) {
+					return foundProp;
+				}
+			}
+		}
+		return null;
+	};
+
+	/**
+		* Constructs a property path string based on the given array of selected properties.
+		* 
+		* @param {Array} selectedProperties - An array of selected Property or PropertyGroup objects.
+		* @returns {string|undefined} The property path string, or undefined if not applicable.
+		* @example
+		* var selectedProperties = app.project.activeItem.selectedProperties;
+		* var propertyPath = Ae.constructPropPathString(selectedProperties);
+		* alert(`The selected property path is: ${propertyPath}`);
+		*/
+	module.constructPropPathString = function (selectedProperties) {
+
+		/**
+		 * Finds the deepest selected property or property group from the given array of selected properties.
+		 * 
+		 * @returns {Property|PropertyGroup|null} The deepest selected property or property group, or null if none or multiple are selected.
+		 */
+		function findDeepestSelectedProp() {
+			var deepestProp, numDeepestProps = 0, deepestPropDepth = 0;
+			var prop;
+
+			for (var i = 0; i < selectedProperties.length; i++) {
+				prop = selectedProperties[i];
+
+				if (prop.propertyDepth >= deepestPropDepth) {
+					if (prop.propertyDepth > deepestPropDepth)
+						numDeepestProps = 0;
+					deepestProp = prop;
+					numDeepestProps++;
+					deepestPropDepth = prop.propertyDepth;
+				}
+			}
+
+			return (numDeepestProps > 1) ? null : deepestProp;
+		}
+
+		var prop = findDeepestSelectedProp();
+		if (prop === null) {
+			return;
+		}
+
+		var propPathString = "";
+		var name;
+
+		while (prop.parentProperty !== null) {
+			name = "\"" + ((prop.matchName !== "") ? prop.matchName : prop.name) + "\"";
+			propPathString = "(" + name + ")" + propPathString;
+			prop = prop.parentProperty;
+		}
+
+		name = "\"" + prop.name + "\"";
+		propPathString = "layer(" + name + ")" + propPathString;
+
+		return propPathString;
+	};
+	
+	/**
+	 * Constructs a property path object based on the given array of selected properties.
+	 * 
+	 * @param {Array} selectedProperties - An array of selected Property or PropertyGroup objects.
+	 * @returns {Property|PropertyGroup|null} The deepest selected property or property group, or null if none or multiple are selected.
+	 * @example
+	 * var selectedProperties = app.project.activeItem.selectedProperties;
+	 * var propertyObject = Ae.getDeepestSelectedProperty(selectedProperties);
+	 * if (propertyObject && propertyObject.canSetExpression) {
+	 *     propertyObject.expression = "your expression here";
+	 * }
+	 */
+	module.getDeepestSelectedProperty = function (selectedProperties) {
+		/**
+		 * Finds the deepest selected property or property group from the given array of selected properties.
+		 * 
+		 * @returns {Property|PropertyGroup|null} The deepest selected property or property group, or null if none or multiple are selected.
+		 */
+		function findDeepestSelectedProp() {
+			var deepestProp, numDeepestProps = 0, deepestPropDepth = 0;
+			var prop;
+
+			for (var i = 0; i < selectedProperties.length; i++) {
+				prop = selectedProperties[i];
+
+				if (prop.propertyDepth >= deepestPropDepth) {
+					if (prop.propertyDepth > deepestPropDepth)
+						numDeepestProps = 0;
+					deepestProp = prop;
+					numDeepestProps++;
+					deepestPropDepth = prop.propertyDepth;
+				}
+			}
+
+			return (numDeepestProps > 1) ? null : deepestProp;
+		}
+
+		return findDeepestSelectedProp();
+	};
+	
+	/**
+	 * Determines the type of the deepest selected property from an array of selected properties.
+	 * Checks whether the property is 1D, 2D, 3D, or Color by trying to set expressions and catching errors.
+	 * 
+	 * @param {Array} selectedProperties - An array of selected properties.
+	 * @returns {string} The type of the deepest selected property ("1D", "2D", "3D", "Color", or "Unknown").
+	 */
+	
+	module.checkPropertyType = function (selectedProperties) {
+		var deepestProperty = this.getDeepestSelectedProperty(selectedProperties);
+
+		if (!deepestProperty) {
+			alert("No deepest property found!");
+			return "Unknown";
+		}
+
+		var originalExpression = deepestProperty.expression;
+		var propertyType = "Unknown";
+
+		for (var i = 1; i <= 4; i++) {
+			var testExpressionArray = [];
+			for (var j = 0; j < i; j++) {
+				testExpressionArray.push("value[" + j + "]");
+			}
+			var testExpression = "[" + testExpressionArray.join(", ") + "]";
+
+			try {
+				deepestProperty.expression = testExpression;
+
+				// Check for expression error
+				if (deepestProperty.expressionError === "") {
+					// If it reaches here, the expression was successfully set
+					if (i === 4) {
+						propertyType = "Color";
+					} else {
+						propertyType = i + "D";
+					}
+				}
+			} catch (e) {
+				// Log the error if needed
+			}
+		}
+
+		// Restore the original expression
+		deepestProperty.expression = originalExpression;
+
+		return propertyType;
+	};
+
+	/**
+		* Retrieves the first selected property from the currently active composition and layer.
+		* @returns {(Object|null)} - The first selected property object, or null if not found.
+		*/
 	module.retrieveProp = function () {
 		var comp = app.project.activeItem;
 		if (comp !== null && (comp instanceof CompItem)) {

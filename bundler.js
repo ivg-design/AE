@@ -11,7 +11,7 @@ function extractFunctions(content, prefix) {
     return functions;
 }
 
-function includeRequiredFunctions(filePath, requiredFunctions, logFlag = true) {
+function includeRequiredFunctions(filePath, requiredFunctions, allIncludedFunctions, logFlag = true) {
     const content = fs.readFileSync(filePath, 'utf-8');
     let includedContent = '';
 
@@ -20,6 +20,13 @@ function includeRequiredFunctions(filePath, requiredFunctions, logFlag = true) {
     }
 
     requiredFunctions.forEach(func => {
+        if (allIncludedFunctions.has(func)) {
+            console.log(`Function ${func} already included.`);
+            return;
+        }
+
+        allIncludedFunctions.add(func);
+
         const regex = new RegExp(`(\\/\\*\\*[\\s\\S]*?\\*\\/\\s*)?module\\.${func}\\s*=\\s*function\\s*\\([^]*?}\\s*;`, 'g');
         const found = content.match(regex);
         if (found) {
@@ -29,34 +36,26 @@ function includeRequiredFunctions(filePath, requiredFunctions, logFlag = true) {
             const innerRequired = extractFunctions(found.join('\n'), 'Ae|ArrayEx');
             if (innerRequired.size > 0) {
                 console.log(`Inner required functions for ${func}: ${Array.from(innerRequired).join(', ')}`);
-                includedContent += includeRequiredFunctions(filePath, innerRequired, false);
+                includedContent += includeRequiredFunctions(filePath, innerRequired, allIncludedFunctions, false);
             }
         } else {
             console.log(`Function ${func} not found in ${filePath}`);
         }
     });
 
-    if (requiredFunctions.size > 0) {
-        includedContent = `var ${path.basename(filePath, '.js')} = (function() {\n var module = {};\n${includedContent}\n return module;\n})();\n`;
-    }
-
     return includedContent;
 }
 
 let logContent = '';
+let allIncludedFunctions = new Set();
 
 const mainFilePath = process.argv[2] || path.join(__dirname, 'TuneSync.jsx');
 const basePath = path.dirname(mainFilePath);
 let mainContent = fs.readFileSync(mainFilePath, 'utf-8');
-
-// Remove //@include lines from mainContent (with or without space after //)
 mainContent = mainContent.replace(/\/\/\s*@include.*\n/g, '');
 
 const aeFunctions = extractFunctions(mainContent, 'Ae');
 const arrayExFunctions = extractFunctions(mainContent, 'ArrayEx');
-
-aeFunctions.delete('js');
-arrayExFunctions.delete('js');
 
 console.log(`Functions to include from Ae.js: ${Array.from(aeFunctions).join(', ')}`);
 console.log(`Functions to include from ArrayEx.js: ${Array.from(arrayExFunctions).join(', ')}`);
@@ -65,13 +64,15 @@ let functionContent = '';
 
 if (aeFunctions.size > 0) {
     const aePath = path.join(basePath, 'modules', 'Ae.js');
-    functionContent += includeRequiredFunctions(aePath, aeFunctions);
+    functionContent += includeRequiredFunctions(aePath, aeFunctions, allIncludedFunctions);
 }
 
 if (arrayExFunctions.size > 0) {
     const arrayExPath = path.join(basePath, 'modules', 'ArrayEx.js');
-    functionContent += includeRequiredFunctions(arrayExPath, arrayExFunctions);
+    functionContent += includeRequiredFunctions(arrayExPath, arrayExFunctions, allIncludedFunctions);
 }
+
+functionContent = `var Ae = (function () {\n var module = {};\n${functionContent}\n return module;\n})();\n`;
 
 const cleanedBundledContent = `//========== INCLUDED FUNCTIONS ============//\n${functionContent}//========== END OF INCLUDED FUNCTIONS ============//\n\n${mainContent}`;
 
