@@ -25,7 +25,6 @@
  */
 
 function main() {
-	// @include 'modules/ErrorLogging.js' 
 	//var debug = ErrorLogging("control_vertices");
 	
 		/****************** HELPER FUNCTIONS ******************/

@@ -6,28 +6,58 @@ var config = {
   version: "1.0.0"
 }
 
+/**
+ * Applies an effect to the given layer. If the effect is not found, it writes a file and adds an animation preset.
+ * 
+ * @module applyEffect
+ * 
+ * @param {object} layer - The layer to which the effect should be applied.
+ * 
+ * @returns {object} effect - Returns the effect applied to the layer.
+ * 
+ * @example 
+ * var layer = someLayerObject;
+ * var result = module.applyEffect(layer);
+ */
 module.applyEffect = function (layer) {
-    var effect = findEffect(layer, config.matchName);
+  var effect = findEffect(layer, config.matchName);
     if (!effect) {
       var ffxfile = FileEx.writeFile(ScriptConfig.userFolder() + '/' + config.name + '_v' + config.version + '.ffx', config.binary, 'BINARY');
       effect = addAnimationPreset(layer, ffxfile);
     }
 
     return effect;
-  };
+    };
 
 
 
-  function addAnimationPreset(layer, file) {
-    var myComp = app.project.activeItem;
-    deselectAll(myComp); // a strange AE bug, look at #3 in ../../notes.md > ..
-    layer.selected = true; // > needs deselecting and reselecting
-    layer.applyPreset(file);
-    var effects = Ae.getEffectsProperty(layer);
-    var my_effect = effects.property(effects.numProperties);
-    if (effects.numProperties > 1) {
-      my_effect.moveTo(1); // get to the top
-      var my_effect = effects.property(1);
-    }
-    return my_effect;
-  };
+
+ /**
+  * Applies an animation preset to the given layer and then returns the effect.
+  *
+  * @function addAnimationPreset
+  *
+  * @param {object} layer - The layer to which the preset should be applied.
+  * @param {File} file - The preset file which should be applied to the layer.
+  *
+  * @returns {object} my_effect - Returns the effect applied to the layer.
+  *
+  * @example 
+  * var layer = someLayerObject;
+  * var file = new File("/path/to/preset.ffx");
+  * var result = addAnimationPreset(layer, file);
+  */
+ function addAnimationPreset(layer, file) {
+   var myComp = app.project.activeItem;
+   deselectAll(myComp); // a strange AE bug, look at #3 in ../../notes.md > ..
+   layer.selected = true; // > needs deselecting and reselecting
+   layer.applyPreset(file);
+   var effects = Ae.getEffectsProperty(layer);
+   var my_effect = effects.property(effects.numProperties);
+   if (effects.numProperties > 1) {
+     my_effect.moveTo(1); // get to the top
+     var my_effect = effects.property(1);
+   }
+   return my_effect;
+ };
+ 
