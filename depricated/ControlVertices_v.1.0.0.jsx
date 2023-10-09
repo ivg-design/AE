@@ -20,7 +20,10 @@
  * 4. Click 'Create' to generate control nulls and expressions. An 'Undo' option is also available.
  *
  * @author IVG Design
- * @version 1.0.0
+ * @version 1.0.1
+ * @date 2023 10 8
+ * @changelog 
+ * 	1.0.1	- added "Open/Close Path" checkbox option
  * @license Provided as is
  */
 
@@ -62,6 +65,51 @@ function main() {
 			}
 			return groups;
 		}
+		function getAEPathAndObject(treeView, aeLayer) {
+			var selectedItem = treeView.selection;
+			if (!selectedItem) {
+				alert("Nothing selected!");
+				return;
+			}
+
+			var aePathString = 'thisComp.layer("' + aeLayer.name + '")';
+			var pathComponents = [];
+			var currentAEObject = aeLayer; // Start with the initial AE layer
+
+			// Traverse upwards through the tree to build the path components
+			while (selectedItem && typeof selectedItem.text === 'string') {
+				pathComponents.unshift(selectedItem.text);
+				selectedItem = selectedItem.parent;
+			}
+
+			// Construct both AE Path String and AE Path Object
+			for (var i = 0; i < pathComponents.length; i++) {
+				var component = pathComponents[i];
+				aePathString += '("Contents")("' + component + '")';
+
+				if (currentAEObject && currentAEObject.property) {
+					currentAEObject = currentAEObject.property("Contents").property(component);
+				} else {
+					alert("Invalid path in AE hierarchy");
+					return;
+				}
+			}
+
+			aePathString += '("Path")'; // Add the final "Path"
+
+			if (currentAEObject && currentAEObject.property("Path")) {
+				currentAEObject = currentAEObject.property("Path");
+			} else {
+				alert("Path property not found");
+				return;
+			}
+
+			return {
+				pathString: aePathString,
+				pathObject: currentAEObject
+			};
+		}
+
 
 		/**
 		 * Recursively creates a tree view structure for groups and shapes to display as a tree in
@@ -86,85 +134,6 @@ function main() {
 			}
 		}
 
-		/**
-		 * Recursively searches for a group within a hierarchical structure of groups by its name.
-		 *
-		 * @param {string} shapeName - The name of the group to find.
-		 * @param {Object[]} groups - An array of group objects to search within.
-		 * @returns {Object|null} The found group object or null if not found.
-		 */
-		function findGroupByPath(shapeName, groups) {
-			for (var i = 0; i < groups.length; i++) {
-				if (groups[i].name === shapeName) {
-					return groups[i];
-				}
-				if (groups[i].groups) {
-					var foundGroup = findGroupByPath(shapeName, groups[i].groups);
-					if (foundGroup) return foundGroup;
-				}
-			}
-			return null;
-		}
-
-		/**
-		 * Retrieves a property from a shape layer by following a given property chain.
-		 *
-		 * @param {Layer} shapeLayer - The shape layer to search within.
-		 * @param {string[]} propertyChain - An array of property names forming the chain to the desired property.
-		 * @returns {Property|null} The found property or null if not found.
-		 */
-
-		function getPropertyByChain(shapeLayer, propertyChain) {
-			//debug.debugWrite("Attempting to access property chain: " + propertyChain.join(" -> "));
-			var currentGroup = shapeLayer.property("Contents");
-			for (var i = 0; i < propertyChain.length; i++) {
-				//debug.debugWrite("Current group: " + (currentGroup ? currentGroup.name : "undefined"));
-
-				// Log all available property names in the current group
-				for (var j = 1; j <= currentGroup.numProperties; j++) {
-					//debug.debugWrite("Available property: " + currentGroup.property(j).name);
-				}
-
-				// Attempt to access the property by its name
-				//debug.debugWrite("Attempting to access property: " + propertyChain[i]);
-
-				// Search for the property by its index
-				var propertyFound = false;
-				for (var j = 1; j <= currentGroup.numProperties; j++) {
-					if (currentGroup.property(j).name === propertyChain[i]) {
-						//debug.debugWrite("Property found at index: " + j);
-						currentGroup = currentGroup.property(j);
-						propertyFound = true;
-						break;
-					}
-				}
-
-				if (!propertyFound) {
-					//debug.debugWrite("Property not found: " + propertyChain[i]);
-					return null;
-				}
-
-				// Navigate into 'Contents' if needed
-				if (currentGroup.property("Contents")) {
-					currentGroup = currentGroup.property("Contents");
-					//debug.debugWrite("Navigating into 'Contents' of current group");
-				}
-			}
-
-			var pathProperty = currentGroup ? currentGroup.property("Path 1").property("Path") : null;
-
-			if (pathProperty) {
-				//debug.debugWrite("Path 1 found in current group");
-			} else {
-				//debug.debugWrite("Path 1 not found in current group");
-			}
-
-			//debug.debugWrite("Returning pathProperty: " + (pathProperty ? pathProperty.name : "null"));
-			return pathProperty;
-		}
-
-
-
 	/****************** CREATION FUNCTIONS ******************/
 
 		/**
@@ -181,29 +150,29 @@ function main() {
 		 * createControls(comp, 'Shape 1', { vertex: true, inTangent: false, outTangent: true });
 			*/
 		
-		function createControls(comp, layerName, shapeName, options) {
+		function createControls(comp, layerName, shapeName, options, pathToProp) {
 			//debug.debugWrite("Entering createControls...");
 			var addPositionExpression = function (layer, type) {
-				var pathToPropertyChain = options.pathToPropertyChain || "content('Shape 1').content('Path 1').path"; // Fallback to a default value
+				var pathToPropertyChain = pathToProp;
 				var positionExpression = [
+					'var shapeLayer = thisComp.layer("' + layerName + '");',
 					'var controlFollow = thisLayer.effect("Control/Follow")("Checkbox").value;',
 					'if (controlFollow == 1) {',
-					'    var shapeLayer = thisComp.layer("' + layerName + '");',
 					'    var vertexIndex = Math.floor(thisLayer.effect("Vertex Control")("Slider").value);',
-					'    var pathProperty = shapeLayer.' + pathToPropertyChain + ';',
+					'    var pathProperty = ' + pathToPropertyChain + ';',
 					'    var points = pathProperty.points();',
 					'    if (points.length >= vertexIndex && vertexIndex > 0) {',
 					'        var point = points[vertexIndex - 1];',
-					'        if (point.length >= 2) {',
-					'            if ("' + type + '" === "vertex") {',
-					'                shapeLayer.toComp([point[0], point[1]]);',
-					'            } else if ("' + type + '" === "inTangent" || "' + type + '" === "outTangent") {',
-					'                var tangents = "' + type + '" === "inTangent" ? pathProperty.inTangents() : pathProperty.outTangents();',
-					'                var tangent = tangents[vertexIndex - 1];',
-					'                shapeLayer.toComp([point[0] + tangent[0], point[1] + tangent[1]]);',
-					'            }',
-					'        } else {',
-					'            value;',
+					'        var shapeGroupPosition = pathProperty.propertyGroup(3)("Transform")("Position").value;',
+					'        var shapeGroupAnchor = pathProperty.propertyGroup(3)("Transform")("Anchor Point").value;',
+					'        point[0] += (shapeGroupPosition[0] - shapeGroupAnchor[0]);',
+					'        point[1] += (shapeGroupPosition[1] - shapeGroupAnchor[1]);',
+					'        if ("' + type + '" === "vertex") {',
+					'            shapeLayer.toComp(point);',
+					'        } else if ("' + type + '" === "inTangent" || "' + type + '" === "outTangent") {',
+					'            var tangents = "' + type + '" === "inTangent" ? pathProperty.inTangents() : pathProperty.outTangents();',
+					'            var tangent = tangents[vertexIndex - 1];',
+					'            shapeLayer.toComp([point[0] + tangent[0], point[1] + tangent[1]]);',
 					'        }',
 					'    } else {',
 					'        value;',
@@ -212,6 +181,7 @@ function main() {
 					'    value;',
 					'}',
 				].join('\n');
+
 				layer.position.expression = positionExpression;
 			};
 
@@ -222,6 +192,7 @@ function main() {
 				nullLayer.name = shapeName + " Vertex 1";
 				nullLayer.effect.addProperty("ADBE Slider Control").name = "Vertex Control";
 				nullLayer.effect.addProperty("ADBE Checkbox Control").name = "Control/Follow";
+				nullLayer.effect.addProperty("ADBE Checkbox Control").name = "Open/Closed Path";
 				addPositionExpression(nullLayer, "vertex");
 			}
 
@@ -253,101 +224,61 @@ function main() {
 				 * 
 				 * @returns {string} The generated After Effects expression as a string.
 				 */
-			// function createExpression(propertyChain, options) {
-			// 	// Initialize the expression string with common parts
-			// 	var expressionString = 'var shapeLayer = thisLayer;\n';
+			function createExpression(fullPathForExpression, options, layerName, shapeName) {
+				var expressionString = 'var shapeLayer = thisComp.layer("' + layerName + '");\n';
+				expressionString += 'var shapeName = "' + shapeName + '";\n';  // Include the shape name
+				expressionString += 'var pathProperty = ' + fullPathForExpression + ';\n';  // Use the full path
 
-			// 	// Dynamically build the currentGroup part of the expression
-			// 	var currentGroupString = 'var currentGroup = shapeLayer';
-			// 	for (var i = 0; i < propertyChain.length; i++) {
-			// 		currentGroupString += '.content("' + propertyChain[i] + '")';
-			// 	}
-			// 	currentGroupString += ';\n';
-			// 	expressionString += currentGroupString;
+				expressionString += [
+					'if (pathProperty) {',
+					'    var pathPoints = pathProperty.points();',
+					'    var inTangents = pathProperty.inTangents();',
+					'    var outTangents = pathProperty.outTangents();',
+					'    var controlFollow = 0;',
+					'    var isOpenPath = false;',
+					'    for (var i = 1; i <= thisComp.numLayers; i++) {',
+					'        var layer = thisComp.layer(i);',
+					'        if (layer && layer.name && layer.name.startsWith(shapeName + " Vertex")) {',
+					'            if (layer.effect("Open/Closed Path")) {',
+					'                isOpenPath = layer.effect("Open/Closed Path")("Checkbox").value;',
+					'            }',
+					'            controlFollow = layer.effect("Control/Follow") ? layer.effect("Control/Follow")("Checkbox").value : 0;',
+					'                var vertexControl = layer.effect("Vertex Control")("Slider");',
+					'                if (vertexControl && vertexControl.value > 0) {',
+					'                    var vertexIndex = Math.floor(vertexControl.value) - 1;',
+					'                    var worldVertexPosition = layer.toWorld([0,0]);',
+					'                    var vertexPosition = shapeLayer.fromWorld(worldVertexPosition);',
+					'                var shapeGroupPosition = pathProperty.propertyGroup(3)("Transform")("Position").value;',
+					'                var shapeGroupAnchor = pathProperty.propertyGroup(3)("Transform")("Anchor Point").value;',
+					'                vertexPosition[0] -= (shapeGroupPosition[0] - shapeGroupAnchor[0]);',
+					'                vertexPosition[1] -= (shapeGroupPosition[1] - shapeGroupAnchor[1]);',
+					'                pathPoints[vertexIndex] = vertexPosition;',
+					'                var suffix = layer.name.split(" ").pop();',
+					'                    for (var j = 1; j <= thisComp.numLayers; j++) {',
+					'                        var tangentLayer = thisComp.layer(j);',
+					'                        if (tangentLayer.name.startsWith(shapeName + " inTangent for Vertex") || tangentLayer.name.startsWith(shapeName + " outTangent for Vertex")) {',
+					'                            var tangentType = tangentLayer.name.split(" ")[shapeName.split(" ").length]; // "inTangent" or "outTangent"',
+					'                            var worldTangent = tangentLayer.toWorld([0,0]);',
+					'                            var localTangent = shapeLayer.fromWorld(worldTangent);',
+					'                            var tangentOffset = [localTangent[0] - pathPoints[vertexIndex][0], localTangent[1] - pathPoints[vertexIndex][1]];',
+					'                            if (tangentType === "inTangent") {',
+					'                                inTangents[vertexIndex] = tangentOffset;',
+					'                            } else if (tangentType === "outTangent") {',
+					'                                outTangents[vertexIndex] = tangentOffset;',
+					'                            }',
+					'                        }',
+					'                    }',
+					'                }',
+					'            }',
+					'            break;',
+					'        }',
+					'    }',
+					'    createPath(pathPoints, inTangents, outTangents, isOpenPath);',
+					'}'
+				].join('\n');
 
-			// 	// Add the rest of the common expression parts
-			// 	expressionString += [
-			// 		'if (currentGroup) {',
-			// 		'    var pathProperty = currentGroup.content("Path 1").path;',
-			// 		'    var pathPoints = pathProperty.points();',
-			// 		'    var inTangents = pathProperty.inTangents();',
-			// 		'    var outTangents = pathProperty.outTangents();',
-			// 		'    for (var i = 1; i <= thisComp.numLayers; i++) {',
-			// 		'        var layer = thisComp.layer(i);',
-			// 		'        if (layer.name.startsWith(currentGroup.name + " Vertex")) {',
-			// 		'            var controlFollow = layer.effect("Control/Follow") ? layer.effect("Control/Follow")("Checkbox").value : 0;',
-			// 		'            if (!controlFollow) {',
-			// 		'                var vertexControl = layer.effect("Vertex Control")("Slider");',
-			// 		'                if (vertexControl && vertexControl.value > 0) {',
-			// 		'                    var vertexIndex = Math.floor(vertexControl) - 1;',
-			// 		'                    var vertexPosition = fromComp(layer.toComp([0,0]));',
-			// 		'                    pathPoints[vertexIndex] = vertexPosition;',
-			// 		'                    var inTangentLayer = thisComp.layer(currentGroup.name + " inTangent for Vertex " + (vertexIndex + 1));',
-			// 		'                    var outTangentLayer = thisComp.layer(currentGroup.name + " outTangent for Vertex " + (vertexIndex + 1));',
-			// 		'                    if (inTangentLayer) {',
-			// 		'                        var inTangentPosition = fromComp(inTangentLayer.toComp([0,0]));',
-			// 		'                        inTangents[vertexIndex] = [inTangentPosition[0] - vertexPosition[0], inTangentPosition[1] - vertexPosition[1]]; ',
-			// 		'                    }',
-			// 		'                    if (outTangentLayer) {',
-			// 		'                        var outTangentPosition = fromComp(outTangentLayer.toComp([0,0]));',
-			// 		'                        outTangents[vertexIndex] = [outTangentPosition[0] - vertexPosition[0], outTangentPosition[1] - vertexPosition[1]]; ',
-			// 		'                    }',
-			// 		'                }',
-			// 		'            }',
-			// 		'        }',
-			// 		'    }',
-			// 		'    createPath(pathPoints, inTangents, outTangents, false);',
-			// 		'}'
-			// 	].join('\n');
 
-			// 	return expressionString;
-			// }
-		function createExpression(propertyChain, options, layerName) {
-			var expressionString = 'var shapeLayer = thisComp.layer("' + layerName + '");\n';
-			var currentGroupString = 'var currentGroup = shapeLayer';
-			for (var i = 0; i < propertyChain.length; i++) {
-				currentGroupString += '.content("' + propertyChain[i] + '")';
-			}
-			currentGroupString += ';\n';
-			expressionString += currentGroupString;
 
-			expressionString += [
-				'if (currentGroup) {',
-				'    var pathProperty = currentGroup.content("Path 1").path;',
-				'    var pathPoints = pathProperty.points();',
-				'    var inTangents = pathProperty.inTangents();',
-				'    var outTangents = pathProperty.outTangents();',
-				'    var controlFollow = 0;',
-				'    for (var i = 1; i <= thisComp.numLayers; i++) {',
-				'        var layer = thisComp.layer(i);',
-				'        if (layer.name.startsWith(currentGroup.name + " Vertex")) {',
-				'            controlFollow = layer.effect("Control/Follow") ? layer.effect("Control/Follow")("Checkbox").value : 0;',
-				'            if (!controlFollow) {',
-				'                var vertexControl = layer.effect("Vertex Control")("Slider");',
-				'                if (vertexControl && vertexControl.value > 0) {',
-				'                    var vertexIndex = Math.floor(vertexControl.value) - 1;',
-				'                    var vertexPosition = fromComp(layer.toComp([0,0]));',
-				'                    pathPoints[vertexIndex] = vertexPosition;',
-				'                    try {',
-				'                        var inTangentLayer = thisComp.layer(layer.name.replace(" Vertex", " inTangent for Vertex"));',
-				'                        var inTangentPosition = fromComp(inTangentLayer.toComp([0,0]));',
-				'                        inTangents[vertexIndex] = [inTangentPosition[0] - vertexPosition[0], inTangentPosition[1] - vertexPosition[1]]; ',
-				'                    } catch (e) {}',
-				'                    try {',
-				'                        var outTangentLayer = thisComp.layer(layer.name.replace(" Vertex", " outTangent for Vertex"));',
-				'                        var outTangentPosition = fromComp(outTangentLayer.toComp([0,0]));',
-				'                        outTangents[vertexIndex] = [outTangentPosition[0] - vertexPosition[0], outTangentPosition[1] - vertexPosition[1]]; ',
-				'                    } catch (e) {}',
-				'                }',
-				'            } else {',
-				'                inTangents = pathProperty.inTangents();',
-				'                outTangents = pathProperty.outTangents();',
-				'            }',
-				'        }',
-				'    }',
-				'    createPath(pathPoints, inTangents, outTangents, false);',
-				'}',
-			].join('\n');
 
 			return expressionString;
 		}
@@ -422,25 +353,22 @@ function main() {
 						inTangent: optionsGroup.children[1].value,
 						outTangent: optionsGroup.children[2].value
 					};
-
-					// Create controls for the selected shape
-					createControls(comp, shapeLayer.name, shapeName, options);
-
 					// Find the corresponding group in the extracted groups
-					var targetGroup = findGroupByPath(shapeName, shapeGroups);
+					//var targetGroup = findGroupByPath(shapeName, shapeGroups);
+					var pathForExpression = getAEPathAndObject(treeView, selectedLayers[0]).pathString;
+					var pathObjectforExpression = getAEPathAndObject(treeView, selectedLayers[0]).pathObject;
+					
+					// Create controls for the selected shape
+					createControls(comp, shapeLayer.name, shapeName, options, pathForExpression); 
+					
+						
+					// Generate a new expression based on user options
+					var newExpression = createExpression(pathForExpression, options, shapeLayer.name, shapeName);
 
-					if (targetGroup && targetGroup.propertyChain) {
-						// Generate a new expression based on user options
-						var newExpression = createExpression(targetGroup.propertyChain, options, shapeLayer.name);
-
-						// Get the property based on the property chain
-						var pathProperty = getPropertyByChain(shapeLayer, targetGroup.propertyChain);
-
-						if (pathProperty) {
-							// Set the expression for the property
-							pathProperty.expression = newExpression;
-						}
-					}
+						
+					// Set the expression for the property
+					pathObjectforExpression.expression = newExpression;
+					
 				} else {
 					alert("Please select a shape from the tree view.");
 				}
