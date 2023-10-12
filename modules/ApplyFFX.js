@@ -30,17 +30,17 @@ var ApplyFFX = (function () {
 	var module = {};
 
 	/**
- * Deselects all layers in a given composition.
- * 
- * @function deselectAll
- * @memberof applyFFX
- * 
- * @param {object} theComp - The composition whose layers should be deselected.
- * 
- * @example 
- * var comp = app.project.activeItem;
- * applyFFX.deselectAll(comp);
- */
+	 * Deselects all layers in a given composition.
+	 * 
+	 * @function deselectAll
+	 * @memberof applyFFX
+	 * 
+	 * @param {object} theComp - The composition whose layers should be deselected.
+	 * 
+	 * @example 
+	 * var comp = app.project.activeItem;
+	 * applyFFX.deselectAll(comp);
+	 */
 	module.deselectAll = function (theComp) {
 		for (var i = 1, il = theComp.numLayers; i <= il; i++) {
 			theComp.layer(i).selected = false;

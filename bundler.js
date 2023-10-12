@@ -1,97 +1,94 @@
 const fs = require('fs');
+const esprima = require('esprima');
+const estraverse = require('estraverse');
 const path = require('path');
 
-function extractFunctions(content, prefix) {
-    const regex = new RegExp(`\\b${prefix}\\.([a-zA-Z0-9_]+)`, 'g');
-    const functions = new Set();
-    let match;
-    while ((match = regex.exec(content))) {
-        functions.add(match[1]);
-    }
-    return functions;
-}
+const logStream = fs.createWriteStream('debug_log.txt');
 
-function parseFunctions(content) {
-    let functions = {};
-    let lines = content.split('\n');
-    let insideFunction = false;
-    let buffer = [];
-    let functionName = null;
+const inputFilePath = process.argv[2];
+const outputDir = process.argv[3] || './';
 
-    lines.forEach(line => {
-        if (line.trim().startsWith("module.")) {
-            insideFunction = true;
-            functionName = line.trim().split(' ')[0].split('.')[1];
-        }
+const mainContent = fs.readFileSync(inputFilePath, 'utf-8');
 
-        if (insideFunction) {
-            buffer.push(line);
-        }
+const includeStatements = mainContent.match(/\/\/\s*@include\s*['"]([^'"]+)['"]/g) || [];
+logStream.write(`Found include statements: ${JSON.stringify(includeStatements)}\n`);
 
-        if (line.trim() === '};' && insideFunction) {
-            insideFunction = false;
-            functions[functionName] = buffer.join('\n');
-            buffer = [];
-        }
-    });
+let bundledCode = '/************************ START OF INCLUDED FUNCTIONS ************************/\n';
 
-    return functions;
-}
+includeStatements.forEach(includeStatement => {
+    const libraryPath = includeStatement.match(/['"]([^'"]+)['"]/)[1];
+    const libraryContent = fs.readFileSync(libraryPath, 'utf-8');
+    const astLibrary = esprima.parseScript(libraryContent, { range: true });
 
-function includeRequiredFunctions(libName, filePath, requiredFunctions, allIncludedFunctions) {
-    const content = fs.readFileSync(filePath, 'utf-8').replace(/\/\*\*[\s\S]*?\*\//gm, '');
-    const functions = parseFunctions(content);
+    let availableFunctions = new Map();
+    let functionDependencies = {};
 
-    let includedContent = '';
-    requiredFunctions.forEach(func => {
-        const funcIdentifier = `${libName}:${func}`;
-        if (allIncludedFunctions.has(funcIdentifier)) return;
+    estraverse.traverse(astLibrary, {
+        enter: function (node, parent) {
+            if (node.type === 'AssignmentExpression' && node.left.type === 'MemberExpression' && node.left.object.name === 'module') {
+                const functionName = node.left.property.name;
+                availableFunctions.set(functionName, node);
+            }
 
-        allIncludedFunctions.add(funcIdentifier);
+            if (node.type === 'CallExpression' && node.callee.type === 'MemberExpression' && node.callee.object.name === 'module') {
+                const calledFunction = node.callee.property.name;
+                let declaringFunction = null;
 
-        if (functions.hasOwnProperty(func)) {
-            includedContent += `${functions[func]}\n`;
+                if (parent && parent.type === 'AssignmentExpression' && parent.left && parent.left.type === 'MemberExpression' && parent.left.property) {
+                    declaringFunction = parent.left.property.name;
+                }
+
+                if (declaringFunction) {
+                    if (!functionDependencies[declaringFunction]) {
+                        functionDependencies[declaringFunction] = new Set();
+                    }
+                    functionDependencies[declaringFunction].add(calledFunction);
+                }
+            }
         }
     });
 
-    return includedContent;
-}
+    const astScript = esprima.parseScript(mainContent);
+    let functionsUsed = new Set();
 
-const libraries = {
-    'Ae': 'modules/Ae.js',
-    'ArrayEx': 'modules/ArrayEx.js',
-    'ApplyFFX': 'modules/ApplyFFX.js',
-};
+    estraverse.traverse(astScript, {
+        enter: function (node) {
+            if (node.type === 'MemberExpression' && node.object.name === path.basename(libraryPath, '.js')) {
+                functionsUsed.add(node.property.name);
+            }
+        }
+    });
 
-const outputPaths = [
-    'dist',
-];
-
-let allIncludedFunctions = new Set();
-const mainFilePath = process.argv[2];
-const basePath = path.dirname(mainFilePath);
-let mainContent = fs.readFileSync(mainFilePath, 'utf-8').replace(/\/\/\s*@include.*\n/g, '');
-
-let cleanedBundledContent = `//========== INCLUDED FUNCTIONS ============//\n`;
-
-Object.keys(libraries).forEach(libName => {
-    const requiredFunctions = extractFunctions(mainContent, libName);
-    if (requiredFunctions.size > 0) {
-        const libPath = path.join(basePath, libraries[libName]);
-        let functionContent = includeRequiredFunctions(libName, libPath, requiredFunctions, allIncludedFunctions);
-
-        cleanedBundledContent += `var ${libName} = (function () {\n var module = {};\n${functionContent}\n return module;\n})();\n`;
+    function includeDependencies(funcName) {
+        if (functionDependencies[funcName]) {
+            functionDependencies[funcName].forEach(dependency => {
+                functionsUsed.add(dependency);
+                includeDependencies(dependency);
+            });
+        }
     }
+
+    functionsUsed.forEach(includeDependencies);
+
+    bundledCode += `var ${path.basename(libraryPath, '.js')} = (function () {\n  var module = {};\n`;
+
+    functionsUsed.forEach(fn => {
+        const functionNode = availableFunctions.get(fn);
+        if (functionNode) {
+            const functionCode = libraryContent.substring(functionNode.range[0], functionNode.range[1]);
+            bundledCode += `  module.${fn} = ${functionCode};\n`;
+        }
+    });
+
+    bundledCode += '  return module;\n})();\n';
 });
 
-cleanedBundledContent += `//========== END OF INCLUDED FUNCTIONS ============//\n\n${mainContent}`;
+bundledCode += '/************************ END OF INCLUDED FUNCTIONS ************************/\n';
 
-const outputFileName = `${path.basename(mainFilePath, '.jsx')}_Bundled.jsx`;
+const outputFileName = path.basename(inputFilePath, path.extname(inputFilePath)) + '_bndl' + path.extname(inputFilePath);
 
-outputPaths.forEach(outputPath => {
-    const fullOutputPath = path.join(basePath, outputPath);
-    if (!fs.existsSync(fullOutputPath)) {
-        fs.mkdirSync(fullOutputPath);
-    }
-    fs.writeFileSync(path.join(fullOutputPath, outputFileName), cleanedBundledContent, 'utf-8');
-});
+fs.writeFileSync(path.join(outputDir, outputFileName), bundledCode);
+
+logStream.end();
+
+console.log(`Bundling completed. Output written to ${path.join(outputDir, outputFileName)}`);
