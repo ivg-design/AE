@@ -1,3 +1,5 @@
+
+
 app.beginUndoGroup("Setup Distribution Along Path");
 
 // Step 1: Get the active composition and the selected layers
@@ -92,4 +94,4 @@ for (var i = 1; i <= layers.length; i++) {
 	}
 }
 
-app.endUndoGroup();
+	app.endUndoGroup();

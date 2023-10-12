@@ -32,7 +32,7 @@
 function main() {
 	//var debug = ErrorLogging("control_vertices");
 	
-		/****************** HELPER FUNCTIONS ******************/
+	/****************** HELPER FUNCTIONS ******************/
         /**
          * Recursively extracts groups and shape layers from an After Effects group.
          *
@@ -264,58 +264,63 @@ function main() {
             expressionString += 'var shapeName = "' + shapeName + '";\n';  // Include the shape name
             expressionString += 'var pathProperty = ' + fullPathForExpression + ';\n';  // Use the full path
 
-            expressionString += [
-                'if (pathProperty) {',
-                '    var pathPoints = pathProperty.points();',
-                '    var inTangents = pathProperty.inTangents();',
-                '    var outTangents = pathProperty.outTangents();',
-                '    var isOpenPath = false;',
-                '    for (var i = 1; i <= thisComp.numLayers; i++) {',
-                '        var layer = thisComp.layer(i);',
-                '        if (layer && layer.name && layer.name.startsWith(shapeName + " Vertex")) {',
-                '            if (layer.effect("Open/Closed Path")) {',
-                '                isOpenPath = layer.effect("Open/Closed Path")("Checkbox").value;',
-                '            }',
-                '            var controlFollow = layer.effect("Control/Follow") ? layer.effect("Control/Follow")("Checkbox").value : 0;',
-                '            if (controlFollow) {',
-                '                // Do nothing, let it follow the original path',
-                '            } else {',
-                '                var vertexControl = layer.effect("Vertex Control")("Slider");',
-                '                if (vertexControl && vertexControl.value > 0) {',
-                '                    var vertexIndex = Math.floor(vertexControl.value) - 1;',
-                '                    var worldVertexPosition = layer.toWorld([0,0]);',
-                '                    var vertexPosition = shapeLayer.fromWorld(worldVertexPosition);',
-                '                    var shapeGroupPosition = pathProperty.propertyGroup(3)("Transform")("Position").value;',
-                '                    var shapeGroupAnchor = pathProperty.propertyGroup(3)("Transform")("Anchor Point").value;',
-                '                    vertexPosition[0] -= (shapeGroupPosition[0] - shapeGroupAnchor[0]);',
-                '                    vertexPosition[1] -= (shapeGroupPosition[1] - shapeGroupAnchor[1]);',
-                '                    pathPoints[vertexIndex] = vertexPosition;',
-                '                    for (var j = 1; j <= thisComp.numLayers; j++) {',
-                '                        var tangentLayer = thisComp.layer(j);',
-                '                        if (tangentLayer.name.startsWith(shapeName + " inTangent for Vertex") || tangentLayer.name.startsWith(shapeName + " outTangent for Vertex")) {',
-                '                            var tangentType = tangentLayer.name.split(" ")[shapeName.split(" ").length];',
-                '                            var worldTangent = tangentLayer.toWorld([0,0]);',
-                '                            var localTangent = shapeLayer.fromWorld(worldTangent);',
-                '                            var shapeGroupPosition = pathProperty.propertyGroup(3)("Transform")("Position").value;',
-                '                            var shapeGroupAnchor = pathProperty.propertyGroup(3)("Transform")("Anchor Point").value;',
-                '                            localTangent[0] -= (shapeGroupPosition[0] - shapeGroupAnchor[0]);',
-                '                            localTangent[1] -= (shapeGroupPosition[1] - shapeGroupAnchor[1]);',
-                '                            var tangentOffset = [localTangent[0] - pathPoints[vertexIndex][0], localTangent[1] - pathPoints[vertexIndex][1]];',
+			expressionString += [
+				'if (pathProperty) {',
+				'    var pathPoints = pathProperty.points();',
+				'    var inTangents = pathProperty.inTangents();',
+				'    var outTangents = pathProperty.outTangents();',
+				'    var isOpenPath = false;',
+				'    for (var i = 1; i <= thisComp.numLayers; i++) {',
+				'        var layer = thisComp.layer(i);',
+				'        if (layer && layer.name && layer.name.startsWith(shapeName + " Vertex")) {',
+				'            if (layer.effect("Open/Closed Path")) {',
+				'                isOpenPath = layer.effect("Open/Closed Path")("Checkbox").value;',
+				'            }',
+				'            var controlFollow = layer.effect("Control/Follow") ? layer.effect("Control/Follow")("Checkbox").value : 0;',
+				'            if (controlFollow) {',
+				'                // Do nothing, let it follow the original path',
+				'            } else {',
+				'                var vertexControl = layer.effect("Vertex Control")("Slider");',
+				'                if (vertexControl && vertexControl.value > 0) {',
+				'                    var vertexIndex = Math.floor(vertexControl.value) - 1;',
+				'                    var worldVertexPosition = layer.toWorld([0,0]);',
+				'                    var vertexPosition = shapeLayer.fromWorld(worldVertexPosition);',
+				'                    var shapeGroupPosition = pathProperty.propertyGroup(3)("Transform")("Position").value;',
+				'                    var shapeGroupAnchor = pathProperty.propertyGroup(3)("Transform")("Anchor Point").value;',
+				'                    vertexPosition[0] -= (shapeGroupPosition[0] - shapeGroupAnchor[0]);',
+				'                    vertexPosition[1] -= (shapeGroupPosition[1] - shapeGroupAnchor[1]);',
+				'                    pathPoints[vertexIndex] = vertexPosition;',
+				'                    var vertexNameParts = layer.name.split(" ");',
+				'                    var vertexSuffix = vertexNameParts[vertexNameParts.length - 1];',  // Extract the suffix from the vertex layer name
+				'                    for (var j = 1; j <= thisComp.numLayers; j++) {',
+				'                        var tangentLayer = thisComp.layer(j);',
+				'                        var tangentNameParts = tangentLayer.name.split(" ");',
+				'                        var tangentSuffix = tangentNameParts[tangentNameParts.length - 1];',  // Extract the suffix from the tangent layer name
+				'                        if ((tangentLayer.name.startsWith(shapeName + " inTangent for Vertex") || tangentLayer.name.startsWith(shapeName + " outTangent for Vertex")) && vertexSuffix === tangentSuffix) {',
+				'                            var tangentType = tangentLayer.name.split(" ")[shapeName.split(" ").length];',
+				'                            var worldTangent = tangentLayer.toWorld([0,0]);',
+				'                            var localTangent = shapeLayer.fromWorld(worldTangent);',
+				'                            var shapeGroupPosition = pathProperty.propertyGroup(3)("Transform")("Position").value;',
+				'                            var shapeGroupAnchor = pathProperty.propertyGroup(3)("Transform")("Anchor Point").value;',
+				'                            localTangent[0] -= (shapeGroupPosition[0] - shapeGroupAnchor[0]);',
+				'                            localTangent[1] -= (shapeGroupPosition[1] - shapeGroupAnchor[1]);',
+				'                            var tangentOffset = [localTangent[0] - pathPoints[vertexIndex][0], localTangent[1] - pathPoints[vertexIndex][1]];',
 
-                '                            if (tangentType === "inTangent") {',
-                '                                inTangents[vertexIndex] = tangentOffset;',
-                '                            } else if (tangentType === "outTangent") {',
-                '                                outTangents[vertexIndex] = tangentOffset;',
-                '                            }',
-                '                        }',
-                '                    }',
-                '                }',
-                '            }',
-                '        }',
-                '    }',
-                '    createPath(pathPoints, inTangents, outTangents, isOpenPath);',
-                '}'
-            ].join('\n');
+				'                            if (tangentType === "inTangent") {',
+				'                                inTangents[vertexIndex] = tangentOffset;',
+				'                            } else if (tangentType === "outTangent") {',
+				'                                outTangents[vertexIndex] = tangentOffset;',
+				'                            }',
+				'                        }',
+				'                    }',
+				'                }',
+				'            }',
+				'        }',
+				'    }',
+				'    createPath(pathPoints, inTangents, outTangents, isOpenPath);',
+				'}'
+			].join('\n');
+
 
             return expressionString;
         }

@@ -11,77 +11,87 @@ function extractFunctions(content, prefix) {
     return functions;
 }
 
-function includeRequiredFunctions(filePath, requiredFunctions, allIncludedFunctions, logFlag = true) {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    let includedContent = '';
+function parseFunctions(content) {
+    let functions = {};
+    let lines = content.split('\n');
+    let insideFunction = false;
+    let buffer = [];
+    let functionName = null;
 
-    if (logFlag) {
-        console.log(`Reading from file: ${filePath}`);
-    }
-
-    requiredFunctions.forEach(func => {
-        if (allIncludedFunctions.has(func)) {
-            console.log(`Function ${func} already included.`);
-            return;
+    lines.forEach(line => {
+        if (line.trim().startsWith("module.")) {
+            insideFunction = true;
+            functionName = line.trim().split(' ')[0].split('.')[1];
         }
 
-        allIncludedFunctions.add(func);
+        if (insideFunction) {
+            buffer.push(line);
+        }
 
-        const regex = new RegExp(`(\\/\\*\\*[\\s\\S]*?\\*\\/\\s*)?module\\.${func}\\s*=\\s*function\\s*\\([^]*?}\\s*;`, 'g');
-        const found = content.match(regex);
-        if (found) {
-            console.log(`Found function: ${func}`);
-            includedContent += found.join('\n') + '\n';
-            logContent += `Included ${func} from ${path.basename(filePath)}\n`;
-            const innerRequired = extractFunctions(found.join('\n'), 'Ae|ArrayEx');
-            if (innerRequired.size > 0) {
-                console.log(`Inner required functions for ${func}: ${Array.from(innerRequired).join(', ')}`);
-                includedContent += includeRequiredFunctions(filePath, innerRequired, allIncludedFunctions, false);
-            }
-        } else {
-            console.log(`Function ${func} not found in ${filePath}`);
+        if (line.trim() === '};' && insideFunction) {
+            insideFunction = false;
+            functions[functionName] = buffer.join('\n');
+            buffer = [];
+        }
+    });
+
+    return functions;
+}
+
+function includeRequiredFunctions(libName, filePath, requiredFunctions, allIncludedFunctions) {
+    const content = fs.readFileSync(filePath, 'utf-8').replace(/\/\*\*[\s\S]*?\*\//gm, '');
+    const functions = parseFunctions(content);
+
+    let includedContent = '';
+    requiredFunctions.forEach(func => {
+        const funcIdentifier = `${libName}:${func}`;
+        if (allIncludedFunctions.has(funcIdentifier)) return;
+
+        allIncludedFunctions.add(funcIdentifier);
+
+        if (functions.hasOwnProperty(func)) {
+            includedContent += `${functions[func]}\n`;
         }
     });
 
     return includedContent;
 }
 
-let logContent = '';
+const libraries = {
+    'Ae': 'modules/Ae.js',
+    'ArrayEx': 'modules/ArrayEx.js',
+    'ApplyFFX': 'modules/ApplyFFX.js',
+};
+
+const outputPaths = [
+    'dist',
+];
+
 let allIncludedFunctions = new Set();
-
-const mainFilePath = process.argv[2] || path.join(__dirname, 'TuneSync.jsx');
+const mainFilePath = process.argv[2];
 const basePath = path.dirname(mainFilePath);
-let mainContent = fs.readFileSync(mainFilePath, 'utf-8');
-mainContent = mainContent.replace(/\/\/\s*@include.*\n/g, '');
+let mainContent = fs.readFileSync(mainFilePath, 'utf-8').replace(/\/\/\s*@include.*\n/g, '');
 
-const aeFunctions = extractFunctions(mainContent, 'Ae');
-const arrayExFunctions = extractFunctions(mainContent, 'ArrayEx');
+let cleanedBundledContent = `//========== INCLUDED FUNCTIONS ============//\n`;
 
-console.log(`Functions to include from Ae.js: ${Array.from(aeFunctions).join(', ')}`);
-console.log(`Functions to include from ArrayEx.js: ${Array.from(arrayExFunctions).join(', ')}`);
+Object.keys(libraries).forEach(libName => {
+    const requiredFunctions = extractFunctions(mainContent, libName);
+    if (requiredFunctions.size > 0) {
+        const libPath = path.join(basePath, libraries[libName]);
+        let functionContent = includeRequiredFunctions(libName, libPath, requiredFunctions, allIncludedFunctions);
 
-let functionContent = '';
+        cleanedBundledContent += `var ${libName} = (function () {\n var module = {};\n${functionContent}\n return module;\n})();\n`;
+    }
+});
 
-if (aeFunctions.size > 0) {
-    const aePath = path.join(basePath, 'modules', 'Ae.js');
-    functionContent += includeRequiredFunctions(aePath, aeFunctions, allIncludedFunctions);
-}
-
-if (arrayExFunctions.size > 0) {
-    const arrayExPath = path.join(basePath, 'modules', 'ArrayEx.js');
-    functionContent += includeRequiredFunctions(arrayExPath, arrayExFunctions, allIncludedFunctions);
-}
-
-functionContent = `var Ae = (function () {\n var module = {};\n${functionContent}\n return module;\n})();\n`;
-
-const cleanedBundledContent = `//========== INCLUDED FUNCTIONS ============//\n${functionContent}//========== END OF INCLUDED FUNCTIONS ============//\n\n${mainContent}`;
+cleanedBundledContent += `//========== END OF INCLUDED FUNCTIONS ============//\n\n${mainContent}`;
 
 const outputFileName = `${path.basename(mainFilePath, '.jsx')}_Bundled.jsx`;
-fs.writeFileSync(path.join(basePath, 'dist', outputFileName), cleanedBundledContent, 'utf-8');
 
-const now = new Date().toLocaleString();
-logContent = `${now}\nBundled File: ${outputFileName}\n${logContent}//================ END OF BUNDLING ${outputFileName} ==============//\n`;
-
-fs.appendFileSync(path.join(basePath, 'dist', 'include_log.txt'), logContent, 'utf-8');
-
-console.log(`Bundling the file: ${mainFilePath}`);
+outputPaths.forEach(outputPath => {
+    const fullOutputPath = path.join(basePath, outputPath);
+    if (!fs.existsSync(fullOutputPath)) {
+        fs.mkdirSync(fullOutputPath);
+    }
+    fs.writeFileSync(path.join(fullOutputPath, outputFileName), cleanedBundledContent, 'utf-8');
+});
