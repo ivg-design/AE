@@ -623,8 +623,14 @@ var MainUI = (function () {
 
             // Find and add AUDIO REACTOR compositions to the dropdown
             for (var i = 1; i <= app.project.numItems; i++) {
-                if (app.project.item(i).name.includes("AUDIO REACTOR") && app.project.item(i) instanceof CompItem) {
-                    dropdown.add("item", app.project.item(i).name);
+                var currentItem = app.project.item(i);
+
+                if (currentItem && currentItem instanceof CompItem) {
+                    var currentItemName = currentItem.name;
+
+                    if (typeof currentItemName === 'string' && currentItemName.indexOf("AUDIO REACTOR") !== -1) {
+                        dropdown.add("item", currentItemName);
+                    }
                 }
             }
 
@@ -831,51 +837,54 @@ var MainUI = (function () {
      * handle2DProperty(myLayer, true, false, true, "Position", "AudioReactorLayer", myLayer.property("Position"));
      */
     function handle2DProperty(layer, xSelected, ySelected, isUnified, propName, audioReactorName, selectedProp) {
+        var outputSring = "Property-Vert";
+        var referenceString = "Vertex";
+        var isCaseSensitive = true;
+        var newPropName = compareAndReplace(propName, referenceString, outputSring, isCaseSensitive);
         var propMatchname = Ae.getDeepestSelectedProperty(selectedProp).matchName;
-
         // Add Easing dropdown
         var dropDownParams = ["Linear", "EaseIn", "EaseOut", "EaseInOut"];
         var dropdown = layer.Effects.addProperty("ADBE Dropdown Control");
         var setDropDownParams = dropdown.property(1).setPropertyParameters(dropDownParams);
-        setDropDownParams.propertyGroup(1).name = propName + "_Easing Type";
+        setDropDownParams.propertyGroup(1).name = newPropName + "_Easing Type";
 
         if (isUnified) {
             // Unified sliders for Min and Max Output
             var outMinSlider = layer.Effects.addProperty("ADBE Slider Control");
-            outMinSlider.name = propName + "_Min Output";
+            outMinSlider.name = newPropName + "_Min Output";
 
             var outMaxSlider = layer.Effects.addProperty("ADBE Slider Control");
-            outMaxSlider.name = propName + "_Max Output";
+            outMaxSlider.name = newPropName + "_Max Output";
         } else {
             if (!xSelected && !ySelected) {
                 // Create individual sliders for X and Y Min and Max Output
                 var outMinXSlider = layer.Effects.addProperty("ADBE Slider Control");
-                outMinXSlider.name = propName + "_Min Output X";
+                outMinXSlider.name = newPropName + "_Min Output X";
 
                 var outMaxXSlider = layer.Effects.addProperty("ADBE Slider Control");
-                outMaxXSlider.name = propName + "_Max Output X";
+                outMaxXSlider.name = newPropName + "_Max Output X";
 
                 var outMinYSlider = layer.Effects.addProperty("ADBE Slider Control");
-                outMinYSlider.name = propName + "_Min Output Y";
+                outMinYSlider.name = newPropName + "_Min Output Y";
 
                 var outMaxYSlider = layer.Effects.addProperty("ADBE Slider Control");
-                outMaxYSlider.name = propName + "_Max Output Y";
+                outMaxYSlider.name = newPropName + "_Max Output Y";
             } else {
                 // Individual sliders for X and Y Min and Max Output
                 if (xSelected) {
                     var outMinXSlider = layer.Effects.addProperty("ADBE Slider Control");
-                    outMinXSlider.name = propName + "_Min Output X";
+                    outMinXSlider.name = newPropName + "_Min Output X";
 
                     var outMaxXSlider = layer.Effects.addProperty("ADBE Slider Control");
-                    outMaxXSlider.name = propName + "_Max Output X";
+                    outMaxXSlider.name = newPropName + "_Max Output X";
                 }
 
                 if (ySelected) {
                     var outMinYSlider = layer.Effects.addProperty("ADBE Slider Control");
-                    outMinYSlider.name = propName + "_Min Output Y";
+                    outMinYSlider.name = newPropName + "_Min Output Y";
 
                     var outMaxYSlider = layer.Effects.addProperty("ADBE Slider Control");
-                    outMaxYSlider.name = propName + "_Max Output Y";
+                    outMaxYSlider.name = newPropName + "_Max Output Y";
                 }
             }
         };
@@ -907,13 +916,17 @@ var MainUI = (function () {
      */
 
     function build2DExpression(xSelected, ySelected, isUnified, propName, audioReactorName) {
+        var outputSring = "Property-Vert";
+        var referenceString = "Vertex";
+        var isCaseSensitive = true;
+        var newPropName = compareAndReplace(propName, referenceString, outputSring, isCaseSensitive);
         var expressionBase = 'd = comp("' + audioReactorName + '").layer("Select Frequency").effect("Audio Reactor")("Output Power");\n' +
             'iMin = 0;\n' +
             'iMax = 100;\n' +
             'originalValue = value;\n';
 
         var easingExpressionBase = 'ctrlLayer = thisLayer;\n' +
-            'easeType = ctrlLayer.effect("' + propName + '_Easing Type")("Menu").value;\n';
+            'easeType = ctrlLayer.effect("' + newPropName + '_Easing Type")("Menu").value;\n';
 
         var commonEasingLogic = '(easeType == 1 ? linear(d, iMin, iMax, outMin, outMax) : ' +
             '(easeType == 2 ? easeIn(d, iMin, iMax, outMin, outMax) : ' +
@@ -923,28 +936,28 @@ var MainUI = (function () {
         var finalExpression = expressionBase + easingExpressionBase;
 
         if (isUnified || (xSelected && ySelected)) {
-            finalExpression += 'outMin = ctrlLayer.effect("' + propName + '_Min Output")("Slider");\n';
-            finalExpression += 'outMax = ctrlLayer.effect("' + propName + '_Max Output")("Slider");\n';
+            finalExpression += 'outMin = ctrlLayer.effect("' + newPropName + '_Min Output")("Slider");\n';
+            finalExpression += 'outMax = ctrlLayer.effect("' + newPropName + '_Max Output")("Slider");\n';
             finalExpression += 'xResult = yResult = ' + commonEasingLogic + ';\n';
         } else {
             if (!xSelected && !ySelected) {
-                finalExpression += 'outMin = ctrlLayer.effect("' + propName + '_Min Output X")("Slider");\n';
-                finalExpression += 'outMax = ctrlLayer.effect("' + propName + '_Max Output X")("Slider");\n';
+                finalExpression += 'outMin = ctrlLayer.effect("' + newPropName + '_Min Output X")("Slider");\n';
+                finalExpression += 'outMax = ctrlLayer.effect("' + newPropName + '_Max Output X")("Slider");\n';
                 finalExpression += 'xResult = ' + commonEasingLogic + ';\n';
-                finalExpression += 'outMin = ctrlLayer.effect("' + propName + '_Min Output Y")("Slider");\n';
-                finalExpression += 'outMax = ctrlLayer.effect("' + propName + '_Max Output Y")("Slider");\n';
+                finalExpression += 'outMin = ctrlLayer.effect("' + newPropName + '_Min Output Y")("Slider");\n';
+                finalExpression += 'outMax = ctrlLayer.effect("' + newPropName + '_Max Output Y")("Slider");\n';
                 finalExpression += 'yResult = ' + commonEasingLogic + ';\n';
             } else {
                 if (xSelected) {
-                    finalExpression += 'outMin = ctrlLayer.effect("' + propName + '_Min Output X")("Slider");\n';
-                    finalExpression += 'outMax = ctrlLayer.effect("' + propName + '_Max Output X")("Slider");\n';
+                    finalExpression += 'outMin = ctrlLayer.effect("' + newPropName + '_Min Output X")("Slider");\n';
+                    finalExpression += 'outMax = ctrlLayer.effect("' + newPropName + '_Max Output X")("Slider");\n';
                     finalExpression += 'xResult = ' + commonEasingLogic + ';\n';
                     finalExpression += 'yResult = originalValue[1];\n';
                 }
 
                 if (ySelected) {
-                    finalExpression += 'outMin = ctrlLayer.effect("' + propName + '_Min Output Y")("Slider");\n';
-                    finalExpression += 'outMax = ctrlLayer.effect("' + propName + '_Max Output Y")("Slider");\n';
+                    finalExpression += 'outMin = ctrlLayer.effect("' + newPropName + '_Min Output Y")("Slider");\n';
+                    finalExpression += 'outMax = ctrlLayer.effect("' + newPropName + '_Max Output Y")("Slider");\n';
                     finalExpression += 'yResult = ' + commonEasingLogic + ';\n';
                     finalExpression += 'xResult = originalValue[0];\n';
                 }
@@ -1224,6 +1237,34 @@ var MainUI = (function () {
         dialog.show();
     }
 
+    /**
+     * Compares and replaces a reference string within an input string.
+     *
+     * @param {string} inputString - The string to search within.
+     * @param {string} referenceString - The string to search for.
+     * @param {string} outputString - The string to replace the reference string with.
+     * @param {boolean} isCaseSensitive - Whether the comparison should be case-sensitive.
+     * @returns {string} - The updated string if a match is found; otherwise, the original string.
+     *
+     * @example
+     * const stringToCompare = "Hello There";
+     * const reference = "There";
+     * const output = "you";
+     * const isCaseSensitive = false;
+     * const result = compareAndReplace(stringToCompare, reference, output, isCaseSensitive);
+     * console.log(result);  // Outputs: "Hello you"
+     */
+    function compareAndReplace(inputString, referenceString, outputString, isCaseSensitive) {
+        var searchStr = isCaseSensitive ? referenceString : referenceString.toLowerCase();
+        var sourceStr = isCaseSensitive ? inputString : inputString.toLowerCase();
+
+        if (sourceStr.indexOf(searchStr) !== -1) {
+            var regex = new RegExp(referenceString, isCaseSensitive ? "" : "i");
+            return inputString.replace(regex, outputString);
+        } else {
+            return inputString;
+        }
+    }
 
     return module;
 })();
