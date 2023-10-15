@@ -25,7 +25,16 @@
 var PropPath = (function () {
 	var module = {};
 
-	// showDeepestSelectedProperty function definition
+	/**
+	 * @function showDeepestSelectedProperty
+	 * @memberOf PropPath
+	 * @description Finds the deepest selected property among the provided selected properties.
+	 * @param {Object[]} selectedProperties - Array of selected properties from the After Effects composition.
+	 * @returns {Object|null} - Returns the deepest selected property, or null if none found.
+	 * @example
+	 * // Usage: Use this module individually
+	 * const deepestProperty = PropPath.showDeepestSelectedProperty(selectedProps);
+	 */
 	module.showDeepestSelectedProperty = function (selectedProperties) {
 		if (selectedProperties.length === 1) {
 			return selectedProperties[0]; // Directly return if only one property is selected
@@ -47,7 +56,18 @@ var PropPath = (function () {
 		}
 	};
 	
-	// collectPropertyHierarchyInfo function definition
+
+	/**
+	 * @function collectPropertyHierarchyInfo
+	 * @memberOf PropPath
+	 * @description Collects and returns property hierarchy or specific information based on the flag.
+	 * @param {Object} prop - Property object from Adobe After Effects.
+	 * @param {string} [flag] - Optional flag ('hierarchy', 'comp', 'layerName', 'layerMatchName', 'layerIndex').
+	 * @returns {(Array<Object>|string|number)} - Array of property objects for 'hierarchy', or specific information based on the flag.
+	 * @example
+	 * // Usage: Use this module individually
+	 * const hierarchyInfo = PropPath.collectPropertyHierarchyInfo(selectedProp, 'hierarchy');
+	 */
 	module.collectPropertyHierarchyInfo = function (prop, flag) {
 		var propInfo = []; // Array to store property hierarchy information
 
@@ -99,7 +119,23 @@ var PropPath = (function () {
 		}
 	};
 	
-	// constructPropertyPath function definition
+	/**
+	 * @function constructPropertyPath
+	 * @memberOf PropPath
+	 * @description Constructs an Adobe After Effects (AE) property path based on hierarchical property information.
+	 * @param {Array<Object>} collectedHierarchy - Array of objects containing AE property information.
+	 * @param {Object} flags - Flags to guide property path construction.
+	 * @param {boolean} [flags.useNames=false] - Whether to use 'name' attributes for constructing the property path.
+	 * @param {boolean} [flags.useMatchNames=false] - Whether to use 'matchName' attributes for constructing the property path.
+	 * @param {boolean} [flags.useGroupIndices=false] - Whether to use group indices for constructing the property path.
+	 * @returns {string} - Returns the constructed AE property path string.
+	 * @example
+	 * // Usage: Use this module individually
+	 * const collectedHierarchy = [{name: "Position", matchName: "ADBE Position", propertyDepth: 1}, {name: "Layer 1", layerIndex: 1}];
+	 * const flags = { useNames: true };
+	 * const propertyPath = PropPath.constructPropertyPath(collectedHierarchy, flags);
+	 * // Output would be 'layer(1).property("Position")'
+	 */
 	module.constructPropertyPath = function (collectedHierarchy, flags) {
 		var useNames = flags.useNames || false;
 		var useMatchNames = flags.useMatchNames || false;
@@ -151,8 +187,8 @@ var PropPath = (function () {
 	};
 	
 	/**
-	 * @function
-	 * @name mainFunction
+	 * @function mainFunction
+	 * @memberOf PropPath
 	 * @description Main function of the PropPath module. Processes the selected property from Adobe After Effects.
 	 * @param {Object} selectedProperty - Selected property object from Adobe After Effects.
 	 * @param {string} returnType - Type of data to return ('propString' or 'propObject').
@@ -194,46 +230,9 @@ var PropPath = (function () {
 		}
 	};
 
-	/**
-	 * @function
-	 * @name showDeepestSelectedProperty
-	 * @description Finds the deepest selected property among the provided selected properties.
-	 * @param {Object[]} selectedProperties - Array of selected properties from the After Effects composition.
-	 * @returns {Object|null} - Returns the deepest selected property, or null if none found.
-	 * @example
-	 * // Usage: Use this module individually
-	 * const deepestProperty = PropPath.showDeepestSelectedProperty(selectedProps);
-	 */
+	/** @lends PropPath */
 	mainFunction.showDeepestSelectedProperty = module.showDeepestSelectedProperty;
-	/**
-	 * @function
-	 * @name collectPropertyHierarchyInfo
-	 * @description Collects and returns property hierarchy or specific information based on the flag.
-	 * @param {Object} prop - Property object from Adobe After Effects.
-	 * @param {string} [flag] - Optional flag ('hierarchy', 'comp', 'layerName', 'layerMatchName', 'layerIndex').
-	 * @returns {(Array<Object>|string|number)} - Array of property objects for 'hierarchy', or specific information based on the flag.
-	 * @example
-	 * // Usage: Use this module individually
-	 * const hierarchyInfo = PropPath.collectPropertyHierarchyInfo(selectedProp, 'hierarchy');
-	 */
 	mainFunction.collectPropertyHierarchyInfo = module.collectPropertyHierarchyInfo;
-	/**
-	 * @function
-	 * @name constructPropertyPath
-	 * @description Constructs an Adobe After Effects (AE) property path based on hierarchical property information.
-	 * @param {Array<Object>} collectedHierarchy - Array of objects containing AE property information.
-	 * @param {Object} flags - Flags to guide property path construction.
-	 * @param {boolean} [flags.useNames=false] - Whether to use 'name' attributes for constructing the property path.
-	 * @param {boolean} [flags.useMatchNames=false] - Whether to use 'matchName' attributes for constructing the property path.
-	 * @param {boolean} [flags.useGroupIndices=false] - Whether to use group indices for constructing the property path.
-	 * @returns {string} - Returns the constructed AE property path string.
-	 * @example
-	 * // Usage: Use this module individually
-	 * const collectedHierarchy = [{name: "Position", matchName: "ADBE Position", propertyDepth: 1}, {name: "Layer 1", layerIndex: 1}];
-	 * const flags = { useNames: true };
-	 * const propertyPath = PropPath.constructPropertyPath(collectedHierarchy, flags);
-	 * // Output would be 'layer(1).property("Position")'
-	 */
 	mainFunction.constructPropertyPath = module.constructPropertyPath;
 
 	return mainFunction;
@@ -241,56 +240,56 @@ var PropPath = (function () {
 })();
 
 // // /*********************TESTER MODULE**********************/
-	function testPropPathModule() {
-		var comp = app.project.activeItem;
-		if (comp && comp instanceof CompItem) {
-			var selectedProperties = comp.selectedProperties;
-			if (selectedProperties.length === 0) {
-				alert('No property selected.');
-				return;
-			}
+	// function testPropPathModule() {
+	// 	var comp = app.project.activeItem;
+	// 	if (comp && comp instanceof CompItem) {
+	// 		var selectedProperties = comp.selectedProperties;
+	// 		if (selectedProperties.length === 0) {
+	// 			alert('No property selected.');
+	// 			return;
+	// 		}
 
-			// Create the palette
-			var win = new Window('palette', 'Property Info', undefined, { resizeable: true });
-			win.orientation = 'column';
+	// 		// Create the palette
+	// 		var win = new Window('palette', 'Property Info', undefined, { resizeable: true });
+	// 		win.orientation = 'column';
 
-			// Create the text area
-			var textArea = win.add('edittext', undefined, '', {
-				multiline: true,
-				scrolling: true
-			});
-			textArea.size = [500, 200];
+	// 		// Create the text area
+	// 		var textArea = win.add('edittext', undefined, '', {
+	// 			multiline: true,
+	// 			scrolling: true
+	// 		});
+	// 		textArea.size = [500, 200];
 
-			win.onResizing = win.onResize = function () {
-				this.layout.resize();
-				textArea.size = [this.size[0] - 30, this.size[1] - 40];
-			};
+	// 		win.onResizing = win.onResize = function () {
+	// 			this.layout.resize();
+	// 			textArea.size = [this.size[0] - 30, this.size[1] - 40];
+	// 		};
 			
-			// var propObj = PropPath(selectedProperties, "propObject",null, 'layerIndex');
-			// textArea.text += 'Prop Object: ' + propObj + '\n';	
+	// 		// var propObj = PropPath(selectedProperties, "propObject",null, 'layerIndex');
+	// 		// textArea.text += 'Prop Object: ' + propObj + '\n';	
 			
-			//TEST ALL POSSIBLE COMBINATIONS
-			var stringArgCombo = [
-				{ useNames: true },
-				{ useNames: true, useGroupIndices: true },
-				{ useMatchNames: true },
-				{ useMatchNames: true, useGroupIndices: true }
-			];
+	// 		//TEST ALL POSSIBLE COMBINATIONS
+	// 		var stringArgCombo = [
+	// 			{ useNames: true },
+	// 			{ useNames: true, useGroupIndices: true },
+	// 			{ useMatchNames: true },
+	// 			{ useMatchNames: true, useGroupIndices: true }
+	// 		];
 
-			var propObjFlags = ['hierarchy', 'comp', 'layerName', 'layerMatchName', 'layerIndex'];
-			var result = PropPath(selectedProperties, "propString", stringArgCombo[3]);
-			textArea.text = result;
+	// 		var propObjFlags = ['hierarchy', 'comp', 'layerName', 'layerMatchName', 'layerIndex'];
+	// 		var result = PropPath(selectedProperties, "propObject");
+	// 		textArea.text = result;
 
-			// Show the palette
-			win.layout.layout(true);
-			win.center();
-			win.show();
-		} else {
-			alert('No composition is currently active.');
-		}
-	}
+	// 		// Show the palette
+	// 		win.layout.layout(true);
+	// 		win.center();
+	// 		win.show();
+	// 	} else {
+	// 		alert('No composition is currently active.');
+	// 	}
+	// }
 
-	// Run the test in After Effects
-	testPropPathModule();
+	// // // Run the test in After Effects
+	// // testPropPathModule();
 
 
