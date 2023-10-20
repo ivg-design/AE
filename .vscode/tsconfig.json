@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "none",
+        "noLib": true,
+        "types":[
+            "types-for-adobe/AfterEffects/22.0",
+            "types-for-adobe/shared"
+        ]},
+    "exclude": [
+        "node_modules",
+    ]
+}
+

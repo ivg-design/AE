@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "types-for-adobe": "github:pravdomil/types-for-adobe"
+  }
+}
