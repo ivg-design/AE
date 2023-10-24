@@ -1,13 +1,23 @@
-{
-    "compilerOptions": {
-        "module": "none",
-        "noLib": true,
-        "types":[
-            "types-for-adobe/AfterEffects/22.0",
-            "types-for-adobe/shared"
-        ]},
-    "exclude": [
-        "node_modules",
-    ]
-}
+// {
+//     "compilerOptions": {
+//         "module": "none",
+//         "noLib": true,
+//         "types":[
+//             "types-for-adobe/AfterEffects/22.0",
+//             "types-for-adobe/shared"
+//         ]},
+//     "exclude": [
+//         "node_modules",
+//     ]
+// }
 
+{
+	"compilerOptions": {
+		"target": "ES6",
+		"module": "CommonJS",
+		"outDir": "./dist", // Output directory for compiled files
+		"rootDir": "./src", // Source directory
+		"strict": true,
+		"esModuleInterop": true
+	}
+}

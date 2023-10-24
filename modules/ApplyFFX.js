@@ -87,6 +87,8 @@ var ApplyFFX = (function () {
 		layer.selected = true;
 		layer.applyPreset(ffxFile);
 	};
+
 	return module;
+	
 })();
 

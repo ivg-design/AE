@@ -11,98 +11,87 @@ function extractFunctions(content, prefix) {
     return functions;
 }
 
-function includeRequiredFunctions(filePath, requiredFunctions, allIncludedFunctions, logFlag = true) {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    let includedContent = '';
+function parseFunctions(content) {
+    let functions = {};
+    let lines = content.split('\n');
+    let insideFunction = false;
+    let buffer = [];
+    let functionName = null;
 
-    if (logFlag) {
-        console.log(`Reading from file: ${filePath}`);
-    }
-
-    requiredFunctions.forEach(func => {
-        const funcIdentifier = `${path.basename(filePath)}:${func}`;
-
-        if (allIncludedFunctions.has(funcIdentifier)) {
-            console.log(`Function ${func} already included.`);
-            return;
+    lines.forEach(line => {
+        if (line.trim().startsWith("module.")) {
+            insideFunction = true;
+            functionName = line.trim().split(' ')[0].split('.')[1];
         }
+
+        if (insideFunction) {
+            buffer.push(line);
+        }
+
+        if (line.trim() === '};' && insideFunction) {
+            insideFunction = false;
+            functions[functionName] = buffer.join('\n');
+            buffer = [];
+        }
+    });
+
+    return functions;
+}
+
+function includeRequiredFunctions(libName, filePath, requiredFunctions, allIncludedFunctions) {
+    const content = fs.readFileSync(filePath, 'utf-8').replace(/\/\*\*[\s\S]*?\*\//gm, '');
+    const functions = parseFunctions(content);
+
+    let includedContent = '';
+    requiredFunctions.forEach(func => {
+        const funcIdentifier = `${libName}:${func}`;
+        if (allIncludedFunctions.has(funcIdentifier)) return;
 
         allIncludedFunctions.add(funcIdentifier);
 
-        const regex = new RegExp(`(\\/\\*\\*[\\s\\S]*?\\*\\/\\s*)?module\\.${func}\\s*=\\s*function\\s*\\([^]*?}\\s*;`, 'g');
-        const found = content.match(regex);
-        if (found && !allIncludedFunctions.has(func)) {
-            console.log(`Found function: ${func}`);
-            includedContent += found.join('\n') + '\n';
-            allIncludedFunctions.add(func);
-            const innerRequired = extractFunctions(found.join('\n'), 'Ae|ArrayEx|ApplyFFX');
-            if (innerRequired.size > 0) {
-                console.log(`Inner required functions for ${func}: ${Array.from(innerRequired).join(', ')}`);
-                includedContent += includeRequiredFunctions(filePath, innerRequired, allIncludedFunctions, false);
-            }
-        } else {
-            console.log(`Function ${func} not found in ${filePath}`);
+        if (functions.hasOwnProperty(func)) {
+            includedContent += `${functions[func]}\n`;
         }
     });
 
     return includedContent;
 }
 
-let logContent = '';
-let allIncludedFunctions = new Set();
+const libraries = {
+    'Ae': 'modules/Ae.js',
+    'ArrayEx': 'modules/ArrayEx.js',
+    'ApplyFFX': 'modules/ApplyFFX.js',
+};
 
+const outputPaths = [
+    'dist',
+];
+
+let allIncludedFunctions = new Set();
 const mainFilePath = process.argv[2];
 const basePath = path.dirname(mainFilePath);
-let mainContent = fs.readFileSync(mainFilePath, 'utf-8');
-mainContent = mainContent.replace(/\/\/\s*@include.*\n/g, '');
-
-const aeFunctions = extractFunctions(mainContent, 'Ae');
-const arrayExFunctions = extractFunctions(mainContent, 'ArrayEx');
-const applyFFXFunctions = extractFunctions(mainContent, 'ApplyFFX');
-
-console.log(`Functions to include from Ae.js: ${Array.from(aeFunctions).join(', ')}`);
-console.log(`Functions to include from ArrayEx.js: ${Array.from(arrayExFunctions).join(', ')}`);
-console.log(`Functions to include from ApplyFFX.js: ${Array.from(applyFFXFunctions).join(', ')}`);
-
-let functionContentAe = '';
-let functionContentArrayEx = '';
-let functionContentApplyFFX = '';
-
-if (aeFunctions.size > 0) {
-    const aePath = path.join(basePath, 'modules', 'Ae.js');
-    functionContentAe += includeRequiredFunctions(aePath, aeFunctions, allIncludedFunctions);
-}
-
-if (arrayExFunctions.size > 0) {
-    const arrayExPath = path.join(basePath, 'modules', 'ArrayEx.js');
-    functionContentArrayEx += includeRequiredFunctions(arrayExPath, arrayExFunctions, allIncludedFunctions);
-}
-
-if (applyFFXFunctions.size > 0) {
-    const applyFFXpath = path.join(basePath, 'modules', 'ApplyFFX.js');
-    functionContentApplyFFX += includeRequiredFunctions(applyFFXpath, applyFFXFunctions, allIncludedFunctions);
-}
+let mainContent = fs.readFileSync(mainFilePath, 'utf-8').replace(/\/\/\s*@include.*\n/g, '');
 
 let cleanedBundledContent = `//========== INCLUDED FUNCTIONS ============//\n`;
 
-const appendLibraryContent = (libName, libContent) => {
-    if (libContent.trim() !== '') {
-        return `var ${libName} = (function () {\n var module = {};\n${libContent}\n return module;\n})();\n`;
-    }
-    return '';
-};
+Object.keys(libraries).forEach(libName => {
+    const requiredFunctions = extractFunctions(mainContent, libName);
+    if (requiredFunctions.size > 0) {
+        const libPath = path.join(basePath, libraries[libName]);
+        let functionContent = includeRequiredFunctions(libName, libPath, requiredFunctions, allIncludedFunctions);
 
-cleanedBundledContent += appendLibraryContent('Ae', functionContentAe);
-cleanedBundledContent += appendLibraryContent('ArrayEx', functionContentArrayEx);
-cleanedBundledContent += appendLibraryContent('ApplyFFX', functionContentApplyFFX);
+        cleanedBundledContent += `var ${libName} = (function () {\n var module = {};\n${functionContent}\n return module;\n})();\n`;
+    }
+});
 
 cleanedBundledContent += `//========== END OF INCLUDED FUNCTIONS ============//\n\n${mainContent}`;
 
 const outputFileName = `${path.basename(mainFilePath, '.jsx')}_Bundled.jsx`;
-fs.writeFileSync(path.join(basePath, 'dist', outputFileName), cleanedBundledContent, 'utf-8');
 
-const now = new Date().toLocaleString();
-logContent = `${now}\nBundled File: ${outputFileName}\n${logContent}//================ END OF BUNDLING ${outputFileName} ==============//\n`;
-fs.appendFileSync(path.join(basePath, 'dist', 'include_log.txt'), logContent, 'utf-8');
-
-console.log(`Bundling the file: ${mainFilePath}`);
+outputPaths.forEach(outputPath => {
+    const fullOutputPath = path.join(basePath, outputPath);
+    if (!fs.existsSync(fullOutputPath)) {
+        fs.mkdirSync(fullOutputPath);
+    }
+    fs.writeFileSync(path.join(fullOutputPath, outputFileName), cleanedBundledContent, 'utf-8');
+});

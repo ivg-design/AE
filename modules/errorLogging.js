@@ -47,5 +47,5 @@ var ErrorLogging = (function (scriptName) {
     module.debugWrite("Debug Starting");
 
     return module;
-});
+})();
 

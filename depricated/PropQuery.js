@@ -7,8 +7,12 @@
  */
 var PropQuery = (function () {
     var module = {};
-    //=============== HELPER MODULES  =================//
-    module.allowedFlags = [
+    //=============== FLAG ARRAY =================//
+    /**
+     * @typedef {Array} FlagArray
+     * @description An array of flags to be used with the PropQuery module.
+     */ 
+    var allowedFlags = [
         "useNames",
         "useGroupIndices",
         "useMatchNames",
@@ -20,43 +24,25 @@ var PropQuery = (function () {
         "propName",
         "propMatchName"
     ];
-    
-    module._init = function () {
-        module.allowedFlags
-        
-        /**
-         * Checks if the given argument is an array.
-         * 
-         * @param {*} arg - The argument to check.
-         * @returns {boolean} True if the argument is an array, false otherwise.
-         */
-        if (!Array.isArray) {
-            Array.isArray = function (arg) {
-                return Object.prototype.toString.call(arg) === '[object Array]';
-            };
-        };
-    };
-    
-    /**
-     * @function
-     * @private
-     * @name indexOf
-     * @description Utility function to find index of element in array.
-     * @param {Array} arr - Array to search.
-     * @param {*} elem - Element to find.
-     * @returns {number} - Index of element, -1 if not found.
-     */
-    module.indexOf = function(arr, elem) {
-        for (var i = 0; i < arr.length; i++) {
-            if (arr[i] === elem) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    
     //=============== MODULES =================//
 
+        /**
+         * @function
+         * @private
+         * @name indexOf
+         * @description Utility function to find index of element in array.
+         * @param {Array} arr - Array to search.
+         * @param {*} elem - Element to find.
+         * @returns {number} - Index of element, -1 if not found.
+         */
+        function indexOf(arr, elem) {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] === elem) {
+                    return i;
+                }
+            }
+            return -1;
+        }
     
         /**
          * @function
@@ -175,9 +161,7 @@ var PropQuery = (function () {
          */
     
         module.collectPropertyHierarchyInfo = function (prop, optionalArg) {
-            module._init();
-            var allowedFlags = module.allowedFlags;
-
+            
             // Handle optionalArg being passed as an array, so it can be used with the module - this converts the array of flags to an object with a flags properties
             if (Array.isArray(optionalArg)) {
                 optionalArg = { flags: optionalArg };
@@ -186,7 +170,7 @@ var PropQuery = (function () {
             // Validate flags against allowedFlags
             var flags = optionalArg && optionalArg.flags || [];
             for (var i = 0; i < flags.length; i++) {
-                if (module.indexOf(allowedFlags, flags[i]) === -1) {
+                if (indexOf(allowedFlags, flags[i]) === -1) {
                     throw new Error("Invalid flag: " + flags[i]);
                 }
             }
@@ -283,9 +267,7 @@ var PropQuery = (function () {
          * var propPath = PropQuery(selectedProperty, 'propPath', optionalArg) 
          */
         module.constructPropertyPath = function (collectedHierarchy, optionalArg) {
-            module._init();
-            var allowedFlags = module.allowedFlags;
-
+            
             // Handle optionalArg being passed as an array, so it can be used with the module - this converts the array of flags to an object with a flags properties
             if (Array.isArray(optionalArg)) {
                 optionalArg = { flags: optionalArg };
@@ -294,14 +276,14 @@ var PropQuery = (function () {
             // Validate flags against allowedFlags
             var flags = optionalArg && optionalArg.flags || [];
             for (var i = 0; i < flags.length; i++) {
-                if (module.indexOf(allowedFlags, flags[i]) === -1) {
+                if (indexOf(allowedFlags, flags[i]) === -1) {
                     throw new Error("Invalid flag: " + flags[i]);
                 }
-            };
+            }
 
-            var useNames = indexOf(flags,"useNames") !== -1;
-            var useMatchNames = indexOf(flags, "useMatchNames") !== -1;
-            var useGroupIndices = indexOf(flags, "useGroupIndices") !== -1;
+            var useNames = flags.indexOf("useNames") !== -1;
+            var useMatchNames = flags.indexOf("useMatchNames") !== -1;
+            var useGroupIndices = flags.indexOf("useGroupIndices") !== -1;
             var propertyPath = '';
 
             // Process layer information first
@@ -356,22 +338,19 @@ var PropQuery = (function () {
          * @param {Array} optionalArg - The optionalArg is an array of flags to be used with the PropQuery module - "useNames", "useGroupIndices", "useMatchNames", "comp", "layerName", "layerMatchName", "layerIndex", "hierarchy", "propName", "propMatchName". Used only for "propPath" and "propInfo" return types. Flags can be combined, such as ["useNames", "useGroupIndices"],["useMatchNames", "useGroupIndices"],["useNames"] or ["useMatchNames"], or ["layerName", "comp"].
          * @returns {String||Object} - The result of the selected return type. selectedProperty object is returned by using returnType "propObject", property type string is returned by using returnType "propType", "propPath", property info object (consisting of the constructed hierarchy) is returned by using returnType "propInfo" without flags.
          * @example
-         * var propPath = PropQuery.main(selectedProperty, 'propPath', ["useNames"])
-         * var propInfo = PropQuery.main(selectedProperty, 'propInfo', ["layerName", "comp"])
+         * var propPath = PropQuery(selectedProperty, 'propPath', ["useNames"])
+         * var propInfo = PropQuery(selectedProperty, 'propInfo', ["layerName", "comp"])
          */
-        module.main = function (selectedProperty, returnType, optionalArg) {
-            module._init();
-            var allowedFlags = module.allowedFlags;
-
+        var mainFunction = function (selectedProperty, returnType, optionalArg) {
             // Handle optionalArg being passed as an array, so it can be used with the module - this converts the array of flags to an object with a flags properties
             if (Array.isArray(optionalArg)) {
                 optionalArg = { flags: optionalArg };
             }
-
+            
             // Validate flags against allowedFlags
             var flags = optionalArg && optionalArg.flags || [];
             for (var i = 0; i < flags.length; i++) {
-                if (module.indexOf(allowedFlags, flags[i]) === -1) {
+                if (indexOf(allowedFlags, flags[i]) === -1) {
                     throw new Error("Invalid flag: " + flags[i]);
                 }
             }
@@ -430,7 +409,59 @@ var PropQuery = (function () {
                     throw new Error("Invalid return type");
             }
         };
+    //============== EXPOSE MODULES FOR INDIVIDUAL USE ==================//
+        mainFunction.showDeepestSelectedProperty = module.showDeepestSelectedProperty;
+        
+        mainFunction.getPropertyType = module.getPropertyType;
+        
+        mainFunction.collectPropertyHierarchyInfo = module.collectPropertyHierarchyInfo;
+        
+        mainFunction.constructPropertyPath = module.constructPropertyPath;
     
-    return module;
+    return mainFunction;
 
 })();
+
+
+/*********************TESTER MODULE**********************/
+
+    function testPropPathModule() {
+        var comp = app.project.activeItem;
+        if (comp && comp instanceof CompItem) {
+            var selectedProperties = comp.selectedProperties;
+            if (selectedProperties.length === 0) {
+                alert('No property selected.');
+                return;
+            }
+
+            // Create the palette
+            var win = new Window('palette', 'Property Info', undefined, { resizeable: true });
+            win.orientation = 'column';
+
+            // Create the text area
+            var textArea = win.add('edittext', undefined, '', {
+                multiline: true,
+                scrolling: true
+            });
+            textArea.size = [500, 200];
+
+            win.onResizing = win.onResize = function () {
+                this.layout.resize();
+                textArea.size = [this.size[0] - 30, this.size[1] - 40];
+            };
+        
+            var result = PropQuery(selectedProperties, 'propInfo', ["propName"])
+            
+            textArea.text = result;
+
+            // Show the palette
+            win.layout.layout(true);
+            win.center();
+            win.show();
+        } else {
+            alert('No composition is currently active.');
+        }
+    }
+
+    // Run the test in After Effects
+    testPropPathModule();

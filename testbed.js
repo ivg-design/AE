@@ -1,5 +1,6 @@
-// @include 'modules/Ae.js'
-// @include 'modules/ArrayEx.js'
+// @include 'modules/PropQuery.js'
+//@include 'modules/ApplyFFX.js'
+
 // Main function
 function main() {
     var comp = app.project.activeItem;
@@ -9,10 +10,12 @@ function main() {
             var selectedLayer = layers[0];
             var selectedProperties = selectedLayer.selectedProperties;
             if (selectedProperties.length > 0) {
-                var propName = Ae.getPropName(selectedProperties);
-                var propAddress = Ae.retrieveProp();
-                propAddress.expression = "loopOut()"
-                alert(propName)
+                var propName = PropQuery.main(selectedProperties, "propInfo", ["layerName","propMatchName"]);
+                var propAddress = PropQuery.main(selectedProperties, 'propPath', ["useNames", "useGroupIndices"]);
+                var propType = PropQuery.main(selectedProperties, 'propType')
+                var ffx = ApplyFFX.config(selectedLayer, "binaryData", "matchName", "version", "name");
+                ffx();
+                alert("the Property Name is: " + propName + "\n" + "the Property Address is: " + propAddress + "\n" + "the Property Type is: " + propType + "\n")
             } else {
                 alert("No property is selected in the layer.");
             }
