@@ -5,7 +5,7 @@
 app.beginUndoGroup("CelMate: The Onionizer for Shape Layers");
 
 (function () {
-    // 1. Get selected keyframes
+    // 1.Check for active composition selected layers, and selected properties
     var comp = app.project.activeItem;
     if (!comp || !(comp instanceof CompItem)) {
         alert("Please select a composition.");
@@ -18,16 +18,23 @@ app.beginUndoGroup("CelMate: The Onionizer for Shape Layers");
         return;
     }
     
-    /*2. look through each selected layer and selected property(s) and create an object that has the following properties:
-        1.layer index
-        2.selected property path object
+    /*
+    2. loop through each selected layer and selected property(s) and create an object that has the following properties:
+        i.layer index
+        ii.selected property(s) path
     */
+
+    /*
+    3. duplicate active composition and rename it to CelSkin  
+     */
 
     // Create new composition named 'CelSkin'
     var celSkinComp = comp.duplicate();
     celSkinComp.name = "CelSkin";
-
-    // Loop through each selected layer in the original composition
+    /*
+    4. using the object created in step 2, loop through each selected layer and selected property(s) and set the expression to the corresponding property in the CelSkin composition
+    
+    */
     for (var i = 0; i < selectedLayers.length; i++) {
         var originalLayer = selectedLgjgjhgjgjasdasdayers[i];
         var celSkinLayer = celSkinComp.layer(originalLayer.name);  // Get the corresponding layer in CelSkin comp
@@ -50,10 +57,20 @@ app.beginUndoGroup("CelMate: The Onionizer for Shape Layers");
             }
         }
     }
-
-    // Create controller null layer "CelMate" in original comp
-    var controller = comp.layers.addNull();
-    controller.name = "CelMate";
+    /*
+    5. add a null called CelMate Controller to the oringial comp
+    (5.1 - add the pseudo effect to the null)
+    */
+   // Create controller null layer "CelMate" in original comp
+   var controller = comp.layers.addNull();
+   controller.name = "CelMate";
+    /*
+    6. add celskin comp to the original comp 7 times and to each instance add the following:
+        i. time remapping
+        ii. stroke effect
+        iii. fill effect
+        (iv. connect relevant properties (TBD) to the controller null)
+    */
 
     // Add 7 instances of CelSkin comp to the original comp
     for (var k = 0; k < 7; k++) {
