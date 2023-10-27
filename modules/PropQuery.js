@@ -18,7 +18,8 @@ var PropQuery = (function () {
         "layerIndex",
         "hierarchy",
         "propName",
-        "propMatchName"
+        "propMatchName",
+        "treeViewGroups"
     ];
     
     module._init = function () {
@@ -56,7 +57,58 @@ var PropQuery = (function () {
     }
     
     //=============== MODULES =================//
+        /**
+         * Recursively extracts and serializes groups and shapes from a given After Effects layer or group.
+         *
+         * @param {Layer|PropertyGroup} layerOrGroup - The layer or group to extract from.
+         * @param {Array<string>} [parentChain] - Optional. The chain of parent group names leading to the current group.
+         *                                        Not needed when the function receives a layer as the argument.
+         * @returns {Array<Object>} An array of serialized objects representing the extracted groups and shapes.
+         * @example 
+         * var selectedLayers = app.project.activeItem.selectedLayers;
+         * if (selectedLayers.length > 0) {
+         * var layer = selectedLayers[0];
+         * var serializedGroups = extractTreeViewGroups(layer);
+         * // Convert the serialized object to a string and display it in an alert
+         * var serializedGroupsStr = JSON.stringify(serializedGroups, null, 2);  // Pretty-print with 2-space indentation
+         * alert("Extracted Groups: \n" + serializedGroupsStr);
+         * }
+         */
+        module.extractTreeViewGroups = function (layerOrGroup, parentChain) {
+            var groups = [];
+            parentChain = parentChain || [];
 
+            // If it's the initial call, start from the "Contents" group of the layer
+            var group = layerOrGroup;
+            if (!parentChain.length && layerOrGroup.matchName === "ADBE Vector Layer") {
+                group = layerOrGroup.property("Contents");
+            }
+
+            for (var i = 1; i <= group.numProperties; i++) {
+                var property = group.property(i);
+                var groupName = property.name;
+                var currentChain = parentChain.concat([groupName]);
+
+                if (property.matchName === "ADBE Vector Group") {
+                    var groupItem = {
+                        name: groupName,
+                        type: "group",
+                        propertyChain: currentChain,
+                        groups: module.extractTreeViewGroups(property.property("Contents"), currentChain)
+                    };
+                    groups.push(groupItem);
+                } else if (property.matchName === "ADBE Vector Shape - Group") {
+                    groups.push({
+                        name: groupName,
+                        type: "shape",
+                        propertyChain: currentChain,
+                        path: "Path Data Here"  // Include relevant path data if needed
+                    });
+                }
+            }
+
+            return groups;
+        }
     
         /**
          * @function
@@ -70,7 +122,12 @@ var PropQuery = (function () {
          * var selectedProp = PropQuery.showDeepestSelectedProperty(selectedProperties);
          */
     
-        module.showDeepestSelectedProperty = function (selectedProperties) {
+    module.showDeepestSelectedProperty = function (selectedProperties) {
+            // Handle the case where selectedProperties is not an array but a single object
+            if (!Array.isArray(selectedProperties)) {
+                return selectedProperties;
+            }    
+
             if (selectedProperties.length === 1) {
                 return selectedProperties[0]; // Directly return if only one property is selected
             }
@@ -299,9 +356,9 @@ var PropQuery = (function () {
                 }
             };
 
-            var useNames = indexOf(flags,"useNames") !== -1;
-            var useMatchNames = indexOf(flags, "useMatchNames") !== -1;
-            var useGroupIndices = indexOf(flags, "useGroupIndices") !== -1;
+            var useNames = module.indexOf(flags,"useNames") !== -1;
+            var useMatchNames = module.indexOf(flags, "useMatchNames") !== -1;
+            var useGroupIndices = module.indexOf(flags, "useGroupIndices") !== -1;
             var propertyPath = '';
 
             // Process layer information first
@@ -387,6 +444,10 @@ var PropQuery = (function () {
             switch (returnType) {
                 case 'propObject':
                     return deepestProp;
+                
+                case 'treeviewGroups':
+                    var layer = selectedLayers[0];
+                    return module.extractTreeViewGroups(layer);
 
                 case 'propType':
                     return module.getPropertyType(deepestProp);

@@ -75,19 +75,19 @@ function main() {
 			return groups;
         }
         
-        /**
-        * Retrieves the After Effects path and object based on the tree view selection and a given AE layer.
-        *
-        * @param {Object} treeView - The tree view object representing the AE hierarchy.
-        * @param {Layer} aeLayer - The After Effects layer to start from.
-        * @returns {Object|null} - An object containing the AE path string and the AE path object, or null if an invalid path or no selection.
-        *
-        * The returned object has the following properties:
-        * - `pathString` (string): The After Effects path string that leads to the selected object.
-        * - `pathObject` (Property): The After Effects object that corresponds to the selected item in the tree view.
-        *
-        * @throws Will show an alert if nothing is selected, if an invalid path is encountered, or if the path property is not found.
-        */
+	    /**
+         * Retrieves the After Effects path and object based on the tree view selection and a given AE layer.
+         *
+         * @param {Object} treeView - The tree view object representing the AE hierarchy.
+         * @param {Layer} aeLayer - The After Effects layer to start from.
+         * @returns {Object|null} - An object containing the AE path string and the AE path object, or null if an invalid path or no selection.
+         *
+         * The returned object has the following properties:
+         * - `pathString` (string): The After Effects path string that leads to the selected object.
+         * - `pathObject` (Property): The After Effects object that corresponds to the selected item in the tree view.
+         *
+         * @throws Will show an alert if nothing is selected, if an invalid path is encountered, or if the path property is not found.
+         */
 		function getAEPathAndObject(treeView, aeLayer) {
 			var selectedItem = treeView.selection;
 			if (!selectedItem) {
