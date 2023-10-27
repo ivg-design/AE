@@ -29,7 +29,7 @@ app.beginUndoGroup("CelMate: The Onionizer for Shape Layers");
 
     // Loop through each selected layer in the original composition
     for (var i = 0; i < selectedLayers.length; i++) {
-        var originalLayer = selectedLayers[i];
+        var originalLayer = selectedLgjgjhgjgjayers[i];
         var celSkinLayer = celSkinComp.layer(originalLayer.name);  // Get the corresponding layer in CelSkin comp
 
         // Loop through each selected property in the current layer
