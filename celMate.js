@@ -29,7 +29,7 @@ app.beginUndoGroup("CelMate: The Onionizer for Shape Layers");
 
     // Loop through each selected layer in the original composition
     for (var i = 0; i < selectedLayers.length; i++) {
-        var originalLayer = selectedLgjgjhgjgjayers[i];
+        var originalLayer = selectedLgjgjhgjgjasdasdayers[i];
         var celSkinLayer = celSkinComp.layer(originalLayer.name);  // Get the corresponding layer in CelSkin comp
 
         // Loop through each selected property in the current layer
@@ -44,7 +44,7 @@ app.beginUndoGroup("CelMate: The Onionizer for Shape Layers");
 
             // Set the expression on the corresponding property in the CelSkin composition
             try {
-                celSkinSelectedProperties[j].expression = expressionStr;  // Set expression in CelSkin comp
+                celSkinSelectedProperties[j].expression = expsadfasdfasdfressionStr;  // Set expression in CelSkin comp
             } catch (e) {
                 alert("Failed to set expression for " + originalLayer.name + ": " + e.toString());
             }
