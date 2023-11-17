@@ -1,4 +1,15 @@
 /**
+ * Include this file in your After Effects scripts folder to use TuneSync in your scripts. 
+ * TuneSync is a script that allows you to sync properties to audio in After Effects. 
+ * Itended to be use with Audio Reactor Template.header
+ * @author IVG Design
+ * @version 1.0.0
+ * @license MIT
+ * @usage - You can use the code herein for your own projects, but please do not redistribute or sell this code as your own. Please attrubute the author if you use this code in your own projects.
+ * @see 
+ */
+
+/**
  * @file
  * @module PropQuery
  * @name PropQuery
@@ -7,7 +18,7 @@
  */
 var PropQuery = (function () {
     var module = {};
-    //=============== FLAG ARRAY =================//
+//=============== FLAG ARRAY =================//
     /**
      * @typedef {Array} FlagArray
      * @description An array of flags to be used with the PropQuery module.
@@ -24,7 +35,7 @@ var PropQuery = (function () {
         "propName",
         "propMatchName"
     ];
-    //=============== MODULES =================//
+//=============== MODULES =================//
 
     /**
      * @function
@@ -43,7 +54,17 @@ var PropQuery = (function () {
         }
         return -1;
     }
-
+    /** 
+     * @function
+     * @private
+     * @name isArray
+     * @description Utility function to check if an object is an array.
+     * @param {*} obj - Object to check.
+     * @returns {boolean} - True if object is an array, false otherwise.
+     */
+    function isArray(obj) {
+        return Object.prototype.toString.call(obj) === '[object Array]';
+    }
     /**
      * @function
      * @memberof PropQuery
@@ -163,7 +184,7 @@ var PropQuery = (function () {
     module.collectPropertyHierarchyInfo = function (prop, optionalArg) {
 
         // Handle optionalArg being passed as an array, so it can be used with the module - this converts the array of flags to an object with a flags properties
-        if (Array.isArray(optionalArg)) {
+        if (isArray(optionalArg)) {
             optionalArg = { flags: optionalArg };
         }
 
@@ -269,7 +290,7 @@ var PropQuery = (function () {
     module.constructPropertyPath = function (collectedHierarchy, optionalArg) {
 
         // Handle optionalArg being passed as an array, so it can be used with the module - this converts the array of flags to an object with a flags properties
-        if (Array.isArray(optionalArg)) {
+        if (isArray(optionalArg)) {
             optionalArg = { flags: optionalArg };
         }
 
@@ -343,7 +364,7 @@ var PropQuery = (function () {
      */
     var mainFunction = function (selectedProperty, returnType, optionalArg) {
         // Handle optionalArg being passed as an array, so it can be used with the module - this converts the array of flags to an object with a flags properties
-        if (Array.isArray(optionalArg)) {
+        if (isArray(optionalArg)) {
             optionalArg = { flags: optionalArg };
         }
 
@@ -376,8 +397,8 @@ var PropQuery = (function () {
 
             case 'propInfo':
                 var info = module.collectPropertyHierarchyInfo(deepestProp, optionalArg);
-                if (Array.isArray(info) || typeof info === 'string') {
-                    if (Array.isArray(info)) {
+                if (isArray(info) || typeof info === 'string') {
+                    if (isArray(info)) {
                         var firstInfo = info[0]; // First should contain the selected property info
                         var lastInfo = info[info.length - 1]; // Last usually contains layer info
                         var results = '';

@@ -39,14 +39,14 @@
         var expression;
         if (prop === "Scale") {
             var expression =
-                "var active = effect(\"Multi_Parent\")(\"Scale\");\n" +
+                "var effectOn = effect(\"Multi_Parent\")(\"Scale\");\n" +
                 "var influence = effect(\"Multi_Parent\")(\"Scale Influence\") / 100;\n" +
                 "var parent1Value = effect(\"Multi_Parent\")(\"Parent 1\").index;\n" +
                 "var parent2Value = effect(\"Multi_Parent\")(\"Parent 2\").index;\n" +
                 "var parent1Layer = (parent1Value && !isNaN(parent1Value) && parent1Value > 0) ? thisComp.layer(parent1Value) : null;\n" +
                 "var parent2Layer = (parent2Value && !isNaN(parent2Value) && parent2Value > 0) ? thisComp.layer(parent2Value) : null;\n" +
                 "var originalScale = transform.scale;\n" +
-                "if (active == 0 || (!parent1Layer && !parent2Layer)) {\n" +
+                "if (effectOn == 0 || (!parent1Layer && !parent2Layer)) {\n" +
                 "    originalScale;\n" +
                 "} else {\n" +
                 "    var baseParentScale = [100, 100];\n" +
@@ -66,12 +66,12 @@
 
         } else {
             expression =
-                "var active = effect(\"Multi_Parent\")(\"" + prop + "\");\n" +
+                "var effectOn = effect(\"Multi_Parent\")(\"" + prop + "\");\n" +
                 "var influence = effect(\"Multi_Parent\")(\"" + prop + " Influence\") / 100;\n" +
                 "var parent1 = effect(\"Multi_Parent\")(\"Parent 1\");\n" +
                 "var parent2 = effect(\"Multi_Parent\")(\"Parent 2\");\n" +
                 "\n" +
-                "if (active == 0) {\n" +
+                "if (effectOn == 0) {\n" +
                 "    transform." + prop.toLowerCase() + ";\n" +
                 "} else {\n" +
                 "    if ((!parent1 || parent1.index == thisLayer.index) && (!parent2 || parent2.index == thisLayer.index)) {\n" +

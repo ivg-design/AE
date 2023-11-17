@@ -5,7 +5,10 @@
 app.beginUndoGroup("CelMate: The Onionizer for Shape Layers");
 
 (function () {
-    // 1.Check for active composition selected layers, and selected properties
+    /* 
+        1.Check for active composition selected layers, and selected properties
+    */
+    
     var comp = app.project.activeItem;
     if (!comp || !(comp instanceof CompItem)) {
         alert("Please select a composition.");
@@ -23,40 +26,103 @@ app.beginUndoGroup("CelMate: The Onionizer for Shape Layers");
         i.layer index
         ii.selected property(s) path
     */
+    
+    //initialize array to store selected info
+    var selectedInfoArray = [];
 
+    for (var i = 0; i < selectedLayers.length; i++) {
+        var layer = selectedLayers[i];
+        var selectedProperties = layer.selectedProperties;
+
+        // Loop through each selected property
+        for (var j = 0; j < selectedProperties.length; j++) {
+            var prop = selectedProperties[j];
+            if (!(prop instanceof PropertyGroup)) {
+                
+                // Use PropQuery.main to get the property object containing the path
+                var propPath = PropQuery.main(prop, "propPath", ["useMatchNames"]);  // Adjust the flags as needed
+                var propObject = PropQuery.main(prop, "propObject");
+                // Create and store the object
+                var selectedInfo = {
+                    layerIndex: layer.index,
+                    propertyPath: propPath,
+                    propertyObject: propObject
+                };
+                selectedInfoArray.push(selectedInfo);
+            }
+        }
+    }
+    
     /*
     3. duplicate active composition and rename it to CelSkin  
      */
-
-    // Create new composition named 'CelSkin'
+    
     var celSkinComp = comp.duplicate();
     celSkinComp.name = "CelSkin";
+    
     /*
     4. using the object created in step 2, loop through each selected layer and selected property(s) and set the expression to the corresponding property in the CelSkin composition
     
     */
-    for (var i = 0; i < selectedLayers.length; i++) {
-        var originalLayer = selectedLgjgjhgjgjasdasdayers[i];
-        var celSkinLayer = celSkinComp.layer(originalLayer.name);  // Get the corresponding layer in CelSkin comp
+    // Loop through each object in selectedInfoArray
+    for (var k = 0; k < selectedInfoArray.length; k++) {
+        var info = selectedInfoArray[k];
 
-        // Loop through each selected property in the current layer
-        var selectedProperties = originalLayer.selectedProperties;
-        var celSkinSelectedProperties = celSkinLayer.selectedProperties; // Assuming the same properties are selected
-        for (var j = 0; j < selectedProperties.length; j++) {
-            // Get the hierarchy and construct the property path for the original property
-            var propertyPath = PropQuery.main(selectedProperties[i], "propObject");
+        // Get the corresponding layer in the CelSkin composition
+        var celSkinLayer = celSkinComp.layer(info.layerIndex);
+        
+        // Use the property path to find the corresponding property in the CelSkin composition
+        var pathComponents = info.propertyPath.split(".");
 
-            // Construct the expression string
-            var expressionStr = 'comp("' + comp.name + '").layer("' + originalLayer.name + '").' + propertyPath;
+        // Directly use celSkinLayer since it's already initialized
+        var propertyObject = celSkinLayer;
+        
+        // // Start looping through the property path, starting from index 1
+        // for (var l = 1; l < pathComponents.length; l++) {
+        //     var propertyName = pathComponents[l];
 
-            // Set the expression on the corresponding property in the CelSkin composition
-            try {
-                celSkinSelectedProperties[j].expression = expsadfasdfasdfressionStr;  // Set expression in CelSkin comp
-            } catch (e) {
-                alert("Failed to set expression for " + originalLayer.name + ": " + e.toString());
+        //     // If the property name is in 'property("...")' format, extract the actual name
+        //     var match = propertyName.match(/property\("(.+)"\)/);
+        //     if (match) {
+        //         propertyName = match[1];
+        //     }
+
+        //     if (propertyObject && propertyObject.property) {
+        //         var nextPropertyObject = propertyObject.property(propertyName);
+        //         if (nextPropertyObject) {
+        //             propertyObject = nextPropertyObject;
+        //         } else {
+        //             throw new Error("Property not found: " + propertyName);
+        //         }
+        //     } else {
+        //         throw new Error("Invalid path component: " + propertyName);
+        //     }
+        //     propertyObject.expression = "expressoin goes here";
+        // }
+        // Iterate through each element in selectedInfoArray
+        var currentPropertyObject = info.propertyObject;
+
+        // Use a temporary variable to navigate so you don't lose your original reference
+        var tempPropertyObject = currentPropertyObject;  // <-- Added this line
+
+        // Navigate up the parentProperty chain until you reach the ultimate parent
+        while (tempPropertyObject && tempPropertyObject.parentProperty) {  
+            if (tempPropertyObject.parentProperty instanceof ShapeLayer) { 
+                // Found the ultimate parent layer, now change the containing comp's name
+                tempPropertyObject.parentProperty.containingComp.name = "CelSkin";  
+                break;
             }
+            tempPropertyObject = tempPropertyObject.parentProperty;  //
         }
+
+        // currentPropertyObject is still the original property object
+        currentPropertyObject.expression = "expression goes here";  // 
+
+        // Now, propertyObject should be the Property or PropertyGroup object you're looking for
     }
+
+
+  
     /*
     5. add a null called CelMate Controller to the oringial comp
     (5.1 - add the pseudo effect to the null)

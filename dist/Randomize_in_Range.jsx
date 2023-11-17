@@ -24,6 +24,7 @@
 
 (function () {
     
+    
     /**
      * Checks if an array contains any NaN values.
      *

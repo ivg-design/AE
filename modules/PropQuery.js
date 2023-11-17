@@ -124,9 +124,9 @@ var PropQuery = (function () {
     
     module.showDeepestSelectedProperty = function (selectedProperties) {
             // Handle the case where selectedProperties is not an array but a single object
-            if (!Array.isArray(selectedProperties)) {
-                return selectedProperties;
-            }    
+            // if (!Array.isArray(selectedProperties)) {
+            //     return selectedProperties;
+            // }    
 
             if (selectedProperties.length === 1) {
                 return selectedProperties[0]; // Directly return if only one property is selected
@@ -495,3 +495,9 @@ var PropQuery = (function () {
     return module;
 
 })();
+
+//layer("Shape Layer 1").property("ADBE Root Vectors Group").property("ADBE Vector Group").property("ADBE Vectors Group").property("ADBE Vector Shape - Group").property("ADBE Vector Shape");
+
+
+
+
