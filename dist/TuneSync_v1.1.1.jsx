@@ -10,6 +10,8 @@
  * - 1.0.0  - Initial Release
  * - 1.1.0  - improve handling of pseudo effects with names that contain the word "Vertex"
  *          - fix handling of color properties
+ * - 1.1.1  - fix handling of properties when looking up using property address (for 1D & 2D properties)
+ *          - fix handling of color properties by adding parent property name to controls/expresions
  */
 
 /**
@@ -539,6 +541,7 @@ var MainUI = (function () {
                 var propName = PropQuery(props, "propInfo", ["propName"]);
                 var propMatchName = PropQuery(props, "propInfo", ["propMatchName"]);
                 var propObj = PropQuery(props, "propObject");
+                var propAddr = PropQuery(props, "propPath", ["useNames"]);
                 var dd = dropdown;
                 var audioReactorName = getAudioReactorName(dd);
 
@@ -547,7 +550,7 @@ var MainUI = (function () {
 
                 switch (propertyType) {
                     case '2D':
-                        XYUnifyDialog(layer, propName, audioReactorName, propMatchName, propObj);
+                        XYUnifyDialog(layer, propName, audioReactorName, propMatchName, propObj, propAddr);
                         break;
                     case '3D':
                         XYZUnifyDialog(layer, propName, audioReactorName, propMatchName, propObj)
@@ -557,7 +560,7 @@ var MainUI = (function () {
                         break;
                     case '1D':
                     default:
-                        handle1DProperty(layer, propName, audioReactorName, propMatchName, propObj);
+                        handle1DProperty(layer, propName, audioReactorName, propMatchName, propObj, propAddr);
                         break;
                 }
                 app.endUndoGroup();
@@ -583,7 +586,7 @@ var MainUI = (function () {
              * @param {string} audioReactorName - name of the composition that contains the audio reactor.
              * @param {string} propMatchName - matchName of the property to add the expression to 
              */
-            function XYUnifyDialog(layer, propName, audioReactorName, propMatchName, propObj) {
+            function XYUnifyDialog(layer, propName, audioReactorName, propMatchName, propObj, propAddr) {
                 //LAYOUT
                     var dialog = new Window('dialog', 'XY Unify');
                     var propObj = propObj;
@@ -619,7 +622,7 @@ var MainUI = (function () {
                     var buttonGroup = dialog.add('group');
                 //ON CLICK FUNCTIONS
                     buttonGroup.add('button', undefined, 'OK').onClick = function () {
-                        handle2DProperty(layer, xCheckBox.value, yCheckBox.value, unifiedCheckBox.value, propName, audioReactorName, propMatchName, propObj);
+                        handle2DProperty(layer, xCheckBox.value, yCheckBox.value, unifiedCheckBox.value, propName, audioReactorName, propMatchName, propObj, propAddr);
                         dialog.close();
                     };
                     buttonGroup.add('button', undefined, 'Cancel').onClick = function () {
@@ -702,25 +705,27 @@ var MainUI = (function () {
              * @param {string} propMatchName - matchName of the property to add the expression to
              * @returns {void}  
              */
-            function handleColorProperty(layer, propName, audioReactorName, propMatchName) {
+            function handleColorProperty(layer, propName, audioReactorName, propMatchName, propObj) {
 
                 // Create Easing dropdown
+                var parentName = propObj.parentProperty.name;
+                var newPropName = parentName + "_" + propName;
                 var dropDownParams = ["Linear", "EaseIn", "EaseOut", "EaseInOut"];
                 var easingDropdown = layer.Effects.addProperty("ADBE Dropdown Control");
                 var setDropDownParams = easingDropdown.property(1).setPropertyParameters(dropDownParams);
-                setDropDownParams.propertyGroup(1).name = propName + "_Easing Type";
+                setDropDownParams.propertyGroup(1).name = newPropName + "_Easing Type";
 
                 // Create Start and End Color controls
                 var startColorControl = layer.Effects.addProperty("ADBE Color Control");
-                startColorControl.name = propName + "_Start Color";
+                startColorControl.name = newPropName + "_Start";
                 startColorControl.property("Color").setValue([0, 1, 0, 1]); // Set to Green (RGBA)
 
                 var endColorControl = layer.Effects.addProperty("ADBE Color Control");
-                endColorControl.name = propName + "_End Color";
+                endColorControl.name = newPropName + "_End";
                 endColorControl.property("Color").setValue([0, 0, 1, 1]); // Set to Blue (RGBA)
 
                 var propLink = findPropertyByMatchName(layer, propMatchName);
-                var expressionString = buildColorExpression(audioReactorName, propName); // Replace with your actual function for building color expressions
+                var expressionString = buildColorExpression(audioReactorName, newPropName); // Replace with your actual function for building color expressions
                 propLink.expression = expressionString;
                 
             };
@@ -739,8 +744,8 @@ var MainUI = (function () {
                     + 'iMax = 100;' + "\n"
                     + 'ctrlLayer = thisLayer;' + "\n"
                     + 'easeType = ctrlLayer.effect("' + propName + '_Easing Type")("Menu").value;' + "\n"
-                    + 'startColor = ctrlLayer.effect("' + propName + '_Start Color")("Color");' + "\n"
-                    + 'endColor = ctrlLayer.effect("' + propName + '_End Color")("Color");' + "\n"
+                    + 'startColor = ctrlLayer.effect("' + propName + '_Start")("Color");' + "\n"
+                    + 'endColor = ctrlLayer.effect("' + propName + '_End")("Color");' + "\n"
                     + 'if (easeType == 1) linear(d, iMin, iMax, startColor, endColor);' + "\n"
                     + 'else if (easeType == 2) easeIn(d, iMin, iMax, startColor, endColor);' + "\n"
                     + 'else if (easeType == 3) easeOut(d, iMin, iMax, startColor, endColor);' + "\n"
@@ -756,9 +761,10 @@ var MainUI = (function () {
              * @param {string} propName - name of 1D property to add the expression to
              * @param {string} audioReactorName - name of the composition that contains the audio reactor.
              * @param {string} propMatchName - matchName of the property to add the expression to
+             * * @param {Object} propObj - The property object returned by the PropQuery module used to get the parent property name if the property is a pseudo effect.
              * @returns {void}
              */
-            function handle1DProperty(layer, propName, audioReactorName, propMatchName, propObj) {
+            function handle1DProperty(layer, propName, audioReactorName, propMatchName, propObj, propAddr) {
                 var outputSring = "Property-Vert";
                 var referenceString = "Vertex";
                 var isCaseSensitive = true;
@@ -778,7 +784,7 @@ var MainUI = (function () {
                 minSlider.name = newPropName + "_Min Output";
                 var maxSlider = layer.Effects.addProperty("ADBE Slider Control");
                 maxSlider.name = newPropName + "_Max Output";
-                var propLink = findPropertyByMatchName(layer, propMatchName);
+                var propLink = findPropertyByAddress(propAddr);
                 if (propLink) {
                     var expressionString = build1DExpression(audioReactorName, newPropName);
                     propLink.expression = expressionString;
@@ -820,9 +826,10 @@ var MainUI = (function () {
              * @param {string} propName - name of 2D property to add the expression to  
              * @param {string} audioReactorName - name of the composition that contains the audio reactor.
              * @param {string} propMatchName - matchName of the property to add the expression to
+             * @param {Object} propObj - The property object returned by the PropQuery module used to get the parent property name if the property is a pseudo effect.
              * @returns {void}
             */
-            function handle2DProperty(layer, xSelected, ySelected, isUnified, propName, audioReactorName, propMatchName, propObj) {
+            function handle2DProperty(layer, xSelected, ySelected, isUnified, propName, audioReactorName, propMatchName, propObj, propAddr) {
                 var outputSring = "Property-Vert";
                 var referenceString = "Vertex";
                 var isCaseSensitive = true;
@@ -881,7 +888,7 @@ var MainUI = (function () {
 
                 // Build the expression based on the selections
                 var expression = build2DExpression(xSelected, ySelected, isUnified, newPropName, audioReactorName);
-                var propLink = findPropertyByMatchName(layer, propMatchName)
+                var propLink = findPropertyByAddress(propAddr)
                 // Apply the expression to the selected property
                 propLink.expression = expression;
             }
@@ -896,11 +903,7 @@ var MainUI = (function () {
              * @param {string} audioReactorName - name of the composition that contains the audio reactor.
              * @returns {string} A string containing the complete expression for After Effects using the parameters provided.
             */
-            function build2DExpression(xSelected, ySelected, isUnified, propName, audioReactorName) {
-                var outputSring = "Property-Vert";
-                var referenceString = "Vertex";
-                var isCaseSensitive = true;
-                var newPropName = compareAndReplace(propName, referenceString, outputSring, isCaseSensitive);
+            function build2DExpression(xSelected, ySelected, isUnified, newPropName, audioReactorName) {
                 var expressionBase = 'd = comp("' + audioReactorName + '").layer("Select Frequency").effect("Audio Reactor")("Output Power");\n' +
                     'iMin = 0;\n' +
                     'iMax = 100;\n' +
@@ -1067,7 +1070,7 @@ var MainUI = (function () {
                 return expr;
             }
 
-            //HELPER FUNCTIONS
+        //HELPER FUNCTIONS
             /**
              * @name compareAndReplace
              * @description - compares two strings and replaces the first string with the second string, if a string contains multiple words it will replace only the word that matches the reference string, if the string does not contain the reference string it will return the original string. Using the isCaseSensitive parameter you can determine if the comparison should be case sensitive.
@@ -1125,6 +1128,51 @@ var MainUI = (function () {
                 }
                 return null;
             };
+
+            /**
+             * Finds a property in an After Effects composition based on a string address.
+             *
+             * @param {string} propAddr - The address of the property.
+             * @return {Object|null} - The found property object, or null if not found.
+             * @example 
+             * var propAddr: layer("Shape Layer 1").property("Effects").property("Vertex_3").property("Vertex")
+             * var prop = findPropertyByAddress(propAddr);
+             */
+            function findPropertyByAddress(propAddr) {
+                // Split the address string into parts for layer and property hierarchy
+                var parts = propAddr.match(/(?:layer|property)\("([^"]+)"\)/g);
+
+                // Reference to your composition, assuming it's the active composition
+                var myComp = app.project.activeItem;
+
+                // Validate that we're dealing with a comp
+                if (!(myComp instanceof CompItem)) {
+                    alert('Active item is not a composition.');
+                    return null;
+                }
+
+                // Starting object, initially set to the composition
+                var currentObject = myComp;
+
+                for (var i = 0; i < parts.length; i++) {
+                    // Extract the match without layer(" or property("
+                    var name = parts[i].match(/(?:layer|property)\("([^"]+)"\)/)[1];
+
+                    if (i === 0 && parts[i].indexOf('layer') === 0) {
+                        // If we're looking for a layer, we use the layer method
+                        currentObject = myComp.layer(name);
+                    } else {
+                        // Otherwise, we're navigating properties
+                        currentObject = currentObject.property(name);
+                    }
+
+                    // If the property or layer is not found, return null
+                    if (!currentObject) return null;
+                }
+
+                // Return the final property object
+                return currentObject;
+            }
 
     return module;
 })();
