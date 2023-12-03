@@ -6,7 +6,7 @@
  * TuneSync is a script that allows you to sync properties to audio in After Effects. 
  * Itended to be use with Audio Reactor Template.header
  * @author IVG Design
- * @version 1.1.0
+ * @version 1.1.3
  * @license MIT
  * @usage - You can use the code herein for your own projects, but please do not redistribute or sell this code as your own. Please attrubute the author if you use this code in your own projects.
  * @ChangeLog 
@@ -16,6 +16,7 @@
  * - 1.1.1  - fix handling of properties when looking up using property address (for 1D & 2D properties)
  *          - fix handling of color properties by adding parent property name to controls/expresions
  * - 1.1.2  - add array.prototype.indexOf shim to support ExtendScript
+ * - 1.1.3  - remove the easing dropdown (it was causing crashes)
  */
 
 //=============== SHIMS =================//
@@ -64,7 +65,6 @@ Array.prototype.indexOf = function (searchElement, fromIndex) {
     }
     return -1;
 };
-
 
 /**
  * @file
@@ -532,6 +532,30 @@ var MainUI = (function () {
             // Refresh button to update the dropdown
             var refreshButton = buttonGroup.add("button", undefined, "↺");
             refreshButton.size = [25, 25];
+                
+            // Add a group for the version information
+            var versionGroup = win.add("group");
+            versionGroup.orientation = "row";
+            versionGroup.alignment = ['right', 'bottom']; // Align to the bottom left
+            versionGroup.alignChildren = ['right', 'bottom'];
+
+            // Add a static text for the version number
+            var versionLabel = versionGroup.add("statictext", undefined, "© 2023, IVG Design, TuneSync v.1.1.3");
+            versionLabel.alignment = ['right', 'bottom'];
+            // Add a button for the link;
+            var linkButton = versionGroup.add("button", undefined, "ℹ︎");
+            linkButton.alignment = ['left', 'bottom'];
+            linkButton.size = [20, 20]; // Adjust size as needed
+
+            // Event listener for the button to open a URL
+            linkButton.onClick = function () {
+                var url = "http://www.youtube.com/@ivg_design"; // Replace with your desired URL
+                if ($.os.toLowerCase().indexOf("mac") >= 0) {
+                    system.callSystem("open \"" + url + "\"");
+                } else {
+                    system.callSystem("cmd /c start \"\" \"" + url + "\"");
+                }
+            };
 
         //DROPDOWN 
             // Populate the dropdown with AUDIO REACTOR compositions
@@ -762,11 +786,7 @@ var MainUI = (function () {
                 // Create Easing dropdown
                 var parentName = propObj.parentProperty.name;
                 var newPropName = parentName + "_" + propName;
-                var dropDownParams = ["Linear", "EaseIn", "EaseOut", "EaseInOut"];
-                var easingDropdown = layer.Effects.addProperty("ADBE Dropdown Control");
-                var setDropDownParams = easingDropdown.property(1).setPropertyParameters(dropDownParams);
-                setDropDownParams.propertyGroup(1).name = newPropName + "_Easing Type";
-
+                
                 // Create Start and End Color controls
                 var startColorControl = layer.Effects.addProperty("ADBE Color Control");
                 startColorControl.name = newPropName + "_Start";
@@ -795,16 +815,12 @@ var MainUI = (function () {
                     + 'iMin = 0;' + "\n"
                     + 'iMax = 100;' + "\n"
                     + 'ctrlLayer = thisLayer;' + "\n"
-                    + 'easeType = ctrlLayer.effect("' + propName + '_Easing Type")("Menu").value;' + "\n"
                     + 'startColor = ctrlLayer.effect("' + propName + '_Start")("Color");' + "\n"
                     + 'endColor = ctrlLayer.effect("' + propName + '_End")("Color");' + "\n"
-                    + 'if (easeType == 1) linear(d, iMin, iMax, startColor, endColor);' + "\n"
-                    + 'else if (easeType == 2) easeIn(d, iMin, iMax, startColor, endColor);' + "\n"
-                    + 'else if (easeType == 3) easeOut(d, iMin, iMax, startColor, endColor);' + "\n"
-                    + 'else ease(d, iMin, iMax, startColor, endColor);';
+                    + 'linear(d, iMin, iMax, startColor, endColor);';
                 return expressionString;
             };
-        
+                
         //1D HANDLER
             /**
              * @name handle1DProperty
@@ -826,11 +842,7 @@ var MainUI = (function () {
                     var newPropName = compareAndReplace(parentName, referenceString, outputSring, isCaseSensitive) + " " + propName;
                 } else {
                     var newPropName = compareAndReplace(propName, referenceString, outputSring, isCaseSensitive);
-                }// Create Easing dropdown
-                var dropDownParams = ["Linear", "EaseIn", "EaseOut", "EaseInOut"];
-                var easingDropdown = layer.Effects.addProperty("ADBE Dropdown Control");
-                var setDropDownParams = easingDropdown.property(1).setPropertyParameters(dropDownParams);
-                setDropDownParams.propertyGroup(1).name = newPropName + "_Easing Type";
+                }
 
                 // Create Min and Max sliders
                 var minSlider = layer.Effects.addProperty("ADBE Slider Control");
@@ -853,21 +865,18 @@ var MainUI = (function () {
              * @param {string} propName - The name of the property being affected (e.g., "Position", "Scale").
              * @returns {string} A string containing the complete expression for After Effects using the parameters provided. 
              */ 
-            function build1DExpression( audioReactorName, propName){
+            function build1DExpression(audioReactorName, propName) {
                 // Create the expression
                 var expressionString = 'd = comp("' + audioReactorName + '").layer("Select Frequency").effect("Audio Reactor")("Output Power");' + "\n"
                     + 'iMin = 0;' + "\n"
                     + 'iMax = 100;' + "\n"
                     + 'ctrlLayer = thisLayer;' + "\n"
-                    + 'easeType = ctrlLayer.effect("' + propName + '_Easing Type")("Menu").value;' + "\n"
                     + 'outMin = ctrlLayer.effect("' + propName + '_Min Output")("Slider");' + "\n"
                     + 'outMax = ctrlLayer.effect("' + propName + '_Max Output")("Slider");' + "\n"
-                    + 'if (easeType == 1) linear(d, iMin, iMax, outMin, outMax);' + "\n"
-                    + 'else if (easeType == 2) easeIn(d, iMin, iMax, outMin, outMax);' + "\n"
-                    + 'else if (easeType == 3) easeOut(d, iMin, iMax, outMin, outMax);' + "\n"
-                    + 'else ease(d, iMin, iMax, outMin, outMax);';
-                return expressionString
+                    + 'linear(d, iMin, iMax, outMin, outMax);';
+                return expressionString;
             }
+
         //2D HANDLER
             /**
              * @name handle2DProperty
@@ -893,11 +902,6 @@ var MainUI = (function () {
                 } else {
                     var newPropName = compareAndReplace(propName, referenceString, outputSring, isCaseSensitive);
                 }
-                // Add Easing dropdown
-                var dropDownParams = ["Linear", "EaseIn", "EaseOut", "EaseInOut"];
-                var dropdown = layer.Effects.addProperty("ADBE Dropdown Control");
-                var setDropDownParams = dropdown.property(1).setPropertyParameters(dropDownParams);
-                setDropDownParams.propertyGroup(1).name = newPropName + "_Easing Type";
 
                 if (isUnified) {
                     // Unified sliders for Min and Max Output
@@ -961,43 +965,34 @@ var MainUI = (function () {
                 var expressionBase = 'd = comp("' + audioReactorName + '").layer("Select Frequency").effect("Audio Reactor")("Output Power");\n' +
                     'iMin = 0;\n' +
                     'iMax = 100;\n' +
-                    'originalValue = value;\n';
+                    'originalValue = value;\n' +
+                    'ctrlLayer = thisLayer;\n';
 
-                var easingExpressionBase = 'ctrlLayer = thisLayer;\n' +
-                    'easeType = ctrlLayer.effect("' + newPropName + '_Easing Type")("Menu").value;\n';
-
-                var commonEasingLogic = '(easeType == 1 ? linear(d, iMin, iMax, outMin, outMax) : ' +
-                    '(easeType == 2 ? easeIn(d, iMin, iMax, outMin, outMax) : ' +
-                    '(easeType == 3 ? easeOut(d, iMin, iMax, outMin, outMax) : ' +
-                    'ease(d, iMin, iMax, outMin, outMax))))';
-
-                var finalExpression = expressionBase + easingExpressionBase;
+                var finalExpression = expressionBase;
 
                 if (isUnified || (xSelected && ySelected)) {
                     finalExpression += 'outMin = ctrlLayer.effect("' + newPropName + '_Min Output")("Slider");\n';
                     finalExpression += 'outMax = ctrlLayer.effect("' + newPropName + '_Max Output")("Slider");\n';
-                    finalExpression += 'xResult = yResult = ' + commonEasingLogic + ';\n';
+                    finalExpression += 'xResult = yResult = linear(d, iMin, iMax, outMin, outMax);\n';
                 } else {
                     if (!xSelected && !ySelected) {
-                        finalExpression += 'outMin = ctrlLayer.effect("' + newPropName + '_Min Output X")("Slider");\n';
-                        finalExpression += 'outMax = ctrlLayer.effect("' + newPropName + '_Max Output X")("Slider");\n';
-                        finalExpression += 'xResult = ' + commonEasingLogic + ';\n';
-                        finalExpression += 'outMin = ctrlLayer.effect("' + newPropName + '_Min Output Y")("Slider");\n';
-                        finalExpression += 'outMax = ctrlLayer.effect("' + newPropName + '_Max Output Y")("Slider");\n';
-                        finalExpression += 'yResult = ' + commonEasingLogic + ';\n';
+                        finalExpression += 'xResult = originalValue[0];\n';
+                        finalExpression += 'yResult = originalValue[1];\n';
                     } else {
                         if (xSelected) {
-                            finalExpression += 'outMin = ctrlLayer.effect("' + newPropName + '_Min Output X")("Slider");\n';
-                            finalExpression += 'outMax = ctrlLayer.effect("' + newPropName + '_Max Output X")("Slider");\n';
-                            finalExpression += 'xResult = ' + commonEasingLogic + ';\n';
-                            finalExpression += 'yResult = originalValue[1];\n';
+                            finalExpression += 'outMinX = ctrlLayer.effect("' + newPropName + '_Min Output X")("Slider");\n';
+                            finalExpression += 'outMaxX = ctrlLayer.effect("' + newPropName + '_Max Output X")("Slider");\n';
+                            finalExpression += 'xResult = linear(d, iMin, iMax, outMinX, outMaxX);\n';
+                        } else {
+                            finalExpression += 'xResult = originalValue[0];\n';
                         }
 
                         if (ySelected) {
-                            finalExpression += 'outMin = ctrlLayer.effect("' + newPropName + '_Min Output Y")("Slider");\n';
-                            finalExpression += 'outMax = ctrlLayer.effect("' + newPropName + '_Max Output Y")("Slider");\n';
-                            finalExpression += 'yResult = ' + commonEasingLogic + ';\n';
-                            finalExpression += 'xResult = originalValue[0];\n';
+                            finalExpression += 'outMinY = ctrlLayer.effect("' + newPropName + '_Min Output Y")("Slider");\n';
+                            finalExpression += 'outMaxY = ctrlLayer.effect("' + newPropName + '_Max Output Y")("Slider");\n';
+                            finalExpression += 'yResult = linear(d, iMin, iMax, outMinY, outMaxY);\n';
+                        } else {
+                            finalExpression += 'yResult = originalValue[1];\n';
                         }
                     }
                 }
@@ -1005,6 +1000,7 @@ var MainUI = (function () {
                 finalExpression += '[xResult, yResult];';
                 return finalExpression;
             }
+
         //3D HANDLER
             /**
              * @name handle3DProperty
@@ -1021,11 +1017,6 @@ var MainUI = (function () {
              *  
             */
             function handle3DProperty(layer, xSelected, ySelected, zSelected, isUnified, propName, audioReactorName, propMatchName) {
-                // Add Easing dropdown
-                var dropDownParams = ["Linear", "EaseIn", "EaseOut", "EaseInOut"];
-                var dropdown = layer.Effects.addProperty("ADBE Dropdown Control");
-                var setDropDownParams = dropdown.property(1).setPropertyParameters(dropDownParams);
-                setDropDownParams.propertyGroup(1).name = propName + "_Easing Type";
 
                 // Create Sliders based on whether it's unified or individual
                 if (isUnified) {
@@ -1079,19 +1070,26 @@ var MainUI = (function () {
                 var expr = 'var d = comp("' + audioReactorName + '").layer("Select Frequency").effect("Audio Reactor")("Output Power");\n' +
                     'var iMin = 0;\n' +
                     'var iMax = 100;\n' +
-                    'var ctrlLayer = thisLayer;\n' +
-                    'var easeType = ctrlLayer.effect("' + propName + '_Easing Type")("Menu").value;\n';
+                    'var ctrlLayer = thisLayer;\n';
 
                 if (isUnified) {
                     expr += 'var outMin = ctrlLayer.effect("' + propName + '_Min Output")("Slider");\n' +
                         'var outMax = ctrlLayer.effect("' + propName + '_Max Output")("Slider");\n';
                 } else {
-                    expr += 'var outMinX = ctrlLayer.effect("' + propName + '_Min Output X")("Slider");\n' +
-                        'var outMaxX = ctrlLayer.effect("' + propName + '_Max Output X")("Slider");\n' +
-                        'var outMinY = ctrlLayer.effect("' + propName + '_Min Output Y")("Slider");\n' +
-                        'var outMaxY = ctrlLayer.effect("' + propName + '_Max Output Y")("Slider");\n' +
-                        'var outMinZ = ctrlLayer.effect("' + propName + '_Min Output Z")("Slider");\n' +
-                        'var outMaxZ = ctrlLayer.effect("' + propName + '_Max Output Z")("Slider");\n';
+                    if (xSelected) {
+                        expr += 'var outMinX = ctrlLayer.effect("' + propName + '_Min Output X")("Slider");\n' +
+                            'var outMaxX = ctrlLayer.effect("' + propName + '_Max Output X")("Slider");\n';
+                    }
+
+                    if (ySelected) {
+                        expr += 'var outMinY = ctrlLayer.effect("' + propName + '_Min Output Y")("Slider");\n' +
+                            'var outMaxY = ctrlLayer.effect("' + propName + '_Max Output Y")("Slider");\n';
+                    }
+
+                    if (zSelected) {
+                        expr += 'var outMinZ = ctrlLayer.effect("' + propName + '_Min Output Z")("Slider");\n' +
+                            'var outMaxZ = ctrlLayer.effect("' + propName + '_Max Output Z")("Slider");\n';
+                    }
                 }
 
                 expr += 'var x = value[0];\n' +
@@ -1099,30 +1097,27 @@ var MainUI = (function () {
                     'var z = value[2];\n';
 
                 if (xSelected) {
-                    expr += 'if (easeType == 1) x = ease(d, iMin, iMax, outMin, outMax);\n' +
-                        'else if (easeType == 2) x = easeIn(d, iMin, iMax, outMin, outMax);\n' +
-                        'else if (easeType == 3) x = easeOut(d, iMin, iMax, outMin, outMax);\n' +
-                        'else x = easeInOut(d, iMin, iMax, outMin, outMax);\n';
+                    expr += 'x = linear(d, iMin, iMax, ' + (isUnified ? 'outMin' : 'outMinX') + ', ' + (isUnified ? 'outMax' : 'outMaxX') + ');\n';
+                } else {
+                    expr += 'x = originalValue[0];\n'; // Retain original X if not selected
                 }
 
                 if (ySelected) {
-                    expr += 'if (easeType == 1) y = ease(d, iMin, iMax, outMin, outMax);\n' +
-                        'else if (easeType == 2) y = easeIn(d, iMin, iMax, outMin, outMax);\n' +
-                        'else if (easeType == 3) y = easeOut(d, iMin, iMax, outMin, outMax);\n' +
-                        'else y = easeInOut(d, iMin, iMax, outMin, outMax);\n';
+                    expr += 'y = linear(d, iMin, iMax, ' + (isUnified ? 'outMin' : 'outMinY') + ', ' + (isUnified ? 'outMax' : 'outMaxY') + ');\n';
+                } else {
+                    expr += 'y = originalValue[1];\n'; // Retain original Y if not selected
                 }
 
                 if (zSelected) {
-                    expr += 'if (easeType == 1) z = ease(d, iMin, iMax, outMin, outMax);\n' +
-                        'else if (easeType == 2) z = easeIn(d, iMin, iMax, outMin, outMax);\n' +
-                        'else if (easeType == 3) z = easeOut(d, iMin, iMax, outMin, outMax);\n' +
-                        'else z = easeInOut(d, iMin, iMax, outMin, outMax);\n';
+                    expr += 'z = linear(d, iMin, iMax, ' + (isUnified ? 'outMin' : 'outMinZ') + ', ' + (isUnified ? 'outMax' : 'outMaxZ') + ');\n';
+                } else {
+                    expr += 'z = originalValue[2];\n'; // Retain original Z if not selected
                 }
 
                 expr += '[x, y, z];';
-
                 return expr;
             }
+
 
         //HELPER FUNCTIONS
             /**

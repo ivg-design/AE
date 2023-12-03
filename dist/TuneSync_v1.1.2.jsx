@@ -6,7 +6,7 @@
  * TuneSync is a script that allows you to sync properties to audio in After Effects. 
  * Itended to be use with Audio Reactor Template.header
  * @author IVG Design
- * @version 1.1.0
+ * @version 1.1.2
  * @license MIT
  * @usage - You can use the code herein for your own projects, but please do not redistribute or sell this code as your own. Please attrubute the author if you use this code in your own projects.
  * @ChangeLog 
