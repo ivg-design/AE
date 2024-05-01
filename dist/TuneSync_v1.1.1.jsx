@@ -1,6 +1,3 @@
-
-
-
 /**
  * Include this file in your After Effects scripts folder to use TuneSync in your scripts. 
  * TuneSync is a script that allows you to sync properties to audio in After Effects. 
@@ -15,56 +12,7 @@
  *          - fix handling of color properties
  * - 1.1.1  - fix handling of properties when looking up using property address (for 1D & 2D properties)
  *          - fix handling of color properties by adding parent property name to controls/expresions
- * - 1.1.2  - add array.prototype.indexOf shim to support ExtendScript
  */
-
-//=============== SHIMS =================//
-/**
- * @description - Shim for Array.prototype.filter that is missing in ExtendScript. 
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
- * */
-Array.prototype.indexOf = function (searchElement, fromIndex) {
-    'use strict';
-    var k;
-    if (this == null) {
-        throw new TypeError('"this" is null or not defined');
-    }
-
-    var O = Object(this);
-
-    var len = O.length >>> 0;
-
-    // 4. If len is 0, return -1.
-    if (len === 0) {
-        return -1;
-    }
-
-
-    var n = +fromIndex || 0;
-
-    if (Math.abs(n) === Infinity) {
-        n = 0;
-    }
-
-    if (n >= len) {
-        return -1;
-    }
-
-
-    k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
-
-    // 9. Repeat, while k < len
-    while (k < len) {
-        var kValue;
-
-        if (k in O && O[k] === searchElement) {
-            return k;
-        }
-        k++;
-    }
-    return -1;
-};
-
 
 /**
  * @file
@@ -813,8 +761,7 @@ var MainUI = (function () {
              * @param {string} propName - name of 1D property to add the expression to
              * @param {string} audioReactorName - name of the composition that contains the audio reactor.
              * @param {string} propMatchName - matchName of the property to add the expression to
-             * @param {Object} propObj - The property object returned by the PropQuery module used to get the parent property name if the property is a pseudo effect.
-             * @param {string} propAddr - The property address returned by the PropQuery module used to find the property by address.
+             * * @param {Object} propObj - The property object returned by the PropQuery module used to get the parent property name if the property is a pseudo effect.
              * @returns {void}
              */
             function handle1DProperty(layer, propName, audioReactorName, propMatchName, propObj, propAddr) {
@@ -880,7 +827,6 @@ var MainUI = (function () {
              * @param {string} audioReactorName - name of the composition that contains the audio reactor.
              * @param {string} propMatchName - matchName of the property to add the expression to
              * @param {Object} propObj - The property object returned by the PropQuery module used to get the parent property name if the property is a pseudo effect.
-             * * @param {string} propAddr - The property address returned by the PropQuery module used to find the property by address.
              * @returns {void}
             */
             function handle2DProperty(layer, xSelected, ySelected, isUnified, propName, audioReactorName, propMatchName, propObj, propAddr) {
