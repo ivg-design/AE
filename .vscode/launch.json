@@ -12,7 +12,8 @@
         {
             "type": "extendscript-debug",
             "request": "launch",
-            "name": "Launch Script in ExtendScript Engine"
+            "name": "Launch Script in ExtendScript Engine",
+            "debugLevel" : 1
         }
     ]
 }
