@@ -7,8 +7,12 @@
  */
 var PropQuery = (function () {
     var module = {};
-    //=============== HELPER MODULES  =================//
-    module.allowedFlags = [
+    //=============== FLAG ARRAY =================//
+    /**
+     * @typedef {Array} FlagArray
+     * @description An array of flags to be used with the PropQuery module.
+     */ 
+    var allowedFlags = [
         "useNames",
         "useGroupIndices",
         "useMatchNames",
@@ -18,96 +22,26 @@ var PropQuery = (function () {
         "layerIndex",
         "hierarchy",
         "propName",
-        "propMatchName",
-        "treeViewGroups"
+        "propMatchName"
     ];
-    
-    module._init = function () {
-        module.allowedFlags
-        
-        /**
-         * Checks if the given argument is an array.
-         * 
-         * @param {*} arg - The argument to check.
-         * @returns {boolean} True if the argument is an array, false otherwise.
-         */
-        if (!Array.isArray) {
-            Array.isArray = function (arg) {
-                return Object.prototype.toString.call(arg) === '[object Array]';
-            };
-        };
-    };
-    
-    /**
-     * @function
-     * @private
-     * @name indexOf
-     * @description Utility function to find index of element in array.
-     * @param {Array} arr - Array to search.
-     * @param {*} elem - Element to find.
-     * @returns {number} - Index of element, -1 if not found.
-     */
-    module.indexOf = function(arr, elem) {
-        for (var i = 0; i < arr.length; i++) {
-            if (arr[i] === elem) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    
     //=============== MODULES =================//
+
         /**
-         * Recursively extracts and serializes groups and shapes from a given After Effects layer or group.
-         *
-         * @param {Layer|PropertyGroup} layerOrGroup - The layer or group to extract from.
-         * @param {Array<string>} [parentChain] - Optional. The chain of parent group names leading to the current group.
-         *                                        Not needed when the function receives a layer as the argument.
-         * @returns {Array<Object>} An array of serialized objects representing the extracted groups and shapes.
-         * @example 
-         * var selectedLayers = app.project.activeItem.selectedLayers;
-         * if (selectedLayers.length > 0) {
-         * var layer = selectedLayers[0];
-         * var serializedGroups = extractTreeViewGroups(layer);
-         * // Convert the serialized object to a string and display it in an alert
-         * var serializedGroupsStr = JSON.stringify(serializedGroups, null, 2);  // Pretty-print with 2-space indentation
-         * alert("Extracted Groups: \n" + serializedGroupsStr);
-         * }
+         * @function
+         * @private
+         * @name indexOf
+         * @description Utility function to find index of element in array.
+         * @param {Array} arr - Array to search.
+         * @param {*} elem - Element to find.
+         * @returns {number} - Index of element, -1 if not found.
          */
-        module.extractTreeViewGroups = function (layerOrGroup, parentChain) {
-            var groups = [];
-            parentChain = parentChain || [];
-
-            // If it's the initial call, start from the "Contents" group of the layer
-            var group = layerOrGroup;
-            if (!parentChain.length && layerOrGroup.matchName === "ADBE Vector Layer") {
-                group = layerOrGroup.property("Contents");
-            }
-
-            for (var i = 1; i <= group.numProperties; i++) {
-                var property = group.property(i);
-                var groupName = property.name;
-                var currentChain = parentChain.concat([groupName]);
-
-                if (property.matchName === "ADBE Vector Group") {
-                    var groupItem = {
-                        name: groupName,
-                        type: "group",
-                        propertyChain: currentChain,
-                        groups: module.extractTreeViewGroups(property.property("Contents"), currentChain)
-                    };
-                    groups.push(groupItem);
-                } else if (property.matchName === "ADBE Vector Shape - Group") {
-                    groups.push({
-                        name: groupName,
-                        type: "shape",
-                        propertyChain: currentChain,
-                        path: "Path Data Here"  // Include relevant path data if needed
-                    });
+        function indexOf(arr, elem) {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] === elem) {
+                    return i;
                 }
             }
-
-            return groups;
+            return -1;
         }
     
         /**
@@ -122,12 +56,7 @@ var PropQuery = (function () {
          * var selectedProp = PropQuery.showDeepestSelectedProperty(selectedProperties);
          */
     
-    module.showDeepestSelectedProperty = function (selectedProperties) {
-            // Handle the case where selectedProperties is not an array but a single object
-            // if (!Array.isArray(selectedProperties)) {
-            //     return selectedProperties;
-            // }    
-
+        module.showDeepestSelectedProperty = function (selectedProperties) {
             if (selectedProperties.length === 1) {
                 return selectedProperties[0]; // Directly return if only one property is selected
             }
@@ -232,9 +161,7 @@ var PropQuery = (function () {
          */
     
         module.collectPropertyHierarchyInfo = function (prop, optionalArg) {
-            module._init();
-            var allowedFlags = module.allowedFlags;
-
+            
             // Handle optionalArg being passed as an array, so it can be used with the module - this converts the array of flags to an object with a flags properties
             if (Array.isArray(optionalArg)) {
                 optionalArg = { flags: optionalArg };
@@ -243,7 +170,7 @@ var PropQuery = (function () {
             // Validate flags against allowedFlags
             var flags = optionalArg && optionalArg.flags || [];
             for (var i = 0; i < flags.length; i++) {
-                if (module.indexOf(allowedFlags, flags[i]) === -1) {
+                if (indexOf(allowedFlags, flags[i]) === -1) {
                     throw new Error("Invalid flag: " + flags[i]);
                 }
             }
@@ -340,9 +267,7 @@ var PropQuery = (function () {
          * var propPath = PropQuery(selectedProperty, 'propPath', optionalArg) 
          */
         module.constructPropertyPath = function (collectedHierarchy, optionalArg) {
-            module._init();
-            var allowedFlags = module.allowedFlags;
-
+            
             // Handle optionalArg being passed as an array, so it can be used with the module - this converts the array of flags to an object with a flags properties
             if (Array.isArray(optionalArg)) {
                 optionalArg = { flags: optionalArg };
@@ -351,14 +276,14 @@ var PropQuery = (function () {
             // Validate flags against allowedFlags
             var flags = optionalArg && optionalArg.flags || [];
             for (var i = 0; i < flags.length; i++) {
-                if (module.indexOf(allowedFlags, flags[i]) === -1) {
+                if (indexOf(allowedFlags, flags[i]) === -1) {
                     throw new Error("Invalid flag: " + flags[i]);
                 }
-            };
+            }
 
-            var useNames = module.indexOf(flags,"useNames") !== -1;
-            var useMatchNames = module.indexOf(flags, "useMatchNames") !== -1;
-            var useGroupIndices = module.indexOf(flags, "useGroupIndices") !== -1;
+            var useNames = flags.indexOf("useNames") !== -1;
+            var useMatchNames = flags.indexOf("useMatchNames") !== -1;
+            var useGroupIndices = flags.indexOf("useGroupIndices") !== -1;
             var propertyPath = '';
 
             // Process layer information first
@@ -413,22 +338,19 @@ var PropQuery = (function () {
          * @param {Array} optionalArg - The optionalArg is an array of flags to be used with the PropQuery module - "useNames", "useGroupIndices", "useMatchNames", "comp", "layerName", "layerMatchName", "layerIndex", "hierarchy", "propName", "propMatchName". Used only for "propPath" and "propInfo" return types. Flags can be combined, such as ["useNames", "useGroupIndices"],["useMatchNames", "useGroupIndices"],["useNames"] or ["useMatchNames"], or ["layerName", "comp"].
          * @returns {String||Object} - The result of the selected return type. selectedProperty object is returned by using returnType "propObject", property type string is returned by using returnType "propType", "propPath", property info object (consisting of the constructed hierarchy) is returned by using returnType "propInfo" without flags.
          * @example
-         * var propPath = PropQuery.main(selectedProperty, 'propPath', ["useNames"])
-         * var propInfo = PropQuery.main(selectedProperty, 'propInfo', ["layerName", "comp"])
+         * var propPath = PropQuery(selectedProperty, 'propPath', ["useNames"])
+         * var propInfo = PropQuery(selectedProperty, 'propInfo', ["layerName", "comp"])
          */
-        module.main = function (selectedProperty, returnType, optionalArg) {
-            module._init();
-            var allowedFlags = module.allowedFlags;
-
+        var mainFunction = function (selectedProperty, returnType, optionalArg) {
             // Handle optionalArg being passed as an array, so it can be used with the module - this converts the array of flags to an object with a flags properties
             if (Array.isArray(optionalArg)) {
                 optionalArg = { flags: optionalArg };
             }
-
+            
             // Validate flags against allowedFlags
             var flags = optionalArg && optionalArg.flags || [];
             for (var i = 0; i < flags.length; i++) {
-                if (module.indexOf(allowedFlags, flags[i]) === -1) {
+                if (indexOf(allowedFlags, flags[i]) === -1) {
                     throw new Error("Invalid flag: " + flags[i]);
                 }
             }
@@ -444,10 +366,6 @@ var PropQuery = (function () {
             switch (returnType) {
                 case 'propObject':
                     return deepestProp;
-                
-                case 'treeviewGroups':
-                    var layer = selectedLayers[0];
-                    return module.extractTreeViewGroups(layer);
 
                 case 'propType':
                     return module.getPropertyType(deepestProp);
@@ -491,13 +409,59 @@ var PropQuery = (function () {
                     throw new Error("Invalid return type");
             }
         };
+    //============== EXPOSE MODULES FOR INDIVIDUAL USE ==================//
+        mainFunction.showDeepestSelectedProperty = module.showDeepestSelectedProperty;
+        
+        mainFunction.getPropertyType = module.getPropertyType;
+        
+        mainFunction.collectPropertyHierarchyInfo = module.collectPropertyHierarchyInfo;
+        
+        mainFunction.constructPropertyPath = module.constructPropertyPath;
     
-    return module;
+    return mainFunction;
 
 })();
 
-//layer("Shape Layer 1").property("ADBE Root Vectors Group").property("ADBE Vector Group").property("ADBE Vectors Group").property("ADBE Vector Shape - Group").property("ADBE Vector Shape");
 
+/*********************TESTER MODULE**********************/
 
+    function testPropPathModule() {
+        var comp = app.project.activeItem;
+        if (comp && comp instanceof CompItem) {
+            var selectedProperties = comp.selectedProperties;
+            if (selectedProperties.length === 0) {
+                alert('No property selected.');
+                return;
+            }
 
+            // Create the palette
+            var win = new Window('palette', 'Property Info', undefined, { resizeable: true });
+            win.orientation = 'column';
 
+            // Create the text area
+            var textArea = win.add('edittext', undefined, '', {
+                multiline: true,
+                scrolling: true
+            });
+            textArea.size = [500, 200];
+
+            win.onResizing = win.onResize = function () {
+                this.layout.resize();
+                textArea.size = [this.size[0] - 30, this.size[1] - 40];
+            };
+        
+            var result = PropQuery(selectedProperties, 'propInfo', ["propName"])
+            
+            textArea.text = result;
+
+            // Show the palette
+            win.layout.layout(true);
+            win.center();
+            win.show();
+        } else {
+            alert('No composition is currently active.');
+        }
+    }
+
+    // Run the test in After Effects
+    testPropPathModule();

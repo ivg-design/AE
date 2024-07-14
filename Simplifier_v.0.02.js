@@ -1,0 +1,191 @@
+// ShapeLayerSimplifier.jsx
+// Author: [Your Name]
+// Description: Simplifies the selected path of a shape layer using the Douglas-Peucker algorithm.
+
+(function () {
+    // UI Setup
+    var ui = {
+        slider: null,
+        sliderValue: null,
+        entireTimelineCheckbox: null,
+        simplifyButton: null,
+
+        createUI: function (thisObj) {
+            var window = (thisObj instanceof Panel) ? thisObj : new Window("palette", "Shape Layer Simplifier", undefined, { resizeable: true });
+
+            var sliderGroup = window.add("group");
+            sliderGroup.add("statictext", undefined, "Simplification Strength:");
+            this.slider = sliderGroup.add("slider", undefined, 50, 1, 100);
+            this.slider.preferredSize.width = 200;
+            this.sliderValue = sliderGroup.add("statictext", undefined, "50");
+            this.sliderValue.preferredSize.width = 30;
+            this.slider.onChanging = function () {
+                ui.sliderValue.text = Math.round(this.value);
+            };
+
+            this.entireTimelineCheckbox = window.add("checkbox", undefined, "Entire Timeline");
+
+            this.simplifyButton = window.add("button", undefined, "Simplify");
+            this.simplifyButton.onClick = function () {
+                app.beginUndoGroup("Shape Layer Simplification");
+                simplifySelectedPath();
+                app.endUndoGroup();
+            };
+
+            if (window instanceof Window) {
+                window.center();
+                window.show();
+            }
+        }
+    };
+
+    // Douglas-Peucker Algorithm
+    function douglasPeucker(points, epsilon) {
+        var dmax = 0;
+        var index = 0;
+        var end = points.length - 1;
+
+        for (var i = 1; i < end; i++) {
+            var d = perpendicularDistance(points[i], points[0], points[end]);
+            if (d > dmax) {
+                index = i;
+                dmax = d;
+            }
+        }
+
+        if (dmax > epsilon) {
+            var results1 = douglasPeucker(points.slice(0, index + 1), epsilon);
+            var results2 = douglasPeucker(points.slice(index), epsilon);
+            var results = results1.slice(0, -1).concat(results2);
+            return results;
+        } else {
+            return [points[0], points[end]];
+        }
+    }
+
+    function perpendicularDistance(pt, lineStart, lineEnd) {
+        var dx = lineEnd[0] - lineStart[0];
+        var dy = lineEnd[1] - lineStart[1];
+        return Math.abs(dy * pt[0] - dx * pt[1] + lineEnd[0] * lineStart[1] - lineEnd[1] * lineStart[0]) / Math.sqrt(dx * dx + dy * dy);
+    }
+
+    // Main Logic
+    function simplifySelectedPath() {
+        var comp = app.project.activeItem;
+        if (!(comp instanceof CompItem)) {
+            alert("Please select a composition.");
+            return;
+        }
+
+        var layer = comp.selectedLayers[0];
+        if (!layer || !(layer instanceof ShapeLayer)) {
+            alert("Please select a shape layer.");
+            return;
+        }
+
+        var props = layer.selectedProperties;
+        if (!props || props.length === 0) {
+            alert("Please select a shape path.");
+            return;
+        }
+
+        var path = null;
+        for (var i = 0; i < props.length; i++) {
+            if (props[i].matchName === "ADBE Vector Shape") {
+                path = props[i];
+                break;
+            }
+        }
+
+        if (!path) {
+            alert("Please select a shape path.");
+            return;
+        }
+
+        var epsilon = ui.slider.value // / 1000;
+        var entireTimeline = ui.entireTimelineCheckbox.value;
+
+        if (entireTimeline) {
+            for (var i = 1; i <= path.numKeys; i++) {
+                var t = path.keyTime(i);
+                var shape = path.valueAtTime(t, true);
+                var simplifiedShape = simplifyShape(shape, epsilon);
+                path.setValueAtTime(t, simplifiedShape);
+            }
+        } else {
+            var currentTime = comp.time;
+            var currentKeyframeIndex = path.nearestKeyIndex(currentTime);
+            var keyframeData = [];
+
+            for (var i = 1; i <= path.numKeys; i++) {
+                var t = path.keyTime(i);
+                var shape = path.valueAtTime(t, true);
+                keyframeData.push({
+                    time: t,
+                    vertices: shape.vertices,
+                    inTangents: shape.inTangents,
+                    outTangents: shape.outTangents
+                });
+            }
+
+            var shape;
+            if (currentKeyframeIndex === 0 || path.keyTime(currentKeyframeIndex) !== currentTime) {
+                shape = path.valueAtTime(currentTime, false);
+                path.setValueAtTime(currentTime, shape);
+            } else {
+                shape = path.valueAtTime(path.keyTime(currentKeyframeIndex), false);
+            }
+
+            var simplifiedShape = simplifyShape(shape, epsilon);
+            path.setValueAtTime(currentTime, simplifiedShape);
+
+            for (var i = 0; i < keyframeData.length; i++) {
+                if (keyframeData[i].time !== currentTime) {
+                    var data = keyframeData[i];
+                    var restoredShape = new Shape();
+                    restoredShape.vertices = data.vertices;
+                    restoredShape.inTangents = data.inTangents;
+                    restoredShape.outTangents = data.outTangents;
+                    restoredShape.closed = shape.closed;
+                    path.setValueAtTime(data.time, restoredShape);
+                }
+            }
+        }
+    }
+
+    function simplifyShape(shape, epsilon) {
+        var vertices = shape.vertices;
+        var inTangents = shape.inTangents;
+        var outTangents = shape.outTangents;
+        var closed = shape.closed;
+
+        var simplifiedVertices = douglasPeucker(vertices, epsilon);
+        var simplifiedInTangents = [];
+        var simplifiedOutTangents = [];
+
+        for (var i = 0; i < simplifiedVertices.length; i++) {
+            var index = -1;
+            for (var j = 0; j < vertices.length; j++) {
+                if (vertices[j][0] === simplifiedVertices[i][0] && vertices[j][1] === simplifiedVertices[i][1]) {
+                    index = j;
+                    break;
+                }
+            }
+            if (index !== -1) {
+                simplifiedInTangents.push(inTangents[index]);
+                simplifiedOutTangents.push(outTangents[index]);
+            }
+        }
+
+        var simplifiedShape = new Shape();
+        simplifiedShape.vertices = simplifiedVertices;
+        simplifiedShape.inTangents = simplifiedInTangents;
+        simplifiedShape.outTangents = simplifiedOutTangents;
+        simplifiedShape.closed = closed;
+
+        return simplifiedShape;
+    }
+
+    // Run the script
+    ui.createUI(this);
+})();

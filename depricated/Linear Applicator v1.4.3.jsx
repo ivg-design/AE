@@ -1,0 +1,389 @@
+/**
+ * Linear Applicator
+ *
+ * This script allows users to apply linear expressions to After Effects properties, driven by another property.
+ * It supports 1D and 2D properties and captures keyframe values to create smooth interpolations based on a driver property.
+ *
+ * FUNCTIONALITY:
+ * - Prompts the user to select a target property and a driver property.
+ * - Ensures the target property has at least two keyframes.
+ * - Supports 1D and 2D properties, while excluding 3D, 4D, and properties with hold keyframes.
+ * - Applies a linear expression to the target property based on the driver property values.
+ *
+ * USAGE:
+ * 1. Select a composition in Adobe After Effects.
+ * 2. Run the script.
+ * 3. Click "Select Target Property" and choose a property with at least two keyframes.
+ * 4. Click "Select Driver Property" and choose a driver property.
+ * 5. Enter the min and max values for the driver property.
+ * 6. Click "Apply Linear Expression" to apply the expression to the target property.
+ *
+ * @version 1.4.2
+ * @date 2024-07-01
+ * @license MIT License
+ * @author IVG Design
+ * @changelog 
+ * 1.0.0 Initial version.
+ * 1.1.0 Added support for 2D properties.
+ * 1.1.1 Fixed bug that broke the expression when layers are parented.
+ * 1.2.0 Improved keyframe value capturing for accurate interpolation.
+ * 1.3.0 Added added linearArrayInterpolation function.
+ * 1.4.0 Enhanced UI to select target and driver properties.
+ * 1.4.1 Added checks for incompatible properties (3D, 4D, hold keyframes).
+ * 1.4.2 Optimized expression generation and ensured compatibility with ECMA 3.
+ * 1.4.3 Fix the issuse with expression not working on 2D non path properties
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+
+(function () {
+    /**
+     * Creates a linear expression for the target property based on the driver property.
+     * Captures keyframe values and generates the appropriate expression to interpolate
+     * between these values based on the driver property.
+     *
+     * @param {String} driverLayerName - The name of the layer containing the driver property.
+     * @param {String} driverPropertyPath - The expression path of the driver property.
+     * @param {Array} keyframes - The keyframe values of the target property.
+     * @param {Boolean} is2D - Whether the target property is 2D.
+     * @param {Number} minVal - The minimum value for the driver property.
+     * @param {Number} maxVal - The maximum value for the driver property.
+     * @param {Property} property - The target property.
+     * @returns {String} The generated linear expression.
+     */
+    function createExpression(driverLayer, driverPropertyPath, keyframes, is2D, minVal, maxVal, property) {
+        var expression = "function linearExpression(value, inputMin, inputMax, outputMin, outputMax) {\n" +
+            "  var normalizedValue = (value - inputMin) / (inputMax - inputMin);\n" +
+            "  var outputValue = outputMin + normalizedValue * (outputMax - outputMin);\n" +
+            "  return Math.max(Math.min(outputValue, Math.max(outputMin, outputMax)), Math.min(outputMin, outputMax));\n" +
+            "}\n\n";
+
+        // Add the linearArrayInterpolation function only if the property is a path property
+        if (property.propertyValueType === PropertyValueType.SHAPE) {
+            expression += "function linearArrayInterpolation(value, inputMin, inputMax, key1, key2) {\n" +
+                "  var result = { vertices: [], inTangents: [], outTangents: [] };\n" +
+                "  for (var i = 0; i < key1.vertices.length; i++) {\n" +
+                "    result.vertices.push([\n" +
+                "      linearExpression(value, inputMin, inputMax, key1.vertices[i][0], key2.vertices[i][0]),\n" +
+                "      linearExpression(value, inputMin, inputMax, key1.vertices[i][1], key2.vertices[i][1])\n" +
+                "    ]);\n" +
+                "    result.inTangents.push([\n" +
+                "      linearExpression(value, inputMin, inputMax, key1.inTangents[i][0], key2.inTangents[i][0]),\n" +
+                "      linearExpression(value, inputMin, inputMax, key1.inTangents[i][1], key2.inTangents[i][1])\n" +
+                "    ]);\n" +
+                "    result.outTangents.push([\n" +
+                "      linearExpression(value, inputMin, inputMax, key1.outTangents[i][0], key2.outTangents[i][0]),\n" +
+                "      linearExpression(value, inputMin, inputMax, key1.outTangents[i][1], key2.outTangents[i][1])\n" +
+                "    ]);\n" +
+                "  }\n" +
+                "  return result;\n" +
+                "}\n\n";
+        }
+
+        expression += "var controllingValue = " + driverPropertyPath + ".value;\n" +
+            "var minVal = Math.min(" + minVal + ", " + maxVal + ");\n" +
+            "var maxVal = Math.max(" + minVal + ", " + maxVal + ");\n" +
+            "if (controllingValue < minVal) controllingValue = minVal;\n" +
+            "if (controllingValue > maxVal) controllingValue = maxVal;\n";
+
+        var numSegments = keyframes.length - 1;
+        var segmentLength = (numSegments > 0) ? (maxVal - minVal) / numSegments : 0;
+
+        if (property.propertyValueType === PropertyValueType.SHAPE) {
+            var allKeys = [];
+
+            for (var i = 0; i < keyframes.length; i++) {
+                var shape = keyframes[i];
+                var kf = {
+                    vertices: shape.vertices,
+                    inTangents: shape.inTangents,
+                    outTangents: shape.outTangents,
+                    isClosed: shape.closed
+                };
+                allKeys.push(kf);
+            }
+
+            expression += "var allKeys = " + JSON.stringify(allKeys) + ";\n";
+            expression += "var result = { vertices: [], inTangents: [], outTangents: [] };\n";
+
+            for (var i = 0; i < numSegments; i++) {
+                var segmentStart = minVal + i * segmentLength;
+                var segmentEnd = segmentStart + segmentLength;
+
+                if (segmentStart === segmentEnd) {
+                    segmentEnd += 0.0001; // Avoid division by zero
+                }
+
+                expression += "if (controllingValue >= " + segmentStart + " && controllingValue <= " + segmentEnd + ") {\n";
+                expression += "  result = linearArrayInterpolation(controllingValue, " + segmentStart + ", " + segmentEnd + ", allKeys[" + i + "], allKeys[" + (i + 1) + "]);\n";
+                expression += "}\n";
+            }
+
+            // Handle cases where controllingValue is outside the defined min/max range
+            expression += "if (controllingValue < minVal) {\n";
+            expression += "  result = allKeys[0];\n";
+            expression += "}\n";
+
+            expression += "if (controllingValue > maxVal) {\n";
+            expression += "  result = allKeys[" + numSegments + "];\n";
+            expression += "}\n";
+
+            expression += "createPath(result.vertices, result.inTangents, result.outTangents, allKeys[0].isClosed);\n";
+
+        } else {
+            // Define segments for non-path 2D/1D properties
+            var segments = [];
+            for (var i = 0; i < numSegments; i++) {
+                var kfStart = keyframes[i];
+                var kfEnd = keyframes[i + 1];
+                var segmentStart = [];
+                var segmentEnd = [];
+                for (var j = 0; j < kfStart.length; j++) {
+                    segmentStart.push(parseFloat(kfStart[j].toFixed(2)));
+                    segmentEnd.push(parseFloat(kfEnd[j].toFixed(2)));
+                }
+                segments.push([segmentStart, segmentEnd]);
+            }
+
+            expression += "function mapSliderToValue(controllingValue, segments, minVal, maxVal) {\n" +
+                "  var numSegments = segments.length;\n" +
+                "  var segmentLength = (maxVal - minVal) / numSegments;\n" +
+                "  var mappedValueX, mappedValueY;\n" +
+                "  for (var i = 0; i < numSegments; i++) {\n" +
+                "    var segmentStart = minVal + i * segmentLength;\n" +
+                "    var segmentEnd = segmentStart + segmentLength;\n" +
+                "    if (segmentStart === segmentEnd) {\n" +
+                "      segmentEnd += 0.0001; // Avoid division by zero\n" +
+                "    }\n" +
+                "    var kfStart = segments[i][0];\n" +
+                "    var kfEnd = segments[i][1];\n" +
+                "    if (controllingValue >= segmentStart && controllingValue <= segmentEnd) {\n" +
+                "      mappedValueX = linearExpression(controllingValue, segmentStart, segmentEnd, kfStart[0], kfEnd[0]);\n" +
+                "      mappedValueY = linearExpression(controllingValue, segmentStart, segmentEnd, kfStart[1], kfEnd[1]);\n" +
+                "    }\n" +
+                "  }\n" +
+                "  if (controllingValue < minVal) {\n" +
+                "    mappedValueX = segments[0][0][0];\n" +
+                "    mappedValueY = segments[0][0][1];\n" +
+                "  }\n" +
+                "  if (controllingValue > maxVal) {\n" +
+                "    mappedValueX = segments[numSegments - 1][1][0];\n" +
+                "    mappedValueY = segments[numSegments - 1][1][1];\n" +
+                "  }\n" +
+                "  return [mappedValueX, mappedValueY];\n" +
+                "}\n\n";
+
+            expression += "var segments = [\n";
+            for (var i = 0; i < numSegments; i++) {
+                var kfStart = keyframes[i];
+                var kfEnd = keyframes[i + 1];
+                expression += "  [[" + parseFloat(kfStart[0].toFixed(2)) + ", " + parseFloat(kfStart[1].toFixed(2)) + "], [" + parseFloat(kfEnd[0].toFixed(2)) + ", " + parseFloat(kfEnd[1].toFixed(2)) + "]]";
+                if (i < numSegments - 1) {
+                    expression += ",\n";
+                }
+            }
+            expression += "\n];\n";
+
+            expression += "var mappedValue = mapSliderToValue(controllingValue, segments, minVal, maxVal);\n";
+            expression += "value = mappedValue;\n";
+            
+        }
+
+        return expression;
+    }
+
+    /**
+     * Constructs the full expression path for a given property.
+     * Ensures the path is properly formatted for After Effects expressions.
+     *
+     * @param {Property} property - The property for which to construct the path.
+     * @returns {String} The full expression path.
+     */
+    function getPropertyExpressionPath(property) {
+        var path = '';
+        var propertyNames = [];
+        while (property !== null) {
+            var propName = property.name;
+            if (property.parentProperty) {
+                if (property.parentProperty.matchName === 'ADBE Effect Parade') {
+                    propName = '("' + propName + '")';
+                } else {
+                    propName = '("' + propName + '")';
+                }
+            } else {
+                propName = 'thisComp.layer("' + propName + '")';
+            }
+            propertyNames.unshift(propName);
+            property = property.parentProperty;
+        }
+        path = propertyNames.join('');
+        return path;
+    }
+    /**
+     * Retrieves the deepest selected property from a list of selected properties.
+     * Ensures the deepest property is returned if multiple properties are selected.
+     *
+     * @param {Array} selectedProperties - The list of selected properties.
+     * @returns {Property} The deepest selected property.
+     */
+    function showDeepestSelectedProperty(selectedProperties) {
+        if (selectedProperties.length === 1) {
+            return selectedProperties[0];
+        }
+
+        if (selectedProperties.length > 1) {
+            var deepestProp = null;
+            var deepestPropDepth = 0;
+
+            for (var i = 0; i < selectedProperties.length; i++) {
+                var prop = selectedProperties[i];
+
+                if (prop.propertyDepth > deepestPropDepth) {
+                    deepestProp = prop;
+                    deepestPropDepth = prop.propertyDepth;
+                }
+            }
+            return deepestProp;
+        }
+    }
+
+    function main() {
+        var comp = app.project.activeItem;
+        if (!(comp instanceof CompItem)) {
+            alert("Please select a composition.");
+            return;
+        }
+
+        var win = new Window("palette", "Driver Property Selector", undefined);
+        win.orientation = "column";
+
+        var targetBtn = win.add("button", undefined, "Select Target Property");
+        var targetInfoGroup = win.add("group");
+        targetInfoGroup.orientation = "column";
+        var targetInfo = targetInfoGroup.add('statictext {text: "-empty-", justify: "center"}');
+        targetInfo.preferredSize.width = 300;
+        
+        var driverBtn = win.add("button", undefined, "Select Driver Property");
+        var driverInfoGroup = win.add("group");
+        driverInfoGroup.orientation = "column";
+        var driverInfo = driverInfoGroup.add('statictext {text: "-empty-", justify: "center"}');
+        driverInfo.preferredSize.width = 300;
+
+        var minInput = win.add("edittext", undefined, "Min Value")
+        minInput.characters = 20;
+        var maxInput = win.add("edittext", undefined, "Max Value");
+        maxInput.characters = 20;
+
+        var buttonGroup = win.add("group");
+        var applyBtn = buttonGroup.add("button", undefined, "Apply Linear Expression");
+        var cancelBtn = buttonGroup.add("button", undefined, "Cancel");
+
+        var driverProperty = null;
+        var targetProperty = null;
+        var driverLayerName = "";
+        var targetLayerName = "";
+
+        driverBtn.onClick = function () {
+            var selectedDriverProperty = showDeepestSelectedProperty(comp.selectedProperties);
+
+            if (driverProperty && selectedDriverProperty && driverProperty === selectedDriverProperty) {
+                driverProperty = null;
+                driverLayerName = "";
+                driverBtn.text = "Select Driver Property";
+                driverInfo.text = "-empty-";
+            } else if (selectedDriverProperty) {
+                driverProperty = selectedDriverProperty;
+                driverLayerName = comp.selectedLayers[0].name; // Assuming the layer name
+                driverBtn.text = "Driver Property Selected";
+                var propertyName = driverProperty.parentProperty.name + " - " + driverProperty.name;
+                driverInfo.text = "Layer: " + driverLayerName + " - Property: " + propertyName;
+            } else {
+                alert("Please select a valid driver property.");
+            }
+        };
+
+        targetBtn.onClick = function () {
+            var selectedTargetProperty = showDeepestSelectedProperty(comp.selectedProperties);
+
+            if (targetProperty && selectedTargetProperty && targetProperty === selectedTargetProperty) {
+                targetProperty = null;
+                targetLayerName = "";
+                targetBtn.text = "Select Target Property";
+                targetInfo.text = "-empty-";
+            } else if (selectedTargetProperty) {
+                if (selectedTargetProperty.numKeys < 2) {
+                    alert("Target property must have at least two keyframes.");
+                } else if (selectedTargetProperty.propertyValueType === 6424 || selectedTargetProperty.propertyValueType === 6418 || selectedTargetProperty.propertyValueType === 6412 ) {
+                    alert("Oops! Linear Applicator doesn't yet work with 3D, 4D properties. Please select a compatible property.");
+                } else {
+                    targetProperty = selectedTargetProperty;
+                    targetLayerName = comp.selectedLayers[0].name; // Assuming the layer name
+                    targetBtn.text = "Target Property Selected";
+
+                    var propertyName = targetProperty.parentProperty.name + " - " + targetProperty.name;
+                    targetInfo.text = "Layer: " + targetLayerName + " - Property: " + propertyName;
+                }
+            } else {
+                alert("Please select a valid target property.");
+            }
+        };
+
+        applyBtn.onClick = function () {
+            if (!driverProperty || !targetProperty) {
+                alert("Please select both driver and target properties.");
+                return;
+            }
+
+            var minVal = parseFloat(minInput.text);
+            var maxVal = parseFloat(maxInput.text);
+
+            if (isNaN(minVal) || isNaN(maxVal)) {
+                alert("Please enter valid numeric values for min and max.");
+                return;
+            }
+
+            var keyframes = [];
+            for (var i = 1; i <= targetProperty.numKeys; i++) {
+                keyframes.push(targetProperty.keyValue(i));
+            }
+
+            var is2D = typeof keyframes[0] === 'object' && keyframes[0].length;
+
+            var driverPropertyPath = getPropertyExpressionPath(driverProperty);
+
+            app.beginUndoGroup("Apply Linear Expression");
+            var expression = createExpression(driverLayerName, driverPropertyPath, keyframes, is2D, minVal, maxVal, targetProperty);
+            // alert("Generated Expression: \n" + expression);
+            targetProperty.expression = expression;
+            app.endUndoGroup();
+
+            win.close();
+        };
+
+        cancelBtn.onClick = function () {
+            win.close();
+        };
+
+        win.center();
+        win.show();
+    }
+
+    main();
+})();

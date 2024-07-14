@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ExtensionManifest
+Version="6.0"
+ExtensionBundleId="com.expression_library.cep"
+ExtensionBundleVersion="0.0.1"
+ExtensionBundleName="Expression Library"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+<ExtensionList>
+  <Extension Id="com.expression_library.cep.main" Version="0.0.1" />
+</ExtensionList>
+<ExecutionEnvironment>
+  <HostList>
+    <Host Name="AEFT" Version="[0.0,99.9]" />
+    <Host Name="AME" Version="[0.0,99.9]" />
+    <Host Name="AUDT" Version="[0.0,99.9]" />
+    <Host Name="FLPR" Version="[0.0,99.9]" />
+    <Host Name="IDSN" Version="[0.0,99.9]" />
+    <Host Name="ILST" Version="[0.0,99.9]" />
+    <Host Name="KBRG" Version="[0.0,99.9]" />
+    <Host Name="PHXS" Version="[0.0,99.9]" />
+    <Host Name="PPRO" Version="[0.0,99.9]" />
+  </HostList>
+  <LocaleList>
+    <Locale Code="All" />
+  </LocaleList>
+  <RequiredRuntimeList>
+    <RequiredRuntime Name="CSXS" Version="9.0" />
+  </RequiredRuntimeList>
+</ExecutionEnvironment>
+<DispatchInfoList>
+  <Extension Id="com.expression_library.cep.main">
+    <DispatchInfo>
+      <Resources>
+        <MainPath>./main/index.html</MainPath>
+        <CEFCommandLine>
+          <Parameter>--v=0</Parameter>
+          <Parameter>--enable-nodejs</Parameter>
+          <Parameter>--mixed-context</Parameter>
+        </CEFCommandLine>
+      </Resources>
+      <Lifecycle>
+        <AutoVisible>true</AutoVisible>
+      </Lifecycle>
+      <UI>
+        <Type>Panel</Type>
+        <Menu>Expression Library</Menu>
+        <Geometry>
+          <Size>
+            <Width>600</Width>
+            <Height>650</Height>
+          </Size>
+        </Geometry>
+        <Icons>
+          <Icon Type="Normal">./src/assets/dark-icon.png</Icon>
+          <Icon Type="DarkNormal">./src/assets/light-icon.png</Icon>
+          <Icon Type="RollOver">./src/assets/dark-icon.png</Icon>
+          <Icon Type="DarkRollOver">./src/assets/light-icon.png</Icon>
+        </Icons>
+      </UI>
+    </DispatchInfo>
+  </Extension>
+</DispatchInfoList>
+</ExtensionManifest>
