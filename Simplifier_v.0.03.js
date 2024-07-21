@@ -168,6 +168,7 @@
 
         return low;
     }
+    
     function basisFunctions(i, t, degree, knots) {
         var N = [1];
         var eps = 1e-10; // Small epsilon value to avoid division by zero
