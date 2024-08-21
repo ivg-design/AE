@@ -15,111 +15,162 @@
  * @creator IVG Design
  */
 
-/**
- * Creates a 'SFX CTRL' Null layer and adds three sliders: 'Voice Over', 'Sound Effects', and 'Music'.
- * @param {CompItem} comp - The composition where the 'SFX CTRL' layer will be created.
- * @returns {AVLayer} The created 'SFX CTRL' null layer.
- */
-function createSFXCTRL(comp) {
-    var sfxCtrl = comp.layers.addNull();
-    sfxCtrl.name = "SFX CTRL";
-    sfxCtrl.property("ADBE Transform Group").property("ADBE Position").setValue([100, 100]); // Position it appropriately
 
-    var voiceOverSlider = sfxCtrl.Effects.addProperty("ADBE Slider Control");
-    voiceOverSlider.name = "Voice Over";
+(function () {
+    /**
+     * Creates a "SFX CTRL" null layer with three slider controls: Voice Over, Sound Effects, and Music.
+     * @param {CompItem} comp - The composition in which to create the SFX CTRL layer.
+     * @returns {AVLayer} The created SFX CTRL null layer.
+     */
+    function createSFXCTRL(comp) {
+        var sfxCtrl = comp.layers.addNull();
+        sfxCtrl.name = "SFX CTRL";
+        sfxCtrl.property("ADBE Transform Group").property("ADBE Position").setValue([100, 100]); // Position it appropriately
 
-    var soundEffectsSlider = sfxCtrl.Effects.addProperty("ADBE Slider Control");
-    soundEffectsSlider.name = "Sound Effects";
+        var voiceOverSlider = sfxCtrl.Effects.addProperty("ADBE Slider Control");
+        voiceOverSlider.name = "Voice Over";
 
-    var musicSlider = sfxCtrl.Effects.addProperty("ADBE Slider Control");
-    musicSlider.name = "Music";
+        var soundEffectsSlider = sfxCtrl.Effects.addProperty("ADBE Slider Control");
+        soundEffectsSlider.name = "Sound Effects";
 
-    return sfxCtrl;
-}
+        var musicSlider = sfxCtrl.Effects.addProperty("ADBE Slider Control");
+        musicSlider.name = "Music";
 
-/**
- * Determines which slider ('Voice Over', 'Music', or 'Sound Effects') to connect based on the first marker's comment.
- * Defaults to 'Sound Effects' if no valid marker is found or if the marker is empty.
- * @param {AVLayer} layer - The audio layer to analyze.
- * @returns {string} The name of the slider to which the audio layer should be connected.
- */
-function determineSlider(layer) {
-    if (layer.property("Marker").numKeys > 0) {
-        var firstMarker = layer.property("Marker").keyValue(1).comment.toLowerCase();
-        if (firstMarker.indexOf("voice over") !== -1) {
-            return "Voice Over";
-        } else if (firstMarker.indexOf("music") !== -1) {
-            return "Music";
-        }
-    }
-    // Default to Sound Effects if no valid marker or no marker at all
-    return "Sound Effects";
-}
-
-/**
- * Adds the 'Stereo Mixer' effect to the audio layer and links it to the specified slider control.
- * @param {AVLayer} layer - The audio layer to which the 'Stereo Mixer' effect will be applied.
- * @param {string} mainCompName - The name of the main composition.
- * @param {string} sliderName - The name of the slider to connect the audio layer to.
- */
-function applyStereoMixer(layer, mainCompName, sliderName) {
-    var stereoMixer = layer.Effects.addProperty("Stereo Mixer");
-    var expression = "comp('" + mainCompName + "').layer('SFX CTRL').effect('" + sliderName + "')('Slider')";
-    stereoMixer.property("Left Level").expression = expression;
-    stereoMixer.property("Right Level").expression = expression;
-}
-
-/**
- * Recursively processes all layers within the composition, applying the 'Stereo Mixer' effect to audio layers 
- * and linking them to the appropriate slider based on marker comments.
- * @param {CompItem} comp - The composition to process.
- * @param {string} mainCompName - The name of the main composition.
- */
-function processComp(comp, mainCompName) {
-    for (var i = 1; i <= comp.numLayers; i++) {
-        var layer = comp.layer(i);
-
-        if (layer.source instanceof FootageItem && !layer.source.hasVideo) {
-            var sliderName = determineSlider(layer);
-            applyStereoMixer(layer, mainCompName, sliderName);
-        } else if (layer.source instanceof CompItem) {
-            processComp(layer.source, mainCompName);
-        }
-    }
-}
-
-/**
- * The main function that runs the script, processing selected compositions and managing audio layers.
- * It creates the 'SFX CTRL' layer if not present and applies the necessary effects and expressions to audio layers.
- */
-function main() {
-    var selectedComps = app.project.selection;
-    app.beginUndoGroup("Apply Stereo Mixer");
-
-    if (selectedComps.length === 0) {
-        alert("Please select at least one composition.");
-        return;
+        return sfxCtrl;
     }
 
-    for (var i = 0; i < selectedComps.length; i++) {
-        if (selectedComps[i] instanceof CompItem) {
-            var comp = selectedComps[i];
-            var mainCompName = comp.name;
-
-            // Create SFX CTRL null with sliders if not already present
-            var sfxCtrlLayer = comp.layer("SFX CTRL");
-            if (!sfxCtrlLayer) {
-                sfxCtrlLayer = createSFXCTRL(comp);
+    /**
+     * Determines the appropriate slider control (Voice Over, Music, or Sound Effects) based on the layer's marker comment.
+     * @param {AVLayer} layer - The layer from which to determine the slider.
+     * @returns {string} The name of the appropriate slider control.
+     */
+    function determineSlider(layer) {
+        if (layer.property("Marker").numKeys > 0) {
+            var firstMarker = layer.property("Marker").keyValue(1).comment.toLowerCase();
+            if (firstMarker.indexOf("voice over") !== -1) {
+                return "Voice Over";
+            } else if (firstMarker.indexOf("music") !== -1) {
+                return "Music";
             }
+        }
+        // Default to Sound Effects if no valid marker or no marker at all
+        return "Sound Effects";
+    }
 
-            processComp(comp, mainCompName);
-        } else {
-            alert("Please select only compositions.");
+    /**
+     * Checks if the given layer already has a Stereo Mixer effect with expressions applied.
+     * @param {AVLayer} layer - The layer to check for an existing Stereo Mixer effect.
+     * @returns {boolean} True if the layer has a Stereo Mixer effect with expressions applied, false otherwise.
+     */
+    function checkForExistingStereoMixer(layer) {
+        var stereoMixer = layer.property("Effects").property("Stereo Mixer");
+        if (stereoMixer) {
+            var leftExpr = stereoMixer.property("Left Level").expression;
+            var rightExpr = stereoMixer.property("Right Level").expression;
+            return (leftExpr || rightExpr); // Returns true if there is an existing expression
+        }
+        return false;
+    }
+
+    /**
+     * Applies or overwrites the Stereo Mixer effect with expressions linked to the specified slider.
+     * @param {AVLayer} layer - The layer on which to apply the Stereo Mixer effect.
+     * @param {string} mainCompName - The name of the main composition.
+     * @param {string} sliderName - The name of the slider control to link the Stereo Mixer effect to.
+     * @param {boolean} overwrite - Whether to overwrite an existing Stereo Mixer effect or add a new one.
+     */
+    function applyStereoMixer(layer, mainCompName, sliderName, overwrite) {
+        var stereoMixer = layer.property("Effects").property("Stereo Mixer");
+
+        if (stereoMixer && !overwrite) {
+            stereoMixer = layer.Effects.addProperty("Stereo Mixer");
+        }
+
+        // Apply or overwrite the expressions
+        stereoMixer.property("Left Level").expression = "comp('" + mainCompName + "').layer('SFX CTRL').effect('" + sliderName + "')('Slider')";
+        stereoMixer.property("Right Level").expression = "comp('" + mainCompName + "').layer('SFX CTRL').effect('" + sliderName + "')('Slider')";
+    }
+
+    /**
+     * Processes a composition and its layers to check for or apply Stereo Mixer effects.
+     * @param {CompItem} comp - The composition to process.
+     * @param {string} mainCompName - The name of the main composition.
+     * @param {boolean} checkOnly - If true, only checks for existing Stereo Mixer effects; if false, applies the effects.
+     * @param {boolean} overwrite - Whether to overwrite existing Stereo Mixer effects if found.
+     * @returns {boolean} True if any layer in the composition has an existing Stereo Mixer effect with expressions.
+     */
+    function processComp(comp, mainCompName, checkOnly, overwrite) {
+        var foundExisting = false;
+
+        for (var i = 1; i <= comp.numLayers; i++) {
+            var layer = comp.layer(i);
+
+            if (layer.source instanceof FootageItem && !layer.source.hasVideo) {
+                if (checkOnly) {
+                    foundExisting = foundExisting || checkForExistingStereoMixer(layer);
+                } else {
+                    var sliderName = determineSlider(layer);
+                    applyStereoMixer(layer, mainCompName, sliderName, overwrite);
+                }
+            } else if (layer.source instanceof CompItem) {
+                foundExisting = foundExisting || processComp(layer.source, mainCompName, checkOnly, overwrite);
+            }
+        }
+
+        return foundExisting;
+    }
+
+    /**
+     * The main function that initiates the processing of selected compositions to apply or overwrite Stereo Mixer effects.
+     */
+    function main() {
+        var selectedComps = app.project.selection;
+        app.beginUndoGroup("Apply Stereo Mixer");
+
+        if (selectedComps.length === 0) {
+            alert("Please select at least one composition.");
             return;
         }
+
+        var foundExisting = false;
+
+        for (var i = 0; i < selectedComps.length; i++) {
+            if (selectedComps[i] instanceof CompItem) {
+                var comp = selectedComps[i];
+                var mainCompName = comp.name;
+
+                // Create SFX CTRL null with sliders if not already present
+                var sfxCtrlLayer = comp.layer("SFX CTRL");
+                if (!sfxCtrlLayer) {
+                    sfxCtrlLayer = createSFXCTRL(comp);
+                }
+
+                // Check for existing Stereo Mixer effects with expressions
+                foundExisting = processComp(comp, mainCompName, true, false);
+            } else {
+                alert("Please select only compositions.");
+                return;
+            }
+        }
+
+        var overwrite = true;
+        if (foundExisting) {
+            overwrite = confirm("One or more layers already have a Stereo Mixer effect with expressions applied. Would you like to overwrite them?");
+        }
+
+        for (var i = 0; i < selectedComps.length; i++) {
+            if (selectedComps[i] instanceof CompItem) {
+                var comp = selectedComps[i];
+                var mainCompName = comp.name;
+
+                // Apply the Stereo Mixer effects based on user's decision
+                processComp(comp, mainCompName, false, overwrite);
+            }
+        }
+
+        app.endUndoGroup();
     }
 
-    app.endUndoGroup();
-}
+    main();
+})();
 
-main();

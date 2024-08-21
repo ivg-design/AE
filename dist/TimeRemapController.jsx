@@ -42,7 +42,7 @@
         timeRemapGroup.alignChildren = ["center", "center"];;
         timeRemapGroup.size = [130, 100]; // Ensure enough height for the label
 
-        var pickTimeRemapButton = timeRemapGroup.add("button", undefined, "🔴", { name: "pickTimeRemapButton" });
+        var pickTimeRemapButton = timeRemapGroup.add("button", undefined, "\uD83D\uDD34",  { name: "pickTimeRemapButton" });
         pickTimeRemapButton.size = [120, 40];
         var pickTimeRemapLabel = timeRemapGroup.add("statictext", [0, 0, 120, 40], "Pick Time\nRemapped Layer", { multiline: true });
         pickTimeRemapLabel.alignment = "center";
@@ -54,7 +54,7 @@
         controllerGroup.alignChildren = ["center", "center"];;
         controllerGroup.size = [130, 100]; // Ensure enough height for the label
 
-        var pickControllerButton = controllerGroup.add("button", undefined, "🔴", { name: "pickControllerButton" });
+        var pickControllerButton = controllerGroup.add("button", undefined, "\uD83D\uDD34",  { name: "pickControllerButton" });
         pickControllerButton.size = [120, 40];
         var pickControllerLabel = controllerGroup.add("statictext", [0, 0, 120, 40], "Pick Time\nRemap Controller", { multiline: true });
         pickControllerLabel.alignment = "center";
@@ -81,7 +81,7 @@
             if (activeLayer && activeLayer.canSetTimeRemapEnabled) {
                 timeRemapPropPath = activeLayer.property("ADBE Time Remapping");
                 if (timeRemapPropPath) {
-                    pickTimeRemapButton.text = "🟢";
+                    pickTimeRemapButton.text = "\uD83D\uDFE2" ;
                 } else {
                     alert("Selected layer does not have Time Remapping enabled.");
                 }
@@ -109,7 +109,7 @@
                 if (controllerProp) {
                     // If a controller with the same name already exists, use it
                     controllerLayer = activeItem;
-                    pickControllerButton.text = "🟢";
+                    pickControllerButton.text = "\uD83D\uDFE2";
                 } else {
                     var selectedEffect = activeItem.selectedProperties[0];
 
@@ -118,7 +118,7 @@
                         // If a slider control is selected, use it directly
                         controllerLayer = activeItem;
                         controllerProp = selectedEffect;
-                        pickControllerButton.text = "🟢";
+                        pickControllerButton.text = "\uD83D\uDFE2";
                     } else {
                         // If only a layer is selected and no matching slider exists, prompt to add a slider
                         var addSlider = confirm("No slider controller found. Would you like to add a Control Slider?");
@@ -126,7 +126,7 @@
                             controllerLayer = activeItem;
                             controllerProp = controllerLayer.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
                             controllerProp.name = controllerName;
-                            pickControllerButton.text = "🟢";
+                            pickControllerButton.text = "\uD83D\uDFE2";
                         }
                     }
                 }
@@ -147,7 +147,7 @@
                     // Add In/Out Range Point Controller if it doesn't exist
                     controlLayer = timeRemapPropPath.propertyGroup(1).property("ADBE Effect Parade").addProperty("ADBE Point Control");
                     controlLayer.name = "In/Out Range";
-                    controlLayer.property("ADBE Point Control-0001").setValue([0, 50]);
+                    controlLayer.property("ADBE Point Control-0001").setValue([0, 60]);
                 }
 
                 // Check if the controller layer already has the required controller
