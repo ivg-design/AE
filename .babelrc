@@ -1,0 +1,3 @@
+{
+	"presets": [["extendscript", { "loose": true, "modules": "amd" }]]
+}
