@@ -6,27 +6,62 @@
  * @description A JavaScript module to query properties in After Effects.
  */
 var PropQuery = (function () {
-    var module = {};
-    //=============== FLAG ARRAY =================//
-    /**
-     * @typedef {Array} FlagArray
-     * @description An array of flags to be used with the PropQuery module.
-     */ 
-    var allowedFlags = [
-        "useNames",
-        "useGroupIndices",
-        "useMatchNames",
-        "comp",
-        "layerName",
-        "layerMatchName",
-        "layerIndex",
-        "hierarchy",
-        "propName",
-        "propMatchName"
-    ];
-    //=============== MODULES =================//
+    //=============== POLYFILLS =================//
+        if (!Array.isArray) {
+            Array.isArray = function (arg) {
+                return Object.prototype.toString.call(arg) === '[object Array]';
+            };
+        }
+    
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (searchElement, fromIndex) {
+                var k;
+                if (this == null) {
+                    throw new TypeError('"this" is null or not defined');
+                }
+                var O = Object(this);
+                var len = O.length >>> 0;
+                if (len === 0) {
+                    return -1;
+                }
+                var n = fromIndex | 0;
+                if (n >= len) {
+                    return -1;
+                }
+                k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+                while (k < len) {
+                    if (O[k] === searchElement) {
+                        return k;
+                    }
+                    k++;
+                }
+                return -1;
+            };
+        }
 
+
+        var module = {};
+    //=============== FLAG ARRAY =================//
+        
         /**
+         * @typedef {Array} FlagArray
+         * @description An array of flags to be used with the PropQuery module.
+         */ 
+        var allowedFlags = [
+            "useNames",
+            "useGroupIndices",
+            "useMatchNames",
+            "comp",
+            "layerName",
+            "layerMatchName",
+            "layerIndex",
+            "hierarchy",
+            "propName",
+            "propMatchName"
+        ];
+
+    //=============== MODULES =================//
+            /**
          * @function
          * @private
          * @name indexOf
@@ -43,7 +78,6 @@ var PropQuery = (function () {
             }
             return -1;
         }
-    
         /**
          * @function
          * @memberof PropQuery
@@ -450,7 +484,7 @@ var PropQuery = (function () {
                 textArea.size = [this.size[0] - 30, this.size[1] - 40];
             };
         
-            var result = PropQuery(selectedProperties, 'propInfo', ["propName"])
+            var result = PropQuery(selectedProperties, 'propPath', ['useNames', 'useGroupIndices'])
             
             textArea.text = result;
 

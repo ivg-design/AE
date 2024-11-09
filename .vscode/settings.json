@@ -1,0 +1,8 @@
+{
+    "git.ignoreLimitWarning": true,
+    "cursor.chat.premiumChatAutoScrollWhenAtBottom": true,
+    "cursor.cmdk.useThemedDiffBackground": true,
+    "cursor.general.enableShadowWorkspace": true,
+    "cursor.chat.alwaysSearchWeb": false,
+    "liveServer.settings.multiRootWorkspaceName": "ADOBE SCRIPTING"
+}

@@ -68,7 +68,27 @@ var ApplyFFX = (function () {
 	 * var name = "MultiParent";
 	 * applyFFX.config(layer, binaryData, matchName, version, name);
 	 */
-	module.config = function (;
+	module.config = function (layer, binaryData, matchName, version, name) {
+		var config = {
+			binary: binaryData,
+			matchName: 'Pseudo/' + matchName,
+			name: name,
+			version: version,
+		};
+
+		var tempFolder = Folder.temp;
+		var ffxFile = File(tempFolder.fsName + '/' + config.name + '_v' + config.version + '.ffx');
+		ffxFile.encoding = 'BINARY';
+		ffxFile.open('w');
+		ffxFile.write(config.binary);
+		ffxFile.close();
+
+		var myComp = app.project.activeItem;
+		module.deselectAll(myComp);
+		layer.selected = true;
+		layer.applyPreset(ffxFile);
+	};
+	return module;
 })();
 
 //========== END OF INCLUDED FUNCTIONS ============//

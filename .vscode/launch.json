@@ -7,7 +7,8 @@
 		{
 			"type": "extendscript-debug",
 			"request": "attach",
-			"name": "Attach to ExtendScript Engine"
+			"name": "Attach to ExtendScript Engine",
+			
 		},
 		{
 			"type": "extendscript-debug",

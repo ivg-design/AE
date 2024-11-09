@@ -1,3 +1,17 @@
+/**
+ * ErrorLogging Module
+ * 
+ * This module provides functionality to log debug messages to a file and the console.
+ * 
+ * Example usage:
+ * 
+ * var debug = ErrorLogging("MyScript");
+ * debug.log("This is a debug message.");
+ * 
+ * This will create a file named "MyScript_Log.txt" (or "Log.txt" if no script name is provided)
+ * and write the debug message to it, along with a timestamp.
+ */
+
 var ErrorLogging = (function (scriptName) {
     var module = {}; // Create a variable to control the start of a new debug session
     var isNewDebugSession = true;
@@ -36,15 +50,15 @@ var ErrorLogging = (function (scriptName) {
      *
      * @param {string} message - The debug message to be written.
      */
-    module.debugWrite = function (message) {
+    module.log = function (message) {
         if (typeof writeLn === "function") {
             writeLn(message); // Write to the Info Panel (only 3 last lines are visible)
         }
         writeDebugToFile(message);
     };
 
-    // Use debugWrite for new debugging messages
-    module.debugWrite("Debug Starting");
+    // Use log for new debugging messages
+    module.log("Debug Starting");
 
     return module;
 });
