@@ -21,7 +21,7 @@
  * 4. The script will create the shape layer, control null, and apply the necessary expressions and pseudo effect.
  *
  * @author IVG Design
- * @version 1.4.0
+ * @version 1.4.1
  * @date 2024-07-13
  * @license MIT License
  * @changelog 
@@ -32,6 +32,8 @@
  * 1.3.1 removed z value from position arrays in IK Angles calculation 
  *       (was causing Lottie errors in browser with mapped linear expressions) 
  * 1.4.0 added pop prevent control, and dynamic IK direction control
+ * 1.4.1 fixed issue with multiple parents of limb layer breaking IK angles 
+ *       calculation
  * 
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -495,31 +497,33 @@ function getExpression(expressionName, limbName) {
             "    var limbLayer = thisComp.layer(\"" + limbName + "\");\n" +
             "    var upperLimbStartPos = worldPosition(limbLayer);\n" +
             "    var goalPos = worldPosition(goalLayer);\n" +
-            "    var goalPos1 = thisLayer.transform.position;\n" +
             "    var upperToGoalVector = ensure2DArray(goalPos - upperLimbStartPos);\n" +
 
-            "    function formatVector(vector) {\n" +
-            "        return vector[0].toFixed(2) + \", \" + vector[1].toFixed(2);\n" +
-            "    }\n" +
-
             "    var distanceToGoal = length(upperToGoalVector);\n" +
-
-            "    var jointAngle2 = - (ikDirection > 0 ? -1 : 1) * Math.acos(clamp((upperToGoalVector[0] * upperToGoalVector[0] + upperToGoalVector[1] * upperToGoalVector[1] - upperLimbLength * upperLimbLength - lowerLimbLength * lowerLimbLength) / (2 * upperLimbLength * lowerLimbLength), -1, 1));\n" +
+            "    var jointAngle2 = - (ikDirection > 0 ? -1 : 1) * Math.acos(clamp((upperToGoalVector[0] * upperToGoalVector[0] + upperToGoalVector[1] * upperToGoalVector[1] - upperLimbLength * upperLimbLength - lowerLimbLength * upperLimbLength) / (2 * upperLimbLength * lowerLimbLength), -1, 1));\n" +
             "    var jointAngle1 = Math.atan2(-upperToGoalVector[0] * (upperLimbLength + lowerLimbLength * Math.cos(jointAngle2)) - upperToGoalVector[1] * (lowerLimbLength * Math.sin(jointAngle2)), upperToGoalVector[1] * (upperLimbLength + lowerLimbLength * Math.cos(jointAngle2)) - upperToGoalVector[0] * (lowerLimbLength * Math.sin(jointAngle2)));\n" +
-
             "    var upperLimbRotation = radiansToDegrees(jointAngle1);\n" +
             "    var lowerLimbRotation = radiansToDegrees(jointAngle2 + jointAngle1);\n" +
 
-            "    var parentRotation = 0;\n" +
+            "    // Subtract the rotation of the limb layer itself\n" +
             "    var limbLayerRotation = limbLayer.transform.rotation.value;\n" +
-            "    if (limbLayer.hasParent) {\n" +
-            "        parentRotation = limbLayer.parent.transform.rotation.value;\n" +
-            "        upperLimbRotation -= parentRotation;\n" +
-            "        lowerLimbRotation -= parentRotation;\n" +
-            "    } else {\n" +
-            "        upperLimbRotation;\n" +
-            "        lowerLimbRotation;\n" +
+            "    upperLimbRotation -= limbLayerRotation;\n" +
+            "    lowerLimbRotation -= limbLayerRotation;\n" +
+
+            "    // Calculate cumulative parent rotation up to 4 levels\n" +
+            "    var cumulativeParentRotation = 0;\n" +
+            "    var currentLayer = limbLayer;\n" +
+            "    for (var i = 0; i < 4; i++) {\n" +
+            "        if (currentLayer.hasParent) {\n" +
+            "            currentLayer = currentLayer.parent;\n" +
+            "            cumulativeParentRotation += currentLayer.transform.rotation.value;\n" +
+            "        } else {\n" +
+            "            break;\n" +
+            "        }\n" +
             "    }\n" +
+
+            "    upperLimbRotation -= cumulativeParentRotation;\n" +
+            "    lowerLimbRotation -= cumulativeParentRotation;\n" +
 
             "    var ikAngles = [upperLimbRotation, lowerLimbRotation];\n" +
             "}\n" +

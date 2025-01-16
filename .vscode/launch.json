@@ -1,19 +1,51 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "extendscript-debug",
-            "request": "attach",
-            "name": "Attach to ExtendScript Engine"
-        },
-        {
-            "type": "extendscript-debug",
-            "request": "launch",
-            "name": "Launch Script in ExtendScript Engine",
-            "debugLevel" : 1
-        }
-    ]
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "extendscript-debug",
+			"request": "attach",
+			"name": "Attach to ExtendScript Engine",
+			
+		},
+		{
+			"type": "extendscript-debug",
+			"request": "launch",
+			"name": "Launch Script in ExtendScript Engine"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Node.js & Typescript Debug",
+			"program": "${workspaceFolder}/customBundler/nodegui-starter/src/index.ts",
+			"preLaunchTask": "tsc: build - tsconfig.json",
+			"outFiles": ["${workspaceFolder}/customBundler/nodegui-starter/dist/**/*.js"] // This is the path to the compiled files
+		},
+		{
+			"name": "Debug Qode Process",
+			"type": "node",
+			"request": "launch",
+			"cwd": "${workspaceRoot}/customBundler/nodegui-starter/src/",
+			"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/qode",
+			"windows": {
+				"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/qode.exe"
+			},
+			"args": ["./dist/index.js"],
+			"outputCapture": "std"
+		},
+		{
+			"command": "npx webpack --devtool source-map && npx qode --inspect ./dist/index.js",
+			"name": "Debug for Cmd",
+			"request": "launch",
+			"type": "node-terminal"
+		},
+		{
+			"command": "npx webpack --devtool source-map; npx qode --inspect ./dist/index.js",
+			"name": "Debug for PowerShell",
+			"request": "launch",
+			"type": "node-terminal"
+		}
+	]
 }

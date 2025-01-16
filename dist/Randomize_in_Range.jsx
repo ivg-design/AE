@@ -15,15 +15,11 @@
  * for each dimension. Clicking "OK" will apply the changes.
  *
  * @license: MIT License
- * @author: IVG Design
- *
- * @function arrayHasNaN - Checks if an array contains any NaN values.
- * @param {Array} arr - The array to check.
- * @return {boolean} True if the array contains at least one NaN, false otherwise.
+ * @autor: IVG Design
  */
 
 (function () {
-    
+
     /**
      * Checks if an array contains any NaN values.
      *
@@ -38,7 +34,6 @@
         }
         return false;
     }
-
 
     var comp = app.project.activeItem;
 
@@ -62,18 +57,21 @@
     var startRangeInputs = [];
     var endRangeInputs = [];
 
-    // Define your labels for each min/max range set - X, Y, Z
     var labels = ['X', 'Y', 'Z'];
 
-    var maxDimensionality = Math.max.apply(null, selectedProperties.map(function (prop) {
-        return prop.value && prop.value instanceof Array ? prop.value.length : 1;
-    }));
+    var maxDimensionality = 1;
+    for (var i = 0; i < selectedProperties.length; i++) {
+        var prop = selectedProperties[i];
+        var dim = (prop.value instanceof Array) ? prop.value.length : 1;
+        if (dim > maxDimensionality) {
+            maxDimensionality = dim;
+        }
+    }
 
-    for (var i = 0; i < maxDimensionality; i++) {
+    for (i = 0; i < maxDimensionality; i++) {
         var rangeGroup = win.add("group");
         rangeGroup.orientation = "row";
 
-        // Add label to the Start Range and End Range
         rangeGroup.add("statictext", undefined, "Start Range " + labels[i] + ":");
         var startRangeInput = rangeGroup.add("edittext", undefined, "0");
         startRangeInput.characters = 5;
@@ -93,37 +91,33 @@
     buttonGroup.add("button", undefined, "Cancel");
 
     buttonGroup.children[0].onClick = function () {
-        var startRanges = startRangeInputs.map(function (input) {
-            return parseFloat(input.text);
-        });
+        var startRanges = [];
+        var endRanges = [];
+        for (var i = 0; i < startRangeInputs.length; i++) {
+            startRanges.push(parseFloat(startRangeInputs[i].text));
+            endRanges.push(parseFloat(endRangeInputs[i].text));
+        }
 
-        var endRanges = endRangeInputs.map(function (input) {
-            return parseFloat(input.text);
-        });
-
-        if (arrayHasNaN(startRanges) || arrayHasNaN(startRanges)) { 
+        if (arrayHasNaN(startRanges) || arrayHasNaN(endRanges)) {
             alert("Please enter valid numbers for the range");
             return;
         }
 
         app.beginUndoGroup("Randomize Keyframes");
 
-        for (var i = 0; i < selectedProperties.length; i++) {
-
+        for (i = 0; i < selectedProperties.length; i++) {
             var property = selectedProperties[i];
 
             if (property.selectedKeys.length > 0) {
-
                 for (var j = 1; j <= property.numKeys; j++) {
-
                     if (property.keySelected(j)) {
                         var randomValue;
 
-                        // Check if the property is array or not
                         if (property.value instanceof Array) {
-                            randomValue = property.value.map(function (_, index) {
-                                return startRanges[index] + Math.random() * (endRanges[index] - startRanges[index]);
-                            });
+                            randomValue = [];
+                            for (var k = 0; k < property.value.length; k++) {
+                                randomValue[k] = startRanges[k] + Math.random() * (endRanges[k] - startRanges[k]);
+                            }
                         } else {
                             randomValue = startRanges[0] + Math.random() * (endRanges[0] - startRanges[0]);
                         }

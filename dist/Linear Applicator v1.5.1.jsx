@@ -76,6 +76,7 @@
      * @param {String} driverPropertyPath - The expression path of the driver property.
      * @param {Array} keyframes - The keyframe values and times of the target property.
      * @param {Boolean} is2D - Whether the target property is 2D.
+     * 
      * @param {Number} minVal - The minimum value for the driver property.
      * @param {Number} maxVal - The maximum value for the driver property.
      * @param {Property} property - The target property.
@@ -83,6 +84,7 @@
      * @param {String} dimensionSuffix - The suffix to append to the driver property path for multi-dimensional properties (e.g., "[0]", "[1]").
      * @returns {String} The generated linear expression.
      */
+
 
     function createExpression(driverLayerName, driverPropertyPath, keyframes, is2D, minVal, maxVal, property, checkboxController, dimensionSuffix) {
         var expression = "";
@@ -122,8 +124,8 @@
         }
 
         expression += "var controllingValue = " + driverPropertyPath + ".value" + dimensionSuffix + ";\n" +
-            "var minVal = Math.min(" + minVal + ", " + maxVal + ");\n" +
-            "var maxVal = Math.max(" + minVal + ", " + maxVal + ");\n" +
+            "var minVal = " + minVal + ";\n" +
+            "var maxVal = " + maxVal + ";\n" +
             "if (controllingValue < minVal) controllingValue = minVal;\n" +
             "if (controllingValue > maxVal) controllingValue = maxVal;\n";
 
@@ -165,6 +167,7 @@
                 "  }\n" +
                 "  if (controllingValue >= segmentStart && controllingValue <= segmentEnd) {\n" +
                 "    result = linearArrayInterpolation(controllingValue, segmentStart, segmentEnd, allKeys[i], allKeys[i + 1]);\n" +
+                "    break;\n" + // Break to prevent further iterations
                 "  }\n" +
                 "}\n";
 
@@ -215,26 +218,27 @@
                 "    if (evenInterpolation) {\n" +
                 "      segmentStart = minVal + i * (maxVal - minVal) / numSegments;\n" +
                 "      segmentEnd = minVal + (i + 1) * (maxVal - minVal) / numSegments;\n" +
-                "      valueStart = segments[0][0] + i * (segments[numSegments - 1][1] - segments[0][0]) / numSegments;\n" +
-                "      valueEnd = segments[0][0] + (i + 1) * (segments[numSegments - 1][1] - segments[0][0]) / numSegments;\n" +
+                "      valueStart = segments[i][0][0];\n" +
+                "      valueEnd = segments[i][1][0];\n" +
                 "    } else {\n" +
                 "      segmentStart = minVal + relativeTimes[i] * (maxVal - minVal);\n" +
                 "      segmentEnd = minVal + relativeTimes[i + 1] * (maxVal - minVal);\n" +
-                "      valueStart = segments[i][0];\n" +
-                "      valueEnd = segments[i][1];\n" +
+                "      valueStart = segments[i][0][0];\n" +
+                "      valueEnd = segments[i][1][0];\n" +
                 "    }\n" +
                 "    if (segmentStart === segmentEnd) {\n" +
                 "      segmentEnd += 0.0001;\n" +
                 "    }\n" +
                 "    if (controllingValue >= segmentStart && controllingValue <= segmentEnd) {\n" +
                 "      mappedValue = linearExpression(controllingValue, segmentStart, segmentEnd, valueStart, valueEnd);\n" +
+                "      break;\n" + // Break to prevent further iterations
                 "    }\n" +
                 "  }\n" +
                 "  if (controllingValue < minVal) {\n" +
-                "    mappedValue = segments[0][0];\n" +
+                "    mappedValue = segments[0][0][0];\n" +
                 "  }\n" +
                 "  if (controllingValue > maxVal) {\n" +
-                "    mappedValue = segments[numSegments - 1][1];\n" +
+                "    mappedValue = segments[numSegments - 1][1][0];\n" +
                 "  }\n" +
                 "  return mappedValue;\n" +
                 "}\n\n";
@@ -248,10 +252,10 @@
                 "    if (evenInterpolation) {\n" +
                 "      segmentStart = minVal + i * (maxVal - minVal) / numSegments;\n" +
                 "      segmentEnd = minVal + (i + 1) * (maxVal - minVal) / numSegments;\n" +
-                "      valueStartX = segments[0][0][0] + i * (segments[numSegments - 1][1][0] - segments[0][0][0]) / numSegments;\n" +
-                "      valueEndX = segments[0][0][0] + (i + 1) * (segments[numSegments - 1][1][0] - segments[0][0][0]) / numSegments;\n" +
-                "      valueStartY = segments[0][0][1] + i * (segments[numSegments - 1][1][1] - segments[0][0][1]) / numSegments;\n" +
-                "      valueEndY = segments[0][0][1] + (i + 1) * (segments[numSegments - 1][1][1] - segments[0][0][1]) / numSegments;\n" +
+                "      valueStartX = segments[i][0][0];\n" +
+                "      valueEndX = segments[i][1][0];\n" +
+                "      valueStartY = segments[i][0][1];\n" +
+                "      valueEndY = segments[i][1][1];\n" +
                 "    } else {\n" +
                 "      segmentStart = minVal + relativeTimes[i] * (maxVal - minVal);\n" +
                 "      segmentEnd = minVal + relativeTimes[i + 1] * (maxVal - minVal);\n" +
@@ -266,6 +270,7 @@
                 "    if (controllingValue >= segmentStart && controllingValue <= segmentEnd) {\n" +
                 "      mappedValueX = linearExpression(controllingValue, segmentStart, segmentEnd, valueStartX, valueEndX);\n" +
                 "      mappedValueY = linearExpression(controllingValue, segmentStart, segmentEnd, valueStartY, valueEndY);\n" +
+                "      break;\n" + // Break to prevent further iterations
                 "    }\n" +
                 "  }\n" +
                 "  if (controllingValue < minVal) {\n" +
@@ -288,12 +293,12 @@
                 "    if (evenInterpolation) {\n" +
                 "      segmentStart = minVal + i * (maxVal - minVal) / numSegments;\n" +
                 "      segmentEnd = minVal + (i + 1) * (maxVal - minVal) / numSegments;\n" +
-                "      valueStartX = segments[0][0][0] + i * (segments[numSegments - 1][1][0] - segments[0][0][0]) / numSegments;\n" +
-                "      valueEndX = segments[0][0][0] + (i + 1) * (segments[numSegments - 1][1][0] - segments[0][0][0]) / numSegments;\n" +
-                "      valueStartY = segments[0][0][1] + i * (segments[numSegments - 1][1][1] - segments[0][0][1]) / numSegments;\n" +
-                "      valueEndY = segments[0][0][1] + (i + 1) * (segments[numSegments - 1][1][1] - segments[0][0][1]) / numSegments;\n" +
-                "      valueStartZ = segments[0][0][2] + i * (segments[numSegments - 1][1][2] - segments[0][0][2]) / numSegments;\n" +
-                "      valueEndZ = segments[0][0][2] + (i + 1) * (segments[numSegments - 1][1][2] - segments[0][0][2]) / numSegments;\n" +
+                "      valueStartX = segments[i][0][0];\n" +
+                "      valueEndX = segments[i][1][0];\n" +
+                "      valueStartY = segments[i][0][1];\n" +
+                "      valueEndY = segments[i][1][1];\n" +
+                "      valueStartZ = segments[i][0][2];\n" +
+                "      valueEndZ = segments[i][1][2];\n" +
                 "    } else {\n" +
                 "      segmentStart = minVal + relativeTimes[i] * (maxVal - minVal);\n" +
                 "      segmentEnd = minVal + relativeTimes[i + 1] * (maxVal - minVal);\n" +
@@ -311,6 +316,7 @@
                 "      mappedValueX = linearExpression(controllingValue, segmentStart, segmentEnd, valueStartX, valueEndX);\n" +
                 "      mappedValueY = linearExpression(controllingValue, segmentStart, segmentEnd, valueStartY, valueEndY);\n" +
                 "      mappedValueZ = linearExpression(controllingValue, segmentStart, segmentEnd, valueStartZ, valueEndZ);\n" +
+                "      break;\n" + // Break to prevent further iterations
                 "    }\n" +
                 "  }\n" +
                 "  if (controllingValue < minVal) {\n" +
@@ -349,6 +355,8 @@
 
         return expression;
     }
+
+
 
     /**
      * Constructs the full expression path for a given property.
@@ -493,6 +501,189 @@
         return propertyType;
     }
 
+    // function main() {
+    //     var comp = app.project.activeItem;
+    //     if (!(comp instanceof CompItem)) {
+    //         alert("Please select a composition.");
+    //         return;
+    //     }
+
+    //     var win = new Window("palette", "Linear Applicator", undefined);
+    //     win.orientation = "column";
+
+    //     var targetBtn = win.add("button", undefined, "Select Target Property");
+    //     var targetInfoGroup = win.add("group");
+    //     targetInfoGroup.orientation = "column";
+    //     var targetInfo = targetInfoGroup.add('statictext {text: "-empty-", justify: "center"}');
+    //     targetInfo.preferredSize.width = 300;
+
+    //     var driverBtn = win.add("button", undefined, "Select Driver Property");
+    //     var driverInfoGroup = win.add("group");
+    //     driverInfoGroup.orientation = "column";
+    //     var driverInfo = driverInfoGroup.add('statictext {text: "-empty-", justify: "center"}');
+    //     driverInfo.preferredSize.width = 300;
+    //     var minMaxGroup = win.add("group");
+    //     minMaxGroup.orientation = "row";
+    //     var minInput = minMaxGroup.add("edittext", undefined, "Min Value");
+    //     minInput.characters = 20;
+    //     var maxInput = minMaxGroup.add("edittext", undefined, "Max Value");
+    //     maxInput.characters = 20;
+
+    //     var buttonGroup = win.add("group");
+    //     var applyBtn = buttonGroup.add("button", undefined, "Apply Linear Expression");
+    //     var cancelBtn = buttonGroup.add("button", undefined, "Cancel");
+
+    //     var driverProperty = null;
+    //     var targetProperty = null;
+    //     var driverLayerName = "";
+    //     var targetLayerName = "";
+
+    //     driverBtn.onClick = function () {
+    //         try {
+    //             var selectedDriverProperty = showDeepestSelectedProperty(comp.selectedProperties);
+    //             var propertyName = "";
+    //             var propertyDimension = "";
+    //             var selectedDimensionIndex = -1; // Default value when no dimension selection is needed
+
+    //             if (driverProperty && selectedDriverProperty && driverProperty === selectedDriverProperty) {
+    //                 driverProperty = null;
+    //                 driverLayerName = "";
+    //                 driverBtn.text = "Select Driver Property";
+    //                 driverInfo.text = "-empty-";
+    //             } else if (selectedDriverProperty) {
+    //                 var propertyType = getPropertyType(selectedDriverProperty);
+
+    //                 if (propertyType === "2D" || propertyType === "3D" || propertyType === "4D") {
+    //                     var dimOptions = [];
+    //                     if (propertyType === "2D") {
+    //                         dimOptions = ["X", "Y"];
+    //                     } else if (propertyType === "3D") {
+    //                         dimOptions = ["X", "Y", "Z"];
+    //                     } else if (propertyType === "4D") {
+    //                         dimOptions = ["X", "Y", "Z", "W"];
+    //                     }
+
+    //                     var dialog = new Window("dialog", "Select Property Dimension");
+    //                     var radioGroup = dialog.add("group");
+    //                     radioGroup.orientation = "row";
+    //                     var radios = [];
+
+    //                     for (var i = 0; i < dimOptions.length; i++) {
+    //                         radios[i] = radioGroup.add("radiobutton", undefined, dimOptions[i]);
+    //                     }
+
+    //                     radios[0].value = true;
+    //                     dialog.add("button", undefined, "OK", { name: "ok" });
+
+    //                     if (dialog.show() !== 1) return;
+
+    //                     for (var i = 0; i < radios.length; i++) {
+    //                         if (radios[i].value) {
+    //                             selectedDimensionIndex = i;
+    //                             propertyDimension = "[" + selectedDimensionIndex + "]";
+    //                             break;
+    //                         }
+    //                     }
+
+    //                     propertyName = getPropertyGroupName(selectedDriverProperty) + ">" + selectedDriverProperty.name + propertyDimension;
+    //                 } else {
+    //                     propertyName = getPropertyGroupName(selectedDriverProperty) + ">" + selectedDriverProperty.name;
+    //                 }
+
+    //                 driverProperty = selectedDriverProperty;
+    //                 driverLayerName = comp.selectedLayers[0].name;
+    //                 driverBtn.text = "Driver Property Selected";
+    //                 driverInfo.text = "Layer: " + driverLayerName + " - Property: " + propertyName;
+    //                 driverProperty.dimensionIndex = selectedDimensionIndex; // Store the selected dimension index
+    //             } else {
+    //                 alert("Please select a valid driver property.");
+    //             }
+    //         } catch (error) {
+    //             alert("An error occurred: " + error.message);
+    //         }
+    //     };
+
+
+    //     targetBtn.onClick = function () {
+    //         var selectedTargetProperty = showDeepestSelectedProperty(comp.selectedProperties);
+
+    //         if (targetProperty && selectedTargetProperty && targetProperty === selectedTargetProperty) {
+    //             targetProperty = null;
+    //             targetLayerName = "";
+    //             targetBtn.text = "Select Target Property";
+    //             targetInfo.text = "-empty-";
+    //         } else if (selectedTargetProperty) {
+    //             if (selectedTargetProperty.numKeys < 2) {
+    //                 alert("Target property must have at least two keyframes.");
+    //             } else if (selectedTargetProperty.propertyValueType === 6424 || selectedTargetProperty.propertyValueType === 6418 || selectedTargetProperty.propertyValueType === 6412) {
+    //                 alert("Oops! Linear Applicator doesn't yet work with 3D, 4D properties. Please select a compatible property.");
+    //             } else {
+    //                 targetProperty = selectedTargetProperty;
+    //                 targetLayerName = comp.selectedLayers[0].name;
+    //                 targetBtn.text = "Target Property Selected";
+
+    //                 var propertyName = getPropertyGroupName(targetProperty) + ">" + targetProperty.name;
+    //                 targetInfo.text = "Layer: " + targetLayerName + " - Property: " + propertyName;
+    //             }
+    //         } else {
+    //             alert("Please select a valid target property.");
+    //         }
+    //     };
+
+    //     applyBtn.onClick = function () {
+    //         if (!driverProperty || !targetProperty) {
+    //             alert("Please select both driver and target properties.");
+    //             return;
+    //         }
+
+    //         var minVal = parseFloat(minInput.text);
+    //         var maxVal = parseFloat(maxInput.text);
+
+    //         if (isNaN(minVal) || isNaN(maxVal)) {
+    //             alert("Please enter valid numeric values for min and max.");
+    //             return;
+    //         }
+    //         var keyframes = [];
+    //         for (var i = 1; i <= targetProperty.numKeys; i++) {
+    //             var keyValue = targetProperty.keyValue(i);
+    //             {
+    //                 keyframes.push({
+    //                     value: keyValue,
+    //                     time: targetProperty.keyTime(i)
+    //                 });
+    //             }
+    //         }
+
+    //         var is2D = typeof keyframes[0] === 'object' && keyframes[0].length;
+
+    //         var driverPropertyPath = getPropertyExpressionPath(driverProperty);
+    //         var dimensionSuffix = '';
+    //         if (driverProperty.dimensionIndex !== undefined && driverProperty.dimensionIndex !== -1) {
+    //             dimensionSuffix = "[" + driverProperty.dimensionIndex + "]";
+    //         }
+
+    //         var propertyName = getPropertyGroupName(targetProperty) + ">" + targetProperty.name;
+    //         var checkboxName = "Uniform Interpolation||" + targetLayerName + ">" + propertyName;
+    //         var driverLayer = comp.layer(driverLayerName);
+    //         var checkboxController = addCheckboxController(driverLayer, checkboxName);
+
+    //         app.beginUndoGroup("Apply Linear Expression");
+    //         var expression = createExpression(driverLayerName, driverPropertyPath, keyframes, is2D, minVal, maxVal, targetProperty, checkboxController, dimensionSuffix);
+    //         targetProperty.expression = expression;
+    //         app.endUndoGroup();
+
+    //         win.close();
+    //     };
+
+    //     cancelBtn.onClick = function () {
+    //         win.close();
+    //     };
+
+    //     win.center();
+    //     win.show();
+    // }
+
+    // main();
     function main() {
         var comp = app.project.activeItem;
         if (!(comp instanceof CompItem)) {
@@ -500,14 +691,63 @@
             return;
         }
 
+        var selectedProperties = [];
+        for (var i = 0; i < comp.selectedProperties.length; i++) {
+            if (comp.selectedProperties[i] instanceof Property) {
+                selectedProperties.push(comp.selectedProperties[i]);
+            }
+        }
+
+        var driverProperty = null;
+        var targetProperty = null;
+        var targetProperties = [];
+        var driverLayerName = "";
+        var targetLayerName = "";
+
         var win = new Window("palette", "Linear Applicator", undefined);
         win.orientation = "column";
 
-        var targetBtn = win.add("button", undefined, "Select Target Property");
-        var targetInfoGroup = win.add("group");
-        targetInfoGroup.orientation = "column";
-        var targetInfo = targetInfoGroup.add('statictext {text: "-empty-", justify: "center"}');
-        targetInfo.preferredSize.width = 300;
+        if (selectedProperties.length < 1) {
+            var targetBtn = win.add("button", undefined, "Select Target Property");
+            var targetInfoGroup = win.add("group");
+            targetInfoGroup.orientation = "column";
+            var targetInfo = targetInfoGroup.add('statictext {text: "-empty-", justify: "center"}');
+            targetInfo.preferredSize.width = 300;
+
+            targetBtn.onClick = function () {
+                var selectedTargetProperty = showDeepestSelectedProperty(comp.selectedProperties);
+
+                if (targetProperty && selectedTargetProperty && targetProperty === selectedTargetProperty) {
+                    targetProperty = null;
+                    targetLayerName = "";
+                    targetBtn.text = "Select Target Property";
+                    targetInfo.text = "-empty-";
+                } else if (selectedTargetProperty) {
+                    if (selectedTargetProperty.numKeys < 2) {
+                        alert("Target property must have at least two keyframes.");
+                    } else if (selectedTargetProperty.propertyValueType === 6424 || selectedTargetProperty.propertyValueType === 6418 || selectedTargetProperty.propertyValueType === 6412) {
+                        alert("Oops! Linear Applicator doesn't yet work with 3D, 4D properties. Please select a compatible property.");
+                    } else {
+                        targetProperty = selectedTargetProperty;
+                        targetLayerName = comp.selectedLayers[0].name;
+                        targetBtn.text = "Target Property Selected";
+
+                        var propertyName = getPropertyGroupName(targetProperty) + ">" + targetProperty.name;
+                        targetInfo.text = "Layer: " + targetLayerName + " - Property: " + propertyName;
+                    }
+                } else {
+                    alert("Please select a valid target property.");
+                }
+            };
+        } else {
+            for (var i = 0; i < selectedProperties.length; i++) {
+                if (selectedProperties[i].numKeys < 2) {
+                    alert("All selected properties must have at least two keyframes.");
+                    return;
+                }
+                targetProperties.push(selectedProperties[i]);
+            }
+        }
 
         var driverBtn = win.add("button", undefined, "Select Driver Property");
         var driverInfoGroup = win.add("group");
@@ -525,17 +765,12 @@
         var applyBtn = buttonGroup.add("button", undefined, "Apply Linear Expression");
         var cancelBtn = buttonGroup.add("button", undefined, "Cancel");
 
-        var driverProperty = null;
-        var targetProperty = null;
-        var driverLayerName = "";
-        var targetLayerName = "";
-
         driverBtn.onClick = function () {
             try {
                 var selectedDriverProperty = showDeepestSelectedProperty(comp.selectedProperties);
                 var propertyName = "";
                 var propertyDimension = "";
-                var selectedDimensionIndex = -1; // Default value when no dimension selection is needed
+                var selectedDimensionIndex = -1;
 
                 if (driverProperty && selectedDriverProperty && driverProperty === selectedDriverProperty) {
                     driverProperty = null;
@@ -586,7 +821,7 @@
                     driverLayerName = comp.selectedLayers[0].name;
                     driverBtn.text = "Driver Property Selected";
                     driverInfo.text = "Layer: " + driverLayerName + " - Property: " + propertyName;
-                    driverProperty.dimensionIndex = selectedDimensionIndex; // Store the selected dimension index
+                    driverProperty.dimensionIndex = selectedDimensionIndex;
                 } else {
                     alert("Please select a valid driver property.");
                 }
@@ -595,36 +830,9 @@
             }
         };
 
-
-        targetBtn.onClick = function () {
-            var selectedTargetProperty = showDeepestSelectedProperty(comp.selectedProperties);
-
-            if (targetProperty && selectedTargetProperty && targetProperty === selectedTargetProperty) {
-                targetProperty = null;
-                targetLayerName = "";
-                targetBtn.text = "Select Target Property";
-                targetInfo.text = "-empty-";
-            } else if (selectedTargetProperty) {
-                if (selectedTargetProperty.numKeys < 2) {
-                    alert("Target property must have at least two keyframes.");
-                } else if (selectedTargetProperty.propertyValueType === 6424 || selectedTargetProperty.propertyValueType === 6418 || selectedTargetProperty.propertyValueType === 6412) {
-                    alert("Oops! Linear Applicator doesn't yet work with 3D, 4D properties. Please select a compatible property.");
-                } else {
-                    targetProperty = selectedTargetProperty;
-                    targetLayerName = comp.selectedLayers[0].name;
-                    targetBtn.text = "Target Property Selected";
-
-                    var propertyName = getPropertyGroupName(targetProperty) + ">" + targetProperty.name;
-                    targetInfo.text = "Layer: " + targetLayerName + " - Property: " + propertyName;
-                }
-            } else {
-                alert("Please select a valid target property.");
-            }
-        };
-
         applyBtn.onClick = function () {
-            if (!driverProperty || !targetProperty) {
-                alert("Please select both driver and target properties.");
+            if (!driverProperty) {
+                alert("Please select a driver property.");
                 return;
             }
 
@@ -635,18 +843,6 @@
                 alert("Please enter valid numeric values for min and max.");
                 return;
             }
-            var keyframes = [];
-            for (var i = 1; i <= targetProperty.numKeys; i++) {
-                var keyValue = targetProperty.keyValue(i);
-                {
-                    keyframes.push({
-                        value: keyValue,
-                        time: targetProperty.keyTime(i)
-                    });
-                }
-            }
-
-            var is2D = typeof keyframes[0] === 'object' && keyframes[0].length;
 
             var driverPropertyPath = getPropertyExpressionPath(driverProperty);
             var dimensionSuffix = '';
@@ -654,16 +850,38 @@
                 dimensionSuffix = "[" + driverProperty.dimensionIndex + "]";
             }
 
-            var propertyName = getPropertyGroupName(targetProperty) + ">" + targetProperty.name;
-            var checkboxName = "Uniform Interpolation||" + targetLayerName + ">" + propertyName;
+            app.beginUndoGroup("Apply Linear Expression");
+
+            if (selectedProperties.length < 1 && targetProperty) {
+                targetProperties.push(targetProperty);
+            }
+
+            var checkboxName = "Uniform Interpolation || Multiple Properties";
+            if (targetProperties.length === 1) {
+                var propertyName = getPropertyGroupName(targetProperties[0]) + ">" + targetProperties[0].name;
+                checkboxName = "Uniform Interpolation ||" + targetLayerName + ">" + propertyName;
+            }
+
             var driverLayer = comp.layer(driverLayerName);
             var checkboxController = addCheckboxController(driverLayer, checkboxName);
 
-            app.beginUndoGroup("Apply Linear Expression");
-            var expression = createExpression(driverLayerName, driverPropertyPath, keyframes, is2D, minVal, maxVal, targetProperty, checkboxController, dimensionSuffix);
-            targetProperty.expression = expression;
-            app.endUndoGroup();
+            for (var i = 0; i < targetProperties.length; i++) {
+                var targetProperty = targetProperties[i];
+                var keyframes = [];
+                for (var j = 1; j <= targetProperty.numKeys; j++) {
+                    var keyValue = targetProperty.keyValue(j);
+                    keyframes.push({
+                        value: keyValue,
+                        time: targetProperty.keyTime(j)
+                    });
+                }
 
+                var is2D = typeof keyframes[0] === 'object' && keyframes[0].length;
+                var expression = createExpression(driverLayerName, driverPropertyPath, keyframes, is2D, minVal, maxVal, targetProperty, checkboxController, dimensionSuffix);
+                targetProperty.expression = expression;
+            }
+
+            app.endUndoGroup();
             win.close();
         };
 
@@ -675,5 +893,8 @@
         win.show();
     }
 
+
+
     main();
+
 })();

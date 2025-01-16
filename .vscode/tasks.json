@@ -9,13 +9,24 @@
 			"options": {
 				"shell": {
 					"executable": "bash",
-					"args": ["-c"]
+					"args": [
+						"-c"
+					]
 				}
 			},
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "customBundler/nodegui-starter/tsconfig.json",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build",
+			"label": "tsc: build - customBundler/nodegui-starter/tsconfig.json"
 		}
 	]
 }
