@@ -1,3 +1,41 @@
+/**
+ * Guiderator with Calculator - Add Guides with Calculation Support for Adobe After Effects
+ *
+ * This script provides a dockable panel that allows users to easily add guides to compositions
+ * with the added functionality of performing calculations directly in the input field.
+ *
+ * FUNCTIONALITY:
+ * - Displays a compact, dockable panel with an input field and buttons
+ * - Supports basic mathematical calculations in the input field (e.g., "540/2", "1920*0.25")
+ * - Adds horizontal or vertical guides at specified positions
+ * - Includes a lock/unlock toggle for guides
+ * - Automatically evaluates calculations when input changes
+ *
+ * USAGE:
+ * 1. Open a composition in After Effects
+ * 2. Run the script to display the panel
+ * 3. Enter a value or calculation in the input field
+ * 4. Click "H" to add a horizontal guide or "V" to add a vertical guide
+ * 5. Use the lock button (🔐/🔓) to toggle guide locking
+ *
+ * CALCULATION EXAMPLES:
+ * - "540" - Adds a guide at position 540
+ * - "1920/2" - Adds a guide at the center (960)
+ * - "1080*0.33" - Adds a guide at approximately 356.4
+ *
+ * @changelog
+ * 1.0.0 - Initial release
+ * 1.0.1 - Added calculation functionality
+ * 1.0.2 - Fixed string handling for input values
+ * 1.0.3 - Improved ECMA3 compatibility
+ * 
+ * @author IVG Design
+ * @name Guiderator with Calculator
+ * @version 1.0.3
+ * @date 2024-03-14
+ * @license MIT
+ */
+
 {
 	function addGuideScript(thisObj) {
 		function buildUI(thisObj) {
@@ -24,12 +62,12 @@
 					}
 				}
 
-				// Add event listener for the "change" event on the input field
-				inputField.addEventListener("change", function () {
+				// Add change handler for the input field (ECMA3 compatible)
+				inputField.onChange = function () {
 					var input = inputField.text;
 					var calculationResult = evaluateCalculation(input);
 					inputField.text = calculationResult.toString();
-				});
+				};
 
 				// Define a fixed size for the buttons
 				var buttonSize = 20; // Adjust this value as needed
@@ -71,22 +109,37 @@
 				// Function to add guide
 				function addGuide(isHorizontal) {
 					var inputValue = inputField.text;
-					if (!isNaN(inputValue) && inputValue.trim() !== "") {
-						var value = parseFloat(inputValue);
-						var comp = app.project.activeItem;
-						if (comp instanceof CompItem) {
-							app.beginUndoGroup("Add Guide");
-							if (isHorizontal) {
-								comp.addGuide(0, value); // 0 for vertical
-							} else {
-								comp.addGuide(1, value); // 1 for horizontal
-							}
-							app.endUndoGroup();
-						} else {
-							alert("Please select a composition.");
-						}
-					} else {
+					// Convert to string and trim in ECMA3 compatible way
+					var inputValueStr = String(inputValue);
+					// ECMA3 compatible trim (removing whitespace from both ends)
+					inputValueStr = inputValueStr.replace(/^\s+|\s+$/g, "");
+
+					// First check if the input is empty
+					if (inputValueStr === "") {
+						alert("Please enter a value.");
+						return;
+					}
+
+					// Try to parse the value as a number
+					var value = parseFloat(inputValueStr);
+
+					// Check if the parsed value is a valid number
+					if (isNaN(value)) {
 						alert("Please enter a valid number.");
+						return;
+					}
+
+					var comp = app.project.activeItem;
+					if (comp instanceof CompItem) {
+						app.beginUndoGroup("Add Guide");
+						if (isHorizontal) {
+							comp.addGuide(0, value); // 0 for vertical
+						} else {
+							comp.addGuide(1, value); // 1 for horizontal
+						}
+						app.endUndoGroup();
+					} else {
+						alert("Please select a composition.");
 					}
 				}
 
