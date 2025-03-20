@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { FrameInfo } from '../types/frame';
 import { getCurrentFrameInfo, navigateToFrame, padNumber, framesToTimecode } from '../utils/frameUtils';
+import CSInterface from '../lib/cep/csinterface';
 
 export const useFrameNavigation = () => {
   const [frameInfo, setFrameInfo] = useState<FrameInfo | null>(null);
@@ -9,6 +10,7 @@ export const useFrameNavigation = () => {
   const [isUserTyping, setIsUserTyping] = useState(false);
   const [lastUserInput, setLastUserInput] = useState<string | null>(null);
   const devModeFrameRef = useRef<number>(1000);
+  const csInterface = useRef(new CSInterface());
 
   const isRunningInCEP = !!window.cep;
 
@@ -39,13 +41,17 @@ export const useFrameNavigation = () => {
 
   const handleNavigate = async () => {
     if (isRunningInCEP) {
-      await navigateToFrame(inputValue, isFrameMode);
-      // Clear user input after navigation
-      setLastUserInput(null);
-      setIsUserTyping(false);
-      // Close the extension
-      if (window.cep) {
-        window.cep.closeExtension();
+      try {
+        await navigateToFrame(inputValue, isFrameMode);
+        // Clear user input after navigation
+        setLastUserInput(null);
+        setIsUserTyping(false);
+        // Close the extension using CSInterface
+        setTimeout(() => {
+          csInterface.current.closeExtension();
+        }, 100); // Small delay to ensure navigation completes
+      } catch (e) {
+        console.error('Navigation failed:', e);
       }
     } else {
       // Dev mode navigation
