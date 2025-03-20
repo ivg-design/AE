@@ -43,6 +43,10 @@ export const useFrameNavigation = () => {
       // Clear user input after navigation
       setLastUserInput(null);
       setIsUserTyping(false);
+      // Close the extension
+      if (window.cep) {
+        window.cep.closeExtension();
+      }
     } else {
       // Dev mode navigation
       try {
@@ -53,6 +57,7 @@ export const useFrameNavigation = () => {
           // Clear user input after navigation
           setLastUserInput(null);
           setIsUserTyping(false);
+          console.log('Dev mode: Would close extension here');
         }
       } catch (e) {
         console.error('Navigation failed:', e);

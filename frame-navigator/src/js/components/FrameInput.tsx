@@ -25,14 +25,21 @@ export const FrameInput: React.FC<FrameInputProps> = ({
 
   // Select all text when component mounts
   useEffect(() => {
-    // Use a small timeout to ensure the input is mounted and has focus
     const timer = setTimeout(() => {
       if (inputRef.current) {
+        inputRef.current.focus();
         inputRef.current.select();
       }
-    }, 0);
+    }, 100); // Increased timeout to ensure DOM is ready
     return () => clearTimeout(timer);
   }, []);
+
+  // Handle focus to ensure text is selected
+  const handleFocus = () => {
+    if (inputRef.current) {
+      inputRef.current.select();
+    }
+  };
 
   return (
     <>
@@ -42,6 +49,7 @@ export const FrameInput: React.FC<FrameInputProps> = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
+        onFocus={handleFocus}
         style={styles.frameInput}
       />
       <div style={styles.statusText}>
