@@ -1,5 +1,5 @@
 var positionExpr = "// Position expression with width/height tracking for proper anchor-based resizing\n" +
-                            "try {\n" +
+                    "try {\n" +
                             "    // Get current values\n" +
                             "    var width = effect(\"Width\")(\"Slider\");\n" +
                             "    var height = effect(\"Height\")(\"Slider\");\n" +
@@ -71,7 +71,7 @@ var positionExpr = "// Position expression with width/height tracking for proper
                             "    \n" +
                             "    // Calculate new position\n" +
                             "    var newPos = [currentPos[0] + xAdj, currentPos[1] + yAdj];\n" +
-                            "    \n" +
+                    "    \n" +
                             "    // Handle anchor point changes specially\n" +
                             "    if (anchorChanged) {\n" +
                             "        // If anchor point type changed, recalculate from original position\n" +
@@ -98,15 +98,15 @@ var positionExpr = "// Position expression with width/height tracking for proper
                             "        \n" +
                             "        newPos = [baseX + anchorX, baseY + anchorY];\n" +
                             "    }\n" +
-                            "    \n" +
+                    "    \n" +
                             "    // Store current values for next frame\n" +
                             "    __lastWidth = width;\n" +
                             "    __lastHeight = height;\n" +
                             "    __lastAnchorType = anchorType;\n" +
-                            "    \n" +
+                    "    \n" +
                             "    // Return the new position\n" +
                             "    newPos;\n" +
-                            "} catch (err) {\n" +
+                    "} catch (err) {\n" +
                             "    // On error, return current position\n" +
-                            "    value;\n" +
-                            "}"; 
+                    "    value;\n" +
+                    "}";

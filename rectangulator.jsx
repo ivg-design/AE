@@ -759,118 +759,119 @@
                     "    [0, 0];\n" +
                     "}";
 
-                var positionExpr = "// Position expression with width/height tracking for proper anchor-based resizing\n" +
+                var positionExpr = "// Comprehensive position expression for proper anchor-based resizing\n" +
                     "try {\n" +
                     "    // Get current values\n" +
                     "    var width = effect(\"Width\")(\"Slider\");\n" +
                     "    var height = effect(\"Height\")(\"Slider\");\n" +
                     "    var posOffset = effect(\"Position Offset\")(\"Point\");\n" +
                     "    var anchorType = effect(\"Anchor Point\")(\"Menu\");\n" +
+                    "    var w = width/2;\n" +
+                    "    var h = height/2;\n" +
+                    "    var result = value.slice(); // Default to current position\n" +
                     "    \n" +
-                    "    // Initialize persistent variables if not yet defined\n" +
-                    "    if (typeof __lastWidth === 'undefined') {\n" +
-                    "        __lastWidth = width;\n" +
-                    "        __lastHeight = height;\n" +
-                    "        __lastAnchorType = anchorType;\n" +
-                    "        __basePos = [posOffset[0], posOffset[1]];\n" +
+                    "    // Initialize and track state\n" +
+                    "    if (typeof __state === 'undefined') {\n" +
+                    "        __state = {\n" +
+                    "            lastWidth: width,\n" +
+                    "            lastHeight: height,\n" +
+                    "            lastAnchorType: anchorType,\n" +
+                    "            lastPosOffset: [posOffset[0], posOffset[1]],\n" +
+                    "            basePos: value.slice(), // Remember initial position\n" +
+                    "            visiblePos: value.slice()\n" +
+                    "        };\n" +
                     "    }\n" +
                     "    \n" +
-                    "    // Calculate dimensional changes\n" +
-                    "    var widthDelta = width - __lastWidth;\n" +
-                    "    var heightDelta = height - __lastHeight;\n" +
-                    "    var anchorChanged = (__lastAnchorType != anchorType);\n" +
+                    "    // Track changes\n" +
+                    "    var widthDelta = width - __state.lastWidth;\n" +
+                    "    var heightDelta = height - __state.lastHeight;\n" +
+                    "    var anchorChanged = (anchorType != __state.lastAnchorType);\n" +
+                    "    var offsetChanged = (posOffset[0] != __state.lastPosOffset[0] || posOffset[1] != __state.lastPosOffset[1]);\n" +
                     "    \n" +
-                    "    // Get current position or initialize it\n" +
-                    "    var currentPos = value;\n" +
+                    "    // Start with current position\n" +
+                    "    var newPos = __state.visiblePos.slice();\n" +
                     "    \n" +
-                    "    // Position adjustments based on anchor point and size changes\n" +
-                    "    var xAdj = 0;\n" +
-                    "    var yAdj = 0;\n" +
-                    "    \n" +
-                    "    // Apply proper position adjustment based on anchor type\n" +
-                    "    switch(anchorType) {\n" +
-                    "        case 1: // Top Left - no adjustment needed\n" +
-                    "            xAdj = 0;\n" +
-                    "            yAdj = 0;\n" +
-                    "            break;\n" +
-                    "        case 2: // Top Center\n" +
-                    "            xAdj = -widthDelta/2;\n" +
-                    "            yAdj = 0;\n" +
-                    "            break;\n" +
-                    "        case 3: // Top Right\n" +
-                    "            xAdj = -widthDelta;\n" +
-                    "            yAdj = 0;\n" +
-                    "            break;\n" +
-                    "        case 4: // Middle Left\n" +
-                    "            xAdj = 0;\n" +
-                    "            yAdj = -heightDelta/2;\n" +
-                    "            break;\n" +
-                    "        case 5: // Middle Center\n" +
-                    "            xAdj = -widthDelta/2;\n" +
-                    "            yAdj = -heightDelta/2;\n" +
-                    "            break;\n" +
-                    "        case 6: // Middle Right\n" +
-                    "            xAdj = -widthDelta;\n" +
-                    "            yAdj = -heightDelta/2;\n" +
-                    "            break;\n" +
-                    "        case 7: // Bottom Left\n" +
-                    "            xAdj = 0;\n" +
-                    "            yAdj = -heightDelta;\n" +
-                    "            break;\n" +
-                    "        case 8: // Bottom Center\n" +
-                    "            xAdj = -widthDelta/2;\n" +
-                    "            yAdj = -heightDelta;\n" +
-                    "            break;\n" +
-                    "        case 9: // Bottom Right\n" +
-                    "            xAdj = -widthDelta;\n" +
-                    "            yAdj = -heightDelta;\n" +
-                    "            break;\n" +
-                    "        default: // Default to Middle Center\n" +
-                    "            xAdj = -widthDelta/2;\n" +
-                    "            yAdj = -heightDelta/2;\n" +
+                    "    // Handle position offset changes directly - this must be applied regardless of other changes\n" +
+                    "    if (offsetChanged) {\n" +
+                    "        // Apply the precise delta between the current and last offset values\n" +
+                    "        var offsetDeltaX = posOffset[0] - __state.lastPosOffset[0];\n" +
+                    "        var offsetDeltaY = posOffset[1] - __state.lastPosOffset[1];\n" +
+                    "        newPos[0] += offsetDeltaX;\n" +
+                    "        newPos[1] += offsetDeltaY;\n" +
+                    "        __state.lastPosOffset = [posOffset[0], posOffset[1]];\n" +
                     "    }\n" +
                     "    \n" +
-                    "    // Calculate new position\n" +
-                    "    var newPos = [currentPos[0] + xAdj, currentPos[1] + yAdj];\n" +
+                    "    // Helper function to get anchor offsets\n" +
+                    "    function getAnchorOffset(type) {\n" +
+                    "        var offset = [0, 0];\n" +
+                    "        \n" +
+                    "        if (type == 1) offset = [-w, -h]; // Top Left\n" +
+                    "        else if (type == 2) offset = [0, -h]; // Top Center\n" +
+                    "        else if (type == 3) offset = [w, -h]; // Top Right\n" +
+                    "        else if (type == 4) offset = [-w, 0]; // Middle Left\n" +
+                    "        else if (type == 5) offset = [0, 0]; // Middle Center\n" +
+                    "        else if (type == 6) offset = [w, 0]; // Middle Right\n" +
+                    "        else if (type == 7) offset = [-w, h]; // Bottom Left\n" +
+                    "        else if (type == 8) offset = [0, h]; // Bottom Center\n" +
+                    "        else if (type == 9) offset = [w, h]; // Bottom Right\n" +
+                    "        \n" +
+                    "        return offset;\n" +
+                    "    }\n" +
                     "    \n" +
-                    "    // Handle anchor point changes specially\n" +
-                    "    if (anchorChanged) {\n" +
-                    "        // If anchor point type changed, recalculate from original position\n" +
-                    "        var w = width/2;\n" +
-                    "        var h = height/2;\n" +
-                    "        var baseX = __basePos[0];\n" +
-                    "        var baseY = __basePos[1];\n" +
-                    "        \n" +
-                    "        // Calculate anchor offset based on new anchor type\n" +
-                    "        var anchorX = 0, anchorY = 0;\n" +
-                    "        \n" +
-                    "        switch(anchorType) {\n" +
-                    "            case 1: anchorX = -w; anchorY = -h; break; // Top Left\n" +
-                    "            case 2: anchorX = 0;  anchorY = -h; break; // Top Center\n" +
-                    "            case 3: anchorX = w;  anchorY = -h; break; // Top Right\n" +
-                    "            case 4: anchorX = -w; anchorY = 0;  break; // Middle Left\n" +
-                    "            case 5: anchorX = 0;  anchorY = 0;  break; // Middle Center\n" +
-                    "            case 6: anchorX = w;  anchorY = 0;  break; // Middle Right\n" +
-                    "            case 7: anchorX = -w; anchorY = h;  break; // Bottom Left\n" +
-                    "            case 8: anchorX = 0;  anchorY = h;  break; // Bottom Center\n" +
-                    "            case 9: anchorX = w;  anchorY = h;  break; // Bottom Right\n" +
-                    "            default: anchorX = 0; anchorY = 0;  break; // Default to Middle Center\n" +
+                    "    // Apply size changes based on anchor type\n" +
+                    "    if (widthDelta !== 0 || heightDelta !== 0) {\n" +
+                    "        if (anchorType == 1) { // Top Left - no adjustment\n" +
+                    "            // No change\n" +
+                    "        } else if (anchorType == 2) { // Top Center\n" +
+                    "            newPos[0] -= widthDelta/2;\n" +
+                    "        } else if (anchorType == 3) { // Top Right\n" +
+                    "            newPos[0] -= widthDelta;\n" +
+                    "        } else if (anchorType == 4) { // Middle Left\n" +
+                    "            newPos[1] -= heightDelta/2;\n" +
+                    "        } else if (anchorType == 5) { // Middle Center\n" +
+                    "            newPos[0] -= widthDelta/2;\n" +
+                    "            newPos[1] -= heightDelta/2;\n" +
+                    "        } else if (anchorType == 6) { // Middle Right\n" +
+                    "            newPos[0] -= widthDelta;\n" +
+                    "            newPos[1] -= heightDelta/2;\n" +
+                    "        } else if (anchorType == 7) { // Bottom Left\n" +
+                    "            newPos[1] -= heightDelta;\n" +
+                    "        } else if (anchorType == 8) { // Bottom Center\n" +
+                    "            newPos[0] -= widthDelta/2;\n" +
+                    "            newPos[1] -= heightDelta;\n" +
+                    "        } else if (anchorType == 9) { // Bottom Right\n" +
+                    "            newPos[0] -= widthDelta;\n" +
+                    "            newPos[1] -= heightDelta;\n" +
                     "        }\n" +
-                    "        \n" +
-                    "        newPos = [baseX + anchorX, baseY + anchorY];\n" +
                     "    }\n" +
                     "    \n" +
-                    "    // Store current values for next frame\n" +
-                    "    __lastWidth = width;\n" +
-                    "    __lastHeight = height;\n" +
-                    "    __lastAnchorType = anchorType;\n" +
+                    "    // FIXED: Handle anchor point changes to match After Effects behavior\n" +
+                    "    // In After Effects, if the anchor moves to [-150,-100], position should stay at [0,0]\n" +
+                    "    if (anchorChanged) {\n" +
+                    "        var oldAnchorOffset = getAnchorOffset(__state.lastAnchorType);\n" +
+                    "        var newAnchorOffset = getAnchorOffset(anchorType);\n" +
+                    "        \n" +
+                    "        // IMPORTANT: In After Effects, we need to use the same values (not negated)\n" +
+                    "        // This is the opposite of what we'd expect mathematically, but it's how AE works\n" +
+                    "        var anchorDiffX = newAnchorOffset[0] - oldAnchorOffset[0];\n" +
+                    "        var anchorDiffY = newAnchorOffset[1] - oldAnchorOffset[1];\n" +
+                    "        \n" +
+                    "        // Apply adjustment to maintain visual position\n" +
+                    "        newPos[0] += anchorDiffX;\n" +
+                    "        newPos[1] += anchorDiffY;\n" +
+                    "    }\n" +
                     "    \n" +
-                    "    // Return the new position\n" +
-                    "    newPos;\n" +
+                    "    // Store state for next time\n" +
+                    "    __state.lastWidth = width;\n" +
+                    "    __state.lastHeight = height;\n" +
+                    "    __state.lastAnchorType = anchorType;\n" +
+                    "    __state.visiblePos = newPos.slice();\n" +
+                    "    \n" +
+                    "    result = newPos;\n" +
                     "} catch (err) {\n" +
-                    "    // On error, return current position\n" +
-                    "    value;\n" +
-                    "}";
+                    "    // Error fallback - just keep current position\n" +
+                    "}\n" +
+                    "result;";
 
                 // Apply the simplified expressions
                 anchorPointProp.expression = anchorPointExpr;
@@ -885,251 +886,6 @@
 
         // Also update the path expression to ensure proper positioning
         try {
-            // Modified path expression with simplified anchor point handling
-            var updatedExpression = "// Custom rounded rectangle with individual corner control\n" +
-                "try {\n" +
-                "    width = effect(\"Width\")(\"Slider\");\n" +
-                "    height = effect(\"Height\")(\"Slider\");\n" +
-                "    tlPercent = effect(\"Top Left Roundness %\")(\"Slider\");\n" +
-                "    trPercent = effect(\"Top Right Roundness %\")(\"Slider\");\n" +
-                "    brPercent = effect(\"Bottom Right Roundness %\")(\"Slider\");\n" +
-                "    blPercent = effect(\"Bottom Left Roundness %\")(\"Slider\");\n" +
-                "    posOffset = effect(\"Position Offset\")(\"Point\");\n" +
-                "    anchorType = effect(\"Anchor Point\")(\"Menu\");\n" +
-                "\n" +
-                "    // Calculate the maximum roundness based on the smallest dimension\n" +
-                "    maxRound = Math.min(width, height);\n" +
-                "\n" +
-                "    // First, clamp individual percentages to 0-100%\n" +
-                "    tlPercent = Math.max(0, Math.min(100, tlPercent));\n" +
-                "    trPercent = Math.max(0, Math.min(100, trPercent));\n" +
-                "    brPercent = Math.max(0, Math.min(100, brPercent));\n" +
-                "    blPercent = Math.max(0, Math.min(100, blPercent));\n" +
-                "\n" +
-                "    // Convert percentages to actual roundness values (0-100% -> 0-maxRound)\n" +
-                "    tl = (tlPercent / 100) * maxRound;\n" +
-                "    tr = (trPercent / 100) * maxRound;\n" +
-                "    br = (brPercent / 100) * maxRound;\n" +
-                "    bl = (blPercent / 100) * maxRound;\n" +
-                "\n" +
-                "    // Ensure all roundness values are non-negative\n" +
-                "    tl = Math.max(0, tl);\n" +
-                "    tr = Math.max(0, tr);\n" +
-                "    br = Math.max(0, br);\n" +
-                "    bl = Math.max(0, bl);\n" +
-                "\n" +
-                "    // Apply constraints to prevent distortion\n" +
-                "    // For horizontal sides (top and bottom)\n" +
-                "    maxTopRoundness = width / 2;\n" +
-                "    maxBottomRoundness = width / 2;\n" +
-                "\n" +
-                "    // For vertical sides (left and right)\n" +
-                "    maxLeftRoundness = height / 2;\n" +
-                "    maxRightRoundness = height / 2;\n" +
-                "\n" +
-                "    // Constraint pairs that share an edge (can intersect)\n" +
-                "    // Left edge: top-left and bottom-left\n" +
-                "    if (tlPercent + blPercent > 100) {\n" +
-                "        // Clamp bottom-left based on top-left value\n" +
-                "        blPercent = Math.min(blPercent, 100 - tlPercent);\n" +
-                "        bl = (blPercent / 100) * maxRound;\n" +
-                "    }\n" +
-                "\n" +
-                "    // Right edge: top-right and bottom-right\n" +
-                "    if (trPercent + brPercent > 100) {\n" +
-                "        // Clamp bottom-right based on top-right value\n" +
-                "        brPercent = Math.min(brPercent, 100 - trPercent);\n" +
-                "        br = (brPercent / 100) * maxRound;\n" +
-                "    }\n" +
-                "\n" +
-                "    // Top edge: top-left and top-right\n" +
-                "    // Only apply constraint if the width is small enough that the corners could intersect\n" +
-                "    if (tlPercent + trPercent > 100 && width <= height) {\n" +
-                "        // Clamp top-right based on top-left value\n" +
-                "        trPercent = Math.min(trPercent, 100 - tlPercent);\n" +
-                "        tr = (trPercent / 100) * maxRound;\n" +
-                "    }\n" +
-                "\n" +
-                "    // Bottom edge: bottom-left and bottom-right\n" +
-                "    // Only apply constraint if the width is small enough that the corners could intersect\n" +
-                "    if (blPercent + brPercent > 100 && width <= height) {\n" +
-                "        // Clamp bottom-right based on bottom-left value\n" +
-                "        brPercent = Math.min(brPercent, 100 - blPercent);\n" +
-                "        br = (brPercent / 100) * maxRound;\n" +
-                "    }\n" +
-                "\n" +
-                "    // Additional physical constraints to prevent distortion\n" +
-                "    // Ensure corners don't exceed physical limits\n" +
-                "    if (tl + tr > width) {\n" +
-                "        var scale = width / (tl + tr);\n" +
-                "        tl *= scale;\n" +
-                "        tr *= scale;\n" +
-                "    }\n" +
-                "\n" +
-                "    if (bl + br > width) {\n" +
-                "        var scale = width / (bl + br);\n" +
-                "        bl *= scale;\n" +
-                "        br *= scale;\n" +
-                "    }\n" +
-                "\n" +
-                "    if (tl + bl > height) {\n" +
-                "        var scale = height / (tl + bl);\n" +
-                "        tl *= scale;\n" +
-                "        bl *= scale;\n" +
-                "    }\n" +
-                "\n" +
-                "    if (tr + br > height) {\n" +
-                "        var scale = height / (tr + br);\n" +
-                "        tr *= scale;\n" +
-                "        br *= scale;\n" +
-                "    }\n" +
-                "\n" +
-                "    // Calculate points\n" +
-                "    w = width / 2;\n" +
-                "    h = height / 2;\n" +
-                "\n" +
-                "    // Calculate anchor point offset based on dropdown selection\n" +
-                "    anchorX = 0;\n" +
-                "    anchorY = 0;\n" +
-                "\n" +
-                "    if (anchorType == 1) { // Top Left\n" +
-                "        anchorX = -w;\n" +
-                "        anchorY = -h;\n" +
-                "    } else if (anchorType == 2) { // Top Center\n" +
-                "        anchorX = 0;\n" +
-                "        anchorY = -h;\n" +
-                "    } else if (anchorType == 3) { // Top Right\n" +
-                "        anchorX = w;\n" +
-                "        anchorY = -h;\n" +
-                "    } else if (anchorType == 4) { // Middle Left\n" +
-                "        anchorX = -w;\n" +
-                "        anchorY = 0;\n" +
-                "    } else if (anchorType == 5) { // Middle Center\n" +
-                "        anchorX = 0;\n" +
-                "        anchorY = 0;\n" +
-                "    } else if (anchorType == 6) { // Middle Right\n" +
-                "        anchorX = w;\n" +
-                "        anchorY = 0;\n" +
-                "    } else if (anchorType == 7) { // Bottom Left\n" +
-                "        anchorX = -w;\n" +
-                "        anchorY = h;\n" +
-                "    } else if (anchorType == 8) { // Bottom Center\n" +
-                "        anchorX = 0;\n" +
-                "        anchorY = h;\n" +
-                "    } else if (anchorType == 9) { // Bottom Right\n" +
-                "        anchorX = w;\n" +
-                "        anchorY = h;\n" +
-                "    }\n" +
-                "\n" +
-                "    // Position offset - use full value (not divided by 2)\n" +
-                "    offsetX = posOffset[0];\n" +
-                "    offsetY = posOffset[1];\n" +
-                "    // Note: Position offset is now handled by the position expression\n" +
-                "    // and not applied to the path vertices\n" +
-                "\n" +
-                "    // Create path arrays\n" +
-                "    vertices = [];\n" +
-                "    inTangents = [];\n" +
-                "    outTangents = [];\n" +
-                "\n" +
-                "    // Calculate control point factor for bezier curves\n" +
-                "    cp = 0.552;\n" +
-                "\n" +
-                "    // Always create 8 vertices (2 for each corner)\n" +
-                "    // Top-left corner (vertices 0 and 1)\n" +
-                "    tlx1 = -w;\n" +
-                "    tly1 = -h + tl;\n" +
-                "    tlx2 = -w + tl;\n" +
-                "    tly2 = -h;\n" +
-                "\n" +
-                "    // Top-right corner (vertices 2 and 3)\n" +
-                "    trx1 = w - tr;\n" +
-                "    try1 = -h;\n" +
-                "    trx2 = w;\n" +
-                "    try2 = -h + tr;\n" +
-                "\n" +
-                "    // Bottom-right corner (vertices 4 and 5)\n" +
-                "    brx1 = w;\n" +
-                "    bry1 = h - br;\n" +
-                "    brx2 = w - br;\n" +
-                "    bry2 = h;\n" +
-                "\n" +
-                "    // Bottom-left corner (vertices 6 and 7)\n" +
-                "    blx1 = -w + bl;\n" +
-                "    bly1 = h;\n" +
-                "    blx2 = -w;\n" +
-                "    bly2 = h - bl;\n" +
-                "\n" +
-                "    // If roundness is 0, make the vertices overlap\n" +
-                "    if (tl === 0) {\n" +
-                "        tlx1 = tlx2 = -w;\n" +
-                "        tly1 = tly2 = -h;\n" +
-                "    }\n" +
-                "\n" +
-                "    if (tr === 0) {\n" +
-                "        trx1 = trx2 = w;\n" +
-                "        try1 = try2 = -h;\n" +
-                "    }\n" +
-                "\n" +
-                "    if (br === 0) {\n" +
-                "        brx1 = brx2 = w;\n" +
-                "        bry1 = bry2 = h;\n" +
-                "    }\n" +
-                "\n" +
-                "    if (bl === 0) {\n" +
-                "        blx1 = blx2 = -w;\n" +
-                "        bly1 = bly2 = h;\n" +
-                "    }\n" +
-                "\n" +
-                "    // Add all vertices with anchor point and offset adjustments\n" +
-                "    // Add all vertices (no anchor point adjustment - handled by transform)\n" +
-                "    vertices.push([tlx1, tly1]);\n" +
-                "    vertices.push([tlx2, tly2]);\n" +
-                "    vertices.push([trx1, try1]);\n" +
-                "    vertices.push([trx2, try2]);\n" +
-                "    vertices.push([brx1, bry1]);\n" +
-                "    vertices.push([brx2, bry2]);\n" +
-                "    vertices.push([blx1, bly1]);\n" +
-                "    vertices.push([blx2, bly2]);\n" +
-                "\n" +
-                "    // Initialize all tangents to zero\n" +
-                "    for (i = 0; i < 8; i++) {\n" +
-                "        inTangents.push([0, 0]);\n" +
-                "        outTangents.push([0, 0]);\n" +
-                "    }\n" +
-                "\n" +
-                "    // Set tangents only for rounded corners\n" +
-                "    // Top-left corner tangents\n" +
-                "    if (tl > 0) {\n" +
-                "        outTangents[0] = [0, -tl * cp];\n" +
-                "        inTangents[1] = [-tl * cp, 0];\n" +
-                "    }\n" +
-                "\n" +
-                "    // Top-right corner tangents\n" +
-                "    if (tr > 0) {\n" +
-                "        outTangents[2] = [tr * cp, 0];\n" +
-                "        inTangents[3] = [0, -tr * cp];\n" +
-                "    }\n" +
-                "\n" +
-                "    // Bottom-right corner tangents\n" +
-                "    if (br > 0) {\n" +
-                "        outTangents[4] = [0, br * cp];\n" +
-                "        inTangents[5] = [br * cp, 0];\n" +
-                "    }\n" +
-                "\n" +
-                "    // Bottom-left corner tangents\n" +
-                "    if (bl > 0) {\n" +
-                "        outTangents[6] = [-bl * cp, 0];\n" +
-                "        inTangents[7] = [0, bl * cp];\n" +
-                "    }\n" +
-                "\n" +
-                "    // Create the path\n" +
-                "    createPath(vertices, inTangents, outTangents, true);\n" +
-                "} catch (err) {\n" +
-                "    // Default fallback path if there's an error\n" +
-                "    createPath([[0,0], [100,0], [100,100], [0,100]], [[0,0],[0,0],[0,0],[0,0]], [[0,0],[0,0],[0,0],[0,0]], true);\n" +
-                "}";
-
             // Get a fresh reference to the shape path using RefManager
             var freshShapePath = RefManager.resolve(shapePathRef);
             if (freshShapePath) {

@@ -1,0 +1,99 @@
+/* Hide window chrome */
+:root {
+  --window-chrome-height: 0px;
+}
+
+/* Remove default margins and padding */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #2D2D2D;
+  overflow: hidden;
+}
+
+/* Hide title bar */
+.topcoat-navigation-bar,
+.title-bar {
+  display: none !important;
+}
+
+/* Hide header bar */
+header,
+nav,
+.header-bar {
+  display: none !important;
+}
+
+/* Main container */
+#root {
+  width: 125px;
+  height: 46px;
+  overflow: hidden;
+  background: #2D2D2D;
+}
+
+/* App styles */
+#app {
+  display: flex;
+  flex-direction: column;
+  background: #2D2D2D;
+}
+
+/* Input container */
+.input-container {
+  width: 125px;
+  height: 46px;
+  background: #2D2D2D;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Input field */
+.input-field {
+  width: 116px;
+  height: 24px;
+  background: #3E3E3E;
+  border: 2px solid #5E5E5E;
+  border-radius: 2px;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 12px;
+  padding: 0 4px;
+  margin: 0;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #0078D7;
+}
+
+/* Status text */
+.status-text {
+  font-size: 9px;
+  color: #999999;
+  margin-top: 1px;
+}
+
+/* Remove any window decorations */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Button styles */
+button {
+  background-color: #4D4D4D;
+  border: none;
+  color: #FFFFFF;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  -webkit-app-region: no-drag; /* Allow interaction with button */
+}
+
+button:hover {
+  background-color: #5D5D5D;
+} 

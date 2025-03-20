@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ExtensionManifest
+Version="6.0"
+ExtensionBundleId="com.frame-navigator.cep"
+ExtensionBundleVersion="0.0.1"
+ExtensionBundleName=""
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+<ExtensionList>
+  <Extension Id="com.frame-navigator.cep.main" Version="0.0.1" />
+</ExtensionList>
+<ExecutionEnvironment>
+  <HostList>
+    <Host Name="AEFT" Version="[0.0,99.9]" />
+  </HostList>
+  <LocaleList>
+    <Locale Code="All" />
+  </LocaleList>
+  <RequiredRuntimeList>
+    <RequiredRuntime Name="CSXS" Version="9.0" />
+  </RequiredRuntimeList>
+</ExecutionEnvironment>
+<DispatchInfoList>
+  <Extension Id="com.frame-navigator.cep.main">
+    <DispatchInfo>
+      <Resources>
+        <MainPath>./main/index.html</MainPath>
+        <CEFCommandLine>
+          <Parameter>--v=0</Parameter>
+          <Parameter>--enable-nodejs</Parameter>
+          <Parameter>--mixed-context</Parameter>
+        </CEFCommandLine>
+      </Resources>
+      <Lifecycle>
+        <AutoVisible>true</AutoVisible>
+      </Lifecycle>
+      <UI>
+        <Type>ModalDialog</Type>
+        <Menu> </Menu>
+        <Geometry>
+          <Size>
+            <Width>125</Width>
+            <Height>46</Height>
+          </Size>
+          <MaxSize>
+            <Width>125</Width>
+            <Height>46</Height>
+          </MaxSize>
+          <MinSize>
+            <Width>125</Width>
+            <Height>46</Height>
+          </MinSize>
+        </Geometry>
+        <Icons>
+          <Icon Type="Normal">./src/assets/dark-icon.png</Icon>
+          <Icon Type="DarkNormal">./src/assets/light-icon.png</Icon>
+          <Icon Type="RollOver">./src/assets/dark-icon.png</Icon>
+          <Icon Type="DarkRollOver">./src/assets/light-icon.png</Icon>
+        </Icons>
+      </UI>
+    </DispatchInfo>
+  </Extension>
+</DispatchInfoList>
+</ExtensionManifest>
