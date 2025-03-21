@@ -66,11 +66,15 @@ export const useFrameNavigation = () => {
       if (lastUserInput !== null) {
         try {
           if (prevMode) {
+            // Converting from frames to timecode
             const frameNum = parseInt(lastUserInput.replace(/^0+/, ""), 10);
             if (!isNaN(frameNum)) {
               setInputValue(framesToTimecode(frameNum, frameInfo.frameRate));
+            } else {
+              setInputValue(frameInfo.timecode);
             }
           } else {
+            // Converting from timecode to frames
             const [hours, minutes, seconds, frames] = lastUserInput.split(':').map(Number);
             if (!isNaN(hours) && !isNaN(minutes) && !isNaN(seconds) && !isNaN(frames)) {
               const totalFrames = hours * 3600 * frameInfo.frameRate +
@@ -78,6 +82,8 @@ export const useFrameNavigation = () => {
                                 seconds * frameInfo.frameRate +
                                 frames;
               setInputValue(padNumber(totalFrames, 5));
+            } else {
+              setInputValue(padNumber(frameInfo.frame, 5));
             }
           }
         } catch {
@@ -104,7 +110,6 @@ export const useFrameNavigation = () => {
 
     const [hours, minutes, seconds, frames] = parts.map(Number);
     const direction = e.key === "ArrowUp" ? 1 : -1;
-    const increment = e.shiftKey ? 10 : (e.metaKey ? 100 : 1);
 
     // Calculate the total frames first
     let totalFrames = hours * 3600 * frameInfo.frameRate +
@@ -114,8 +119,10 @@ export const useFrameNavigation = () => {
 
     // Calculate which digit we're on (0-9) and which position (0-11)
     const digitPosition = caretPosition - (caretPosition > 2 ? 1 : 0) - (caretPosition > 5 ? 1 : 0) - (caretPosition > 8 ? 1 : 0);
-    const isTens = digitPosition % 2 === 0;
-
+    
+    // Determine if we're in position 1 (before), 2 (between), or 3 (after) the zeros
+    const positionInDigit = caretPosition % 3;
+    
     // Calculate the multiplier based on position
     let multiplier = 1;
     if (caretPosition >= 9) {
@@ -128,9 +135,17 @@ export const useFrameNavigation = () => {
       multiplier = 3600 * frameInfo.frameRate; // hours
     }
 
-    // Apply the increment/decrement
-    const step = isTens ? 10 : 1;
-    totalFrames += direction * increment * step * multiplier;
+    // Apply the increment/decrement based on position
+    let step = 1;
+    if (positionInDigit === 1) { // Position 2 (between zeros)
+      step = 1; // Change singles
+    } else if (positionInDigit === 2) { // Position 3 (after zeros)
+      step = 1; // Change singles
+    } else { // Position 1 (before zeros)
+      step = 10; // Change tens
+    }
+
+    totalFrames += direction * step * multiplier;
 
     // Ensure we don't go negative
     totalFrames = Math.max(0, totalFrames);
@@ -175,6 +190,38 @@ export const useFrameNavigation = () => {
     setInputValue(value);
   }, []);
 
+  const handleFrameModeChange = useCallback((newValue: string) => {
+    // Allow empty input for better UX
+    if (!newValue) {
+      setInputValue(newValue);
+      return;
+    }
+
+    // Allow digits, operators (+, -, *, /), and parentheses
+    if (!/^[\d+\-*/(). ]*$/.test(newValue)) {
+      return;
+    }
+
+    // Update input value
+    setInputValue(newValue);
+  }, []);
+
+  const handleTimecodeModeChange = useCallback((newValue: string) => {
+    // Allow empty input for better UX
+    if (!newValue) {
+      setInputValue(newValue);
+      return;
+    }
+
+    // Only allow digits and colons
+    if (!/^[\d:]*$/.test(newValue)) {
+      return;
+    }
+
+    // Update input value
+    setInputValue(newValue);
+  }, []);
+
   return {
     frameInfo,
     inputValue,
@@ -182,6 +229,8 @@ export const useFrameNavigation = () => {
     isFrameMode,
     handleNavigate,
     toggleMode,
-    handleArrowKeys
+    handleArrowKeys,
+    handleFrameModeChange,
+    handleTimecodeModeChange
   };
 }; 

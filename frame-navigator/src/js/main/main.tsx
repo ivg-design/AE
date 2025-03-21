@@ -21,7 +21,9 @@ const ThemedContent = memo(() => {
     isFrameMode,
     handleNavigate,
     toggleMode,
-    handleArrowKeys
+    handleArrowKeys,
+    handleFrameModeChange,
+    handleTimecodeModeChange
   } = useFrameNavigation();
 
   const handleKeyPress = useCallback((e: ReactKeyboardEvent<HTMLInputElement>) => {
@@ -58,17 +60,27 @@ const ThemedContent = memo(() => {
     }
   }, []);
 
+  useEffect(() => {
+    WindowManager.initialize();
+  }, []);
+
   return (
     <div style={styles.container}>
       <FrameInput
         value={inputValue}
-        onChange={setInputValue}
+        onChange={isFrameMode ? handleFrameModeChange : handleTimecodeModeChange}
         onKeyDown={handleKeyPress}
         isFrameMode={isFrameMode}
         frameInfo={frameInfo}
         inputRef={inputRef}
         handleArrowKeys={handleArrowKeys}
       />
+      <button 
+        onClick={toggleMode}
+        style={styles.button}
+      >
+        {isFrameMode ? "Switch to Timecode" : "Switch to Frames"}
+      </button>
     </div>
   );
 });
@@ -76,10 +88,6 @@ const ThemedContent = memo(() => {
 ThemedContent.displayName = 'ThemedContent';
 
 const Main = memo(() => {
-  useEffect(() => {
-    WindowManager.initialize();
-  }, []);
-
   return (
     <ThemeProvider>
       <ThemedContent />

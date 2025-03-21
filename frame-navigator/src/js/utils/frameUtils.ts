@@ -15,13 +15,13 @@ export const framesToTimecode = (frames: number, frameRate: number): string => {
     frameRateCache.set(frameRate, framesPerSecond);
   }
 
-  const remainingFrames = frames % framesPerSecond;
   const totalSeconds = Math.floor(frames / framesPerSecond);
+  const remainingFrames = frames % framesPerSecond;
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
   
-  return `${hours}:${padNumber(minutes, 2)}:${padNumber(seconds, 2)}:${padNumber(remainingFrames, 2)}`;
+  return `${padNumber(hours, 2)}:${padNumber(minutes, 2)}:${padNumber(seconds, 2)}:${padNumber(remainingFrames, 2)}`;
 };
 
 export const getCurrentFrameInfo = async (): Promise<FrameInfo | null> => {

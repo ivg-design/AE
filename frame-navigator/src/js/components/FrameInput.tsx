@@ -12,6 +12,7 @@ interface FrameInputProps {
   frameInfo: FrameInfo | null;
   inputRef: React.RefObject<HTMLInputElement>;
   handleArrowKeys: (e: ReactKeyboardEvent<HTMLInputElement>) => void;
+  placeholder?: string;
 }
 
 const FrameInput: React.FC<FrameInputProps> = memo(({
@@ -21,7 +22,8 @@ const FrameInput: React.FC<FrameInputProps> = memo(({
   isFrameMode,
   frameInfo,
   inputRef,
-  handleArrowKeys
+  handleArrowKeys,
+  placeholder
 }) => {
   const { theme } = useTheme();
   const styles = useStyles(theme);
@@ -68,7 +70,15 @@ const FrameInput: React.FC<FrameInputProps> = memo(({
 
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     shouldSelect.current = false;
-    onChange(e.target.value);
+    const newValue = e.target.value;
+    onChange(newValue);
+    
+    // Move caret to the end after the value is updated
+    requestAnimationFrame(() => {
+      if (inputRef.current) {
+        inputRef.current.setSelectionRange(newValue.length, newValue.length);
+      }
+    });
   }, [onChange]);
 
   const statusText = frameInfo 
@@ -85,6 +95,8 @@ const FrameInput: React.FC<FrameInputProps> = memo(({
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         style={styles.frameInput}
+        placeholder={placeholder || (isFrameMode ? "00000" : "00:00:00:00")}
+        maxLength={isFrameMode ? undefined : 11}
       />
       <div style={styles.statusText}>
         {statusText}
