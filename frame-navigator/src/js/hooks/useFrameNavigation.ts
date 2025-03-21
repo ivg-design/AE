@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { FrameInfo } from '../types/frame';
 import { getCurrentFrameInfo, navigateToFrame, padNumber, framesToTimecode } from '../utils/frameUtils';
 import CSInterface from '../lib/cep/csinterface';
@@ -11,6 +11,7 @@ export const useFrameNavigation = () => {
   const [lastUserInput, setLastUserInput] = useState<string | null>(null);
   const devModeFrameRef = useRef<number>(1000);
   const csInterface = useRef(new CSInterface());
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const isRunningInCEP = !!window.cep;
 
@@ -106,6 +107,93 @@ export const useFrameNavigation = () => {
     }
   };
 
+  const handleFrameModeArrows = (e: ReactKeyboardEvent<HTMLInputElement>, currentFrame: number) => {
+    const increment = e.shiftKey ? 10 : (e.metaKey ? 100 : 1);
+    const newFrame = e.key === "ArrowUp" ? currentFrame + increment : currentFrame - increment;
+    return Math.max(0, newFrame);
+  };
+
+  const handleTimecodeModeArrows = (e: ReactKeyboardEvent<HTMLInputElement>, currentTimecode: string, caretPosition: number) => {
+    if (!frameInfo) return currentTimecode;
+
+    const parts = currentTimecode.split(':');
+    if (parts.length !== 4) return currentTimecode;
+
+    const [hours, minutes, seconds, frames] = parts.map(Number);
+    const direction = e.key === "ArrowUp" ? 1 : -1;
+
+    // Calculate which part to increment based on caret position
+    let newHours = hours;
+    let newMinutes = minutes;
+    let newSeconds = seconds;
+    let newFrames = frames;
+
+    // Determine increment based on caret position
+    // Format is HH:MM:SS:FF (11 chars total)
+    // Position 9-11: Frames (FF)
+    // Position 6-8: Seconds (SS)
+    // Position 3-5: Minutes (MM)
+    // Position 0-2: Hours (HH)
+    if (caretPosition >= 9) { // Frames position
+      newFrames += direction;
+    } else if (caretPosition >= 6) { // Seconds position
+      newSeconds += direction;
+    } else if (caretPosition >= 3) { // Minutes position
+      newMinutes += direction;
+    } else { // Hours position
+      newHours += direction;
+    }
+
+    // Handle overflow/underflow
+    if (newFrames >= frameInfo.frameRate) {
+      newFrames = 0;
+      newSeconds++;
+    } else if (newFrames < 0) {
+      newFrames = frameInfo.frameRate - 1;
+      newSeconds--;
+    }
+
+    if (newSeconds >= 60) {
+      newSeconds = 0;
+      newMinutes++;
+    } else if (newSeconds < 0) {
+      newSeconds = 59;
+      newMinutes--;
+    }
+
+    if (newMinutes >= 60) {
+      newMinutes = 0;
+      newHours++;
+    } else if (newMinutes < 0) {
+      newMinutes = 59;
+      newHours--;
+    }
+
+    // Ensure hours doesn't go negative
+    newHours = Math.max(0, newHours);
+
+    return `${padNumber(newHours, 2)}:${padNumber(newMinutes, 2)}:${padNumber(newSeconds, 2)}:${padNumber(newFrames, 2)}`;
+  };
+
+  const handleArrowKeys = (e: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+    e.preventDefault();
+
+    if (isFrameMode) {
+      // Frame mode
+      const currentFrame = parseInt(inputValue.replace(/^0+/, "") || "0", 10);
+      const newFrame = handleFrameModeArrows(e, currentFrame);
+      setInputValue(padNumber(newFrame, 5));
+      setLastUserInput(padNumber(newFrame, 5));
+    } else {
+      // Timecode mode
+      const caretPosition = e.currentTarget.selectionStart || 0;
+      const newTimecode = handleTimecodeModeArrows(e, inputValue, caretPosition);
+      setInputValue(newTimecode);
+      setLastUserInput(newTimecode);
+    }
+  };
+
   // Get initial frame info on mount
   useEffect(() => {
     updateFrameInfo();
@@ -131,6 +219,7 @@ export const useFrameNavigation = () => {
     },
     isFrameMode,
     handleNavigate,
-    toggleMode
+    toggleMode,
+    handleArrowKeys
   };
 }; 
