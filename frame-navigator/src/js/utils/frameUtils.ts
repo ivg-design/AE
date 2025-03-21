@@ -1,63 +1,45 @@
 import { FrameInfo } from '../types/frame';
 import { evalTS } from '../lib/utils/bolt';
 
-// Cache for frame rate calculations
+// Cache frame rate calculations
 const frameRateCache = new Map<number, number>();
 
-export const padNumber = (num: number, width: number): string => {
-  return String(num).padStart(width, '0');
+export const padNumber = (num: number, size: number): string => {
+  return num.toString().padStart(size, '0');
 };
 
 export const framesToTimecode = (frames: number, frameRate: number): string => {
-  // Cache frame rate calculations
-  if (!frameRateCache.has(frameRate)) {
-    frameRateCache.set(frameRate, frameRate);
+  let framesPerSecond = frameRateCache.get(frameRate);
+  if (framesPerSecond === undefined) {
+    framesPerSecond = Math.round(frameRate);
+    frameRateCache.set(frameRate, framesPerSecond);
   }
 
-  const hours = Math.floor(frames / (3600 * frameRate));
-  frames %= 3600 * frameRate;
+  const remainingFrames = frames % framesPerSecond;
+  const totalSeconds = Math.floor(frames / framesPerSecond);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
   
-  const minutes = Math.floor(frames / (60 * frameRate));
-  frames %= 60 * frameRate;
-  
-  const seconds = Math.floor(frames / frameRate);
-  frames %= frameRate;
-
-  return `${padNumber(hours, 2)}:${padNumber(minutes, 2)}:${padNumber(seconds, 2)}:${padNumber(frames, 2)}`;
+  return `${hours}:${padNumber(minutes, 2)}:${padNumber(seconds, 2)}:${padNumber(remainingFrames, 2)}`;
 };
 
 export const getCurrentFrameInfo = async (): Promise<FrameInfo | null> => {
   try {
-    const result = await evalTS<'getCurrentFrameInfo', () => { frame: number; frameRate: number; timecode: string; } | null>('getCurrentFrameInfo');
-    return result;
-  } catch (e) {
-    console.error('Failed to get current frame info:', e);
+    const result = await evalTS('getCurrentFrameInfo');
+    return result as FrameInfo;
+  } catch (error) {
+    console.error('Error getting current frame info:', error);
     return null;
   }
 };
 
-export const navigateToFrame = async (value: string, isFrameMode: boolean): Promise<void> => {
+export const navigateToFrame = async (value: string, isFrameMode: boolean): Promise<boolean> => {
   try {
-    if (isFrameMode) {
-      const frameNum = parseInt(value.replace(/^0+/, ""), 10);
-      if (!isNaN(frameNum)) {
-        await evalTS<'evaluateExpression', (expression: string) => any>('evaluateExpression', `app.project.activeItem.time = ${frameNum}`);
-      }
-    } else {
-      const [hours, minutes, seconds, frames] = value.split(':').map(Number);
-      if (!isNaN(hours) && !isNaN(minutes) && !isNaN(seconds) && !isNaN(frames)) {
-        const frameRate = await evalTS<'evaluateExpression', (expression: string) => any>('evaluateExpression', 'app.project.activeItem.frameRate');
-        if (frameRate !== null) {
-          const totalFrames = hours * 3600 * frameRate +
-                            minutes * 60 * frameRate +
-                            seconds * frameRate +
-                            frames;
-          await evalTS<'evaluateExpression', (expression: string) => any>('evaluateExpression', `app.project.activeItem.time = ${totalFrames}`);
-        }
-      }
-    }
-  } catch (e) {
-    console.error('Navigation failed:', e);
-    throw e;
+    const result = await evalTS('navigateToFrame', value, isFrameMode);
+    return result as boolean;
+  } catch (error) {
+    console.error('Error navigating to frame:', error);
+    return false;
   }
 }; 

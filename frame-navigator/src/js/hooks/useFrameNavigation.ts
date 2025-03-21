@@ -19,7 +19,7 @@ export const useFrameNavigation = () => {
       if (info) {
         setFrameInfo(info);
         if (lastUserInput === null) {
-          setInputValue(isFrameMode ? padNumber(info.frame, 5) : framesToTimecode(info.frame, info.frameRate));
+          setInputValue(isFrameMode ? padNumber(info.frame, 5) : info.timecode);
         }
       }
     } else {
@@ -30,7 +30,7 @@ export const useFrameNavigation = () => {
       };
       setFrameInfo(mockInfo);
       if (lastUserInput === null) {
-        setInputValue(isFrameMode ? padNumber(mockInfo.frame, 5) : framesToTimecode(mockInfo.frame, mockInfo.frameRate));
+        setInputValue(isFrameMode ? padNumber(mockInfo.frame, 5) : mockInfo.timecode);
       }
     }
   }, [isFrameMode, lastUserInput]);
@@ -63,34 +63,32 @@ export const useFrameNavigation = () => {
 
     setIsFrameMode(prevMode => {
       const newMode = !prevMode;
-      try {
-        if (prevMode) {
-          // Switching from frames to timecode
-          const frameNum = parseInt(lastUserInput || inputValue.replace(/^0+/, ""), 10);
-          if (!isNaN(frameNum)) {
-            setInputValue(framesToTimecode(frameNum, frameInfo.frameRate));
+      if (lastUserInput !== null) {
+        try {
+          if (prevMode) {
+            const frameNum = parseInt(lastUserInput.replace(/^0+/, ""), 10);
+            if (!isNaN(frameNum)) {
+              setInputValue(framesToTimecode(frameNum, frameInfo.frameRate));
+            }
           } else {
-            setInputValue(framesToTimecode(frameInfo.frame, frameInfo.frameRate));
+            const [hours, minutes, seconds, frames] = lastUserInput.split(':').map(Number);
+            if (!isNaN(hours) && !isNaN(minutes) && !isNaN(seconds) && !isNaN(frames)) {
+              const totalFrames = hours * 3600 * frameInfo.frameRate +
+                                minutes * 60 * frameInfo.frameRate +
+                                seconds * frameInfo.frameRate +
+                                frames;
+              setInputValue(padNumber(totalFrames, 5));
+            }
           }
-        } else {
-          // Switching from timecode to frames
-          const [hours, minutes, seconds, frames] = (lastUserInput || inputValue).split(':').map(Number);
-          if (!isNaN(hours) && !isNaN(minutes) && !isNaN(seconds) && !isNaN(frames)) {
-            const totalFrames = hours * 3600 * frameInfo.frameRate +
-                              minutes * 60 * frameInfo.frameRate +
-                              seconds * frameInfo.frameRate +
-                              frames;
-            setInputValue(padNumber(totalFrames, 5));
-          } else {
-            setInputValue(padNumber(frameInfo.frame, 5));
-          }
+        } catch {
+          setInputValue(prevMode ? frameInfo.timecode : padNumber(frameInfo.frame, 5));
         }
-      } catch {
-        setInputValue(prevMode ? framesToTimecode(frameInfo.frame, frameInfo.frameRate) : padNumber(frameInfo.frame, 5));
+      } else {
+        setInputValue(prevMode ? frameInfo.timecode : padNumber(frameInfo.frame, 5));
       }
       return newMode;
     });
-  }, [frameInfo, lastUserInput, inputValue]);
+  }, [frameInfo, lastUserInput]);
 
   const handleFrameModeArrows = useCallback((e: ReactKeyboardEvent<HTMLInputElement>, currentFrame: number) => {
     const increment = e.shiftKey ? 10 : (e.metaKey ? 100 : 1);
@@ -106,6 +104,7 @@ export const useFrameNavigation = () => {
 
     const [hours, minutes, seconds, frames] = parts.map(Number);
     const direction = e.key === "ArrowUp" ? 1 : -1;
+    const increment = e.shiftKey ? 10 : (e.metaKey ? 100 : 1);
 
     // Calculate the total frames first
     let totalFrames = hours * 3600 * frameInfo.frameRate +
@@ -115,9 +114,7 @@ export const useFrameNavigation = () => {
 
     // Calculate which digit we're on (0-9) and which position (0-11)
     const digitPosition = caretPosition - (caretPosition > 2 ? 1 : 0) - (caretPosition > 5 ? 1 : 0) - (caretPosition > 8 ? 1 : 0);
-    
-    // Determine if we're on a tens or ones digit based on the actual caret position
-    const isTens = caretPosition % 3 === 0;
+    const isTens = digitPosition % 2 === 0;
 
     // Calculate the multiplier based on position
     let multiplier = 1;
@@ -133,13 +130,22 @@ export const useFrameNavigation = () => {
 
     // Apply the increment/decrement
     const step = isTens ? 10 : 1;
-    totalFrames += direction * step * multiplier;
+    totalFrames += direction * increment * step * multiplier;
 
     // Ensure we don't go negative
     totalFrames = Math.max(0, totalFrames);
 
     // Convert back to timecode
-    return framesToTimecode(totalFrames, frameInfo.frameRate);
+    const newHours = Math.floor(totalFrames / (3600 * frameInfo.frameRate));
+    totalFrames %= 3600 * frameInfo.frameRate;
+    
+    const newMinutes = Math.floor(totalFrames / (60 * frameInfo.frameRate));
+    totalFrames %= 60 * frameInfo.frameRate;
+    
+    const newSeconds = Math.floor(totalFrames / frameInfo.frameRate);
+    const newFrames = totalFrames % frameInfo.frameRate;
+
+    return `${padNumber(newHours, 2)}:${padNumber(newMinutes, 2)}:${padNumber(newSeconds, 2)}:${padNumber(newFrames, 2)}`;
   }, [frameInfo]);
 
   const handleArrowKeys = useCallback((e: ReactKeyboardEvent<HTMLInputElement>) => {
