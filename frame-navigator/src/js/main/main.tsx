@@ -1,18 +1,18 @@
-import React, { useRef, KeyboardEvent, useEffect } from "react";
-import { FrameInput } from "../components/FrameInput";
+import React, { useRef, useEffect, useCallback, memo } from "react";
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
+import FrameInput from "../components/FrameInput";
 import { useFrameNavigation } from "../hooks/useFrameNavigation";
 import { ThemeProvider, useTheme } from "../theme/ThemeContext";
-import { createStyles } from "../theme/styles";
+import { useStyles } from "../theme/styles";
 import { WindowManager } from "../utils/windowManager";
-import "./main.css";
 
 // Check if we're running in CEP or dev mode
 const isRunningInCEP = !!window.cep;
 
-const ThemedContent = () => {
+const ThemedContent = memo(() => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
-  const styles = createStyles(theme);
+  const styles = useStyles(theme);
   
   const {
     frameInfo,
@@ -24,8 +24,7 @@ const ThemedContent = () => {
     handleArrowKeys
   } = useFrameNavigation();
 
-  // Handle key press for dev mode
-  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = useCallback((e: ReactKeyboardEvent<HTMLInputElement>) => {
     if (!isRunningInCEP) {
       if (e.key === "Enter") {
         handleNavigate();
@@ -34,16 +33,15 @@ const ThemedContent = () => {
         toggleMode();
       }
     }
-  };
+  }, [handleNavigate, toggleMode]);
 
-  // Handle key events from CSInterface
   useEffect(() => {
     if (isRunningInCEP) {
       const handleKeyEvent = (e: globalThis.KeyboardEvent) => {
-        if (e.keyCode === 13) { // Enter key
+        if (e.keyCode === 13) {
           handleNavigate();
           e.preventDefault();
-        } else if (e.keyCode === 9) { // Tab key
+        } else if (e.keyCode === 9) {
           toggleMode();
           e.preventDefault();
         }
@@ -54,7 +52,6 @@ const ThemedContent = () => {
     }
   }, [handleNavigate, toggleMode]);
 
-  // Focus input on mount
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
@@ -74,11 +71,12 @@ const ThemedContent = () => {
       />
     </div>
   );
-};
+});
 
-const Main = () => {
-  React.useEffect(() => {
-    // Initialize window settings
+ThemedContent.displayName = 'ThemedContent';
+
+const Main = memo(() => {
+  useEffect(() => {
     WindowManager.initialize();
   }, []);
 
@@ -87,6 +85,8 @@ const Main = () => {
       <ThemedContent />
     </ThemeProvider>
   );
-};
+});
+
+Main.displayName = 'Main';
 
 export default Main;

@@ -1,5 +1,6 @@
 import CSInterface from '../lib/cep/csinterface';
 
+// Create singleton instance
 const csi = new CSInterface();
 
 export const WindowManager = {
@@ -7,34 +8,47 @@ export const WindowManager = {
    * Initialize the window with headless settings
    */
   initialize: () => {
-    // Set window title
-    csi.setWindowTitle("");
-    
-    // Remove flyout menu
-    csi.setPanelFlyoutMenu("");
-    
-    // Set window size
-    csi.resizeContent(300, 150);
+    try {
+      csi.setWindowTitle("");
+      csi.setPanelFlyoutMenu("");
+      csi.resizeContent(300, 150);
+    } catch (error) {
+      console.error('Error initializing window:', error);
+    }
   },
 
   /**
    * Close the extension window
    */
   close: () => {
-    csi.closeExtension();
+    try {
+      csi.closeExtension();
+    } catch (error) {
+      console.error('Error closing window:', error);
+    }
   },
 
   /**
    * Get current window visibility
    */
   isVisible: (): boolean => {
-    return csi.isWindowVisible();
+    try {
+      return csi.isWindowVisible();
+    } catch (error) {
+      console.error('Error checking window visibility:', error);
+      return false;
+    }
   },
 
   /**
    * Get current window title
    */
   getTitle: (): string => {
-    return csi.getWindowTitle();
+    try {
+      return csi.getWindowTitle();
+    } catch (error) {
+      console.error('Error getting window title:', error);
+      return '';
+    }
   }
 }; 

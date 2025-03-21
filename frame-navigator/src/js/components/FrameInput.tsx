@@ -1,19 +1,20 @@
-import React, { KeyboardEvent, useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback, memo } from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent, ChangeEvent } from 'react';
 import { FrameInfo } from '../types/frame';
 import { useTheme } from '../theme/ThemeContext';
-import { createStyles } from '../theme/styles';
+import { useStyles } from '../theme/styles';
 
 interface FrameInputProps {
   value: string;
   onChange: (value: string) => void;
-  onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
+  onKeyDown: (e: ReactKeyboardEvent<HTMLInputElement>) => void;
   isFrameMode: boolean;
   frameInfo: FrameInfo | null;
   inputRef: React.RefObject<HTMLInputElement>;
-  handleArrowKeys: (e: KeyboardEvent<HTMLInputElement>) => void;
+  handleArrowKeys: (e: ReactKeyboardEvent<HTMLInputElement>) => void;
 }
 
-export const FrameInput: React.FC<FrameInputProps> = ({
+const FrameInput: React.FC<FrameInputProps> = memo(({
   value,
   onChange,
   onKeyDown,
@@ -23,64 +24,75 @@ export const FrameInput: React.FC<FrameInputProps> = ({
   handleArrowKeys
 }) => {
   const { theme } = useTheme();
-  const styles = createStyles(theme);
+  const styles = useStyles(theme);
   const lastCaretPosition = useRef<number | null>(null);
+  const shouldSelect = useRef(true);
 
-  // Select all text when component mounts
+  // Initial mount effect - ensure selection happens after focus
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-        inputRef.current.select();
-      }
-    }, 100);
-    return () => clearTimeout(timer);
+    if (inputRef.current) {
+      inputRef.current.focus();
+      // Use a small timeout to ensure selection happens after focus
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.select();
+        }
+      }, 0);
+    }
   }, []);
 
-  // Restore caret position after value changes
   useEffect(() => {
-    if (lastCaretPosition.current !== null && inputRef.current) {
+    if (lastCaretPosition.current !== null && inputRef.current && !shouldSelect.current) {
       inputRef.current.setSelectionRange(lastCaretPosition.current, lastCaretPosition.current);
       lastCaretPosition.current = null;
     }
+    shouldSelect.current = false;
   }, [value]);
 
-  // Handle focus to ensure text is selected
-  const handleFocus = () => {
+  const handleFocus = useCallback(() => {
     if (inputRef.current) {
       inputRef.current.select();
     }
-  };
+  }, []);
 
-  // Combined key handler
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback((e: ReactKeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-      // Store caret position before the change
       lastCaretPosition.current = e.currentTarget.selectionStart;
+      shouldSelect.current = false;
       handleArrowKeys(e);
     } else {
+      lastCaretPosition.current = e.currentTarget.selectionStart;
       onKeyDown(e);
     }
-  };
+  }, [handleArrowKeys, onKeyDown]);
+
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    shouldSelect.current = false;
+    onChange(e.target.value);
+  }, [onChange]);
+
+  const statusText = frameInfo 
+    ? `${isFrameMode ? frameInfo.timecode : String(frameInfo.frame).padStart(5, '0')}${` (${frameInfo.frameRate} fps)`}`
+    : isFrameMode ? "--:--:--:--" : "-----";
 
   return (
-    <div className="input-container" style={styles.container}>
+    <div style={styles.container}>
       <input
         ref={inputRef}
         type="text"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
-        className="input-field"
         style={styles.frameInput}
       />
-      <div className="status-text" style={styles.statusText}>
-        {isFrameMode 
-          ? `${frameInfo?.timecode || "--:--:--:--"}`
-          : `${frameInfo ? String(frameInfo.frame).padStart(5, '0') : "-----"}`}
-        {frameInfo && ` (${frameInfo.frameRate} fps)`}
+      <div style={styles.statusText}>
+        {statusText}
       </div>
     </div>
   );
-}; 
+});
+
+FrameInput.displayName = 'FrameInput';
+
+export default FrameInput; 

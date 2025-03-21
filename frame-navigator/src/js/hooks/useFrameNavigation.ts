@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useState, useEffect, useRef, KeyboardEvent as ReactKeyboardEvent, useCallback } from 'react';
 import { FrameInfo } from '../types/frame';
 import { getCurrentFrameInfo, navigateToFrame, padNumber, framesToTimecode } from '../utils/frameUtils';
 import CSInterface from '../lib/cep/csinterface';
@@ -7,113 +7,98 @@ export const useFrameNavigation = () => {
   const [frameInfo, setFrameInfo] = useState<FrameInfo | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [isFrameMode, setIsFrameMode] = useState(true);
-  const [isUserTyping, setIsUserTyping] = useState(false);
   const [lastUserInput, setLastUserInput] = useState<string | null>(null);
   const devModeFrameRef = useRef<number>(1000);
   const csInterface = useRef(new CSInterface());
-  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const isRunningInCEP = !!window.cep;
 
-  const updateFrameInfo = async () => {
+  const updateFrameInfo = useCallback(async () => {
     if (isRunningInCEP) {
       const info = await getCurrentFrameInfo();
       if (info) {
         setFrameInfo(info);
-        // Only update input if there's no pending user input
         if (lastUserInput === null) {
-          setInputValue(isFrameMode ? padNumber(info.frame, 5) : info.timecode);
+          setInputValue(isFrameMode ? padNumber(info.frame, 5) : framesToTimecode(info.frame, info.frameRate));
         }
       }
     } else {
-      // Dev mode simulation
       const mockInfo = {
         frame: devModeFrameRef.current,
         frameRate: 24,
         timecode: framesToTimecode(devModeFrameRef.current, 24)
       };
       setFrameInfo(mockInfo);
-      // Only update input if there's no pending user input
       if (lastUserInput === null) {
-        setInputValue(isFrameMode ? padNumber(mockInfo.frame, 5) : mockInfo.timecode);
+        setInputValue(isFrameMode ? padNumber(mockInfo.frame, 5) : framesToTimecode(mockInfo.frame, mockInfo.frameRate));
       }
     }
-  };
+  }, [isFrameMode, lastUserInput]);
 
-  const handleNavigate = async () => {
+  const handleNavigate = useCallback(async () => {
     if (isRunningInCEP) {
       try {
         await navigateToFrame(inputValue, isFrameMode);
-        // Clear user input after navigation
         setLastUserInput(null);
-        setIsUserTyping(false);
-        // Close the extension using CSInterface
-        setTimeout(() => {
-          csInterface.current.closeExtension();
-        }, 100); // Small delay to ensure navigation completes
+        setTimeout(() => csInterface.current.closeExtension(), 100);
       } catch (e) {
         console.error('Navigation failed:', e);
       }
     } else {
-      // Dev mode navigation
       try {
         const parsedValue = parseInt(inputValue.replace(/^0+/, ""), 10);
         if (!isNaN(parsedValue)) {
           devModeFrameRef.current = parsedValue;
           updateFrameInfo();
-          // Clear user input after navigation
           setLastUserInput(null);
-          setIsUserTyping(false);
-          console.log('Dev mode: Would close extension here');
         }
       } catch (e) {
         console.error('Navigation failed:', e);
       }
     }
-  };
+  }, [inputValue, isFrameMode, updateFrameInfo]);
 
-  const toggleMode = () => {
-    setIsFrameMode(!isFrameMode);
-    // Update input value when mode changes, but preserve user input if it exists
-    if (frameInfo) {
-      if (lastUserInput !== null) {
-        // If there's user input, convert it to the new mode
-        try {
-          if (isFrameMode) {
-            // Converting from frame to timecode
-            const frameNum = parseInt(lastUserInput.replace(/^0+/, ""), 10);
-            if (!isNaN(frameNum)) {
-              setInputValue(framesToTimecode(frameNum, frameInfo.frameRate));
-            }
+  const toggleMode = useCallback(() => {
+    if (!frameInfo) return;
+
+    setIsFrameMode(prevMode => {
+      const newMode = !prevMode;
+      try {
+        if (prevMode) {
+          // Switching from frames to timecode
+          const frameNum = parseInt(lastUserInput || inputValue.replace(/^0+/, ""), 10);
+          if (!isNaN(frameNum)) {
+            setInputValue(framesToTimecode(frameNum, frameInfo.frameRate));
           } else {
-            // Converting from timecode to frame
-            const [hours, minutes, seconds, frames] = lastUserInput.split(':').map(Number);
-            if (!isNaN(hours) && !isNaN(minutes) && !isNaN(seconds) && !isNaN(frames)) {
-              const totalFrames = hours * 3600 * frameInfo.frameRate +
-                                minutes * 60 * frameInfo.frameRate +
-                                seconds * frameInfo.frameRate +
-                                frames;
-              setInputValue(padNumber(totalFrames, 5));
-            }
+            setInputValue(framesToTimecode(frameInfo.frame, frameInfo.frameRate));
           }
-        } catch (e) {
-          // If conversion fails, fall back to current frame info
-          setInputValue(isFrameMode ? frameInfo.timecode : padNumber(frameInfo.frame, 5));
+        } else {
+          // Switching from timecode to frames
+          const [hours, minutes, seconds, frames] = (lastUserInput || inputValue).split(':').map(Number);
+          if (!isNaN(hours) && !isNaN(minutes) && !isNaN(seconds) && !isNaN(frames)) {
+            const totalFrames = hours * 3600 * frameInfo.frameRate +
+                              minutes * 60 * frameInfo.frameRate +
+                              seconds * frameInfo.frameRate +
+                              frames;
+            setInputValue(padNumber(totalFrames, 5));
+          } else {
+            setInputValue(padNumber(frameInfo.frame, 5));
+          }
         }
-      } else {
-        // No user input, use current frame info
-        setInputValue(isFrameMode ? frameInfo.timecode : padNumber(frameInfo.frame, 5));
+      } catch {
+        setInputValue(prevMode ? framesToTimecode(frameInfo.frame, frameInfo.frameRate) : padNumber(frameInfo.frame, 5));
       }
-    }
-  };
+      return newMode;
+    });
+  }, [frameInfo, lastUserInput, inputValue]);
 
-  const handleFrameModeArrows = (e: ReactKeyboardEvent<HTMLInputElement>, currentFrame: number) => {
+  const handleFrameModeArrows = useCallback((e: ReactKeyboardEvent<HTMLInputElement>, currentFrame: number) => {
     const increment = e.shiftKey ? 10 : (e.metaKey ? 100 : 1);
     const newFrame = e.key === "ArrowUp" ? currentFrame + increment : currentFrame - increment;
     return Math.max(0, newFrame);
-  };
+  }, []);
 
-  const handleTimecodeModeArrows = (e: ReactKeyboardEvent<HTMLInputElement>, currentTimecode: string, caretPosition: number) => {
+  const handleTimecodeModeArrows = useCallback((e: ReactKeyboardEvent<HTMLInputElement>, currentTimecode: string, caretPosition: number) => {
     if (!frameInfo) return currentTimecode;
 
     const parts = currentTimecode.split(':');
@@ -122,101 +107,72 @@ export const useFrameNavigation = () => {
     const [hours, minutes, seconds, frames] = parts.map(Number);
     const direction = e.key === "ArrowUp" ? 1 : -1;
 
-    // Calculate which part to increment based on caret position
-    let newHours = hours;
-    let newMinutes = minutes;
-    let newSeconds = seconds;
-    let newFrames = frames;
+    // Calculate the total frames first
+    let totalFrames = hours * 3600 * frameInfo.frameRate +
+                      minutes * 60 * frameInfo.frameRate +
+                      seconds * frameInfo.frameRate +
+                      frames;
 
-    // Determine increment based on caret position
-    // Format is HH:MM:SS:FF (11 chars total)
-    // Position 9-11: Frames (FF)
-    // Position 6-8: Seconds (SS)
-    // Position 3-5: Minutes (MM)
-    // Position 0-2: Hours (HH)
-    if (caretPosition >= 9) { // Frames position
-      newFrames += direction;
-    } else if (caretPosition >= 6) { // Seconds position
-      newSeconds += direction;
-    } else if (caretPosition >= 3) { // Minutes position
-      newMinutes += direction;
-    } else { // Hours position
-      newHours += direction;
+    // Calculate which digit we're on (0-9) and which position (0-11)
+    const digitPosition = caretPosition - (caretPosition > 2 ? 1 : 0) - (caretPosition > 5 ? 1 : 0) - (caretPosition > 8 ? 1 : 0);
+    
+    // Determine if we're on a tens or ones digit based on the actual caret position
+    const isTens = caretPosition % 3 === 0;
+
+    // Calculate the multiplier based on position
+    let multiplier = 1;
+    if (caretPosition >= 9) {
+      multiplier = 1; // frames
+    } else if (caretPosition >= 6) {
+      multiplier = frameInfo.frameRate; // seconds
+    } else if (caretPosition >= 3) {
+      multiplier = 60 * frameInfo.frameRate; // minutes
+    } else {
+      multiplier = 3600 * frameInfo.frameRate; // hours
     }
 
-    // Handle overflow/underflow
-    if (newFrames >= frameInfo.frameRate) {
-      newFrames = 0;
-      newSeconds++;
-    } else if (newFrames < 0) {
-      newFrames = frameInfo.frameRate - 1;
-      newSeconds--;
-    }
+    // Apply the increment/decrement
+    const step = isTens ? 10 : 1;
+    totalFrames += direction * step * multiplier;
 
-    if (newSeconds >= 60) {
-      newSeconds = 0;
-      newMinutes++;
-    } else if (newSeconds < 0) {
-      newSeconds = 59;
-      newMinutes--;
-    }
+    // Ensure we don't go negative
+    totalFrames = Math.max(0, totalFrames);
 
-    if (newMinutes >= 60) {
-      newMinutes = 0;
-      newHours++;
-    } else if (newMinutes < 0) {
-      newMinutes = 59;
-      newHours--;
-    }
+    // Convert back to timecode
+    return framesToTimecode(totalFrames, frameInfo.frameRate);
+  }, [frameInfo]);
 
-    // Ensure hours doesn't go negative
-    newHours = Math.max(0, newHours);
-
-    return `${padNumber(newHours, 2)}:${padNumber(newMinutes, 2)}:${padNumber(newSeconds, 2)}:${padNumber(newFrames, 2)}`;
-  };
-
-  const handleArrowKeys = (e: ReactKeyboardEvent<HTMLInputElement>) => {
+  const handleArrowKeys = useCallback((e: ReactKeyboardEvent<HTMLInputElement>) => {
     if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
     e.preventDefault();
 
     if (isFrameMode) {
-      // Frame mode
       const currentFrame = parseInt(inputValue.replace(/^0+/, "") || "0", 10);
       const newFrame = handleFrameModeArrows(e, currentFrame);
-      setInputValue(padNumber(newFrame, 5));
-      setLastUserInput(padNumber(newFrame, 5));
+      const newValue = padNumber(newFrame, 5);
+      setInputValue(newValue);
+      setLastUserInput(newValue);
     } else {
-      // Timecode mode
       const caretPosition = e.currentTarget.selectionStart || 0;
       const newTimecode = handleTimecodeModeArrows(e, inputValue, caretPosition);
       setInputValue(newTimecode);
       setLastUserInput(newTimecode);
     }
-  };
+  }, [isFrameMode, inputValue, handleFrameModeArrows, handleTimecodeModeArrows]);
 
-  // Get initial frame info on mount
   useEffect(() => {
     updateFrameInfo();
-  }, []);
+  }, [updateFrameInfo]);
 
-  // Reset user typing state after 2 seconds of no input
-  useEffect(() => {
-    if (isUserTyping) {
-      const timeout = setTimeout(() => {
-        setIsUserTyping(false);
-      }, 2000);
-      return () => clearTimeout(timeout);
-    }
-  }, [isUserTyping]);
+  const setInput = useCallback((value: string) => {
+    setLastUserInput(value);
+    setInputValue(value);
+  }, []);
 
   return {
     frameInfo,
     inputValue,
-    setInputValue: (value: string) => {
-      setIsUserTyping(true);
-      setLastUserInput(value);
-      setInputValue(value);
-    },
+    setInputValue: setInput,
     isFrameMode,
     handleNavigate,
     toggleMode,
