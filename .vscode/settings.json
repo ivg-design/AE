@@ -4,5 +4,6 @@
     "cursor.cmdk.useThemedDiffBackground": true,
     "cursor.general.enableShadowWorkspace": true,
     "cursor.chat.alwaysSearchWeb": false,
-    "liveServer.settings.multiRootWorkspaceName": "ADOBE SCRIPTING"
+    "liveServer.settings.multiRootWorkspaceName": "ADOBE SCRIPTING",
+    "liveServer.settings.port": 5502
 }

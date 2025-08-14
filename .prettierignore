@@ -1,0 +1,10 @@
+node_modules
+dist
+.archive
+*.min.js
+*.min.jsx
+frame-navigator/dist
+cep_barebones/dist
+packages/*/dist
+temp
+*.log

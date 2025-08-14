@@ -2,3 +2,21 @@ node_modules
 .DS_Store
 .examples
 frame-navigator/dist
+
+# Archive folder for old/deprecated files
+.archive/
+.claude/
+.vscode/
+
+# Temporary files and logs
+temp/
+*.log
+yarn-error.log
+
+# Test output
+test_output/
+
+# Environment variables
+.env
+.env.local
+.env.*.local

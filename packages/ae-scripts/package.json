@@ -1,0 +1,23 @@
+{
+  "name": "@jsx-workspace/ae-scripts",
+  "version": "1.0.0",
+  "description": "Adobe After Effects automation scripts collection",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "echo 'Build script to be implemented'",
+    "clean": "rimraf dist/*",
+    "typecheck": "echo 'No TypeScript files to check'"
+  },
+  "keywords": [
+    "after-effects",
+    "jsx",
+    "automation",
+    "scripting"
+  ],
+  "files": [
+    "src",
+    "dist",
+    "templates"
+  ]
+}
