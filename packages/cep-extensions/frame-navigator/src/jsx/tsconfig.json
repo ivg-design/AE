@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
     "target": "es3",
-    "noLib": true,
-    "strict": true,
+    "lib": ["es5"],
+    "strict": false,
+    "skipLibCheck": true,
     "types": [
-      "./global",
-      "../../node_modules/types-for-adobe/shared/global",
-      "../../node_modules/types-for-adobe/shared/PlugPlugExternalObject"
+      "./global"
     ]
   },
-  "include": ["./**/*"]
+  "include": ["./**/*"],
+  "exclude": ["./index.ts"]
 }

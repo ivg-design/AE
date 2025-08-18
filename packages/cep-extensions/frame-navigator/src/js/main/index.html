@@ -4,6 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title></title>
+    <script>
+      // CEP Polyfills for missing functions
+      if (typeof Object.freeze !== 'function') {
+        Object.freeze = function(obj) { return obj; };
+      }
+      if (typeof Object.isFrozen !== 'function') {
+        Object.isFrozen = function(obj) { return false; };
+      }
+      // Define __objectFreeze if needed
+      if (typeof window.__objectFreeze === 'undefined') {
+        window.__objectFreeze = Object.freeze || function(obj) { return obj; };
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

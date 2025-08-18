@@ -50,7 +50,7 @@ const config: CEP_Config = {
 		country: 'US',
 		province: 'CA',
 		org: 'MyCompany',
-		password: process.env.ZXP_PASSWORD || 'changeme',
+		password: 'changeme',
 		tsa: 'http://timestamp.digicert.com/',
 		sourceMap: false,
 		jsxBin: 'off',

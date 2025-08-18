@@ -9,6 +9,21 @@ import path from "path";
 
 const GLOBAL_THIS = "thisObj";
 
+// Custom plugin to replace __objectFreeze with a simple function
+const replaceObjectFreeze = () => {
+  return {
+    name: 'replace-object-freeze',
+    renderChunk(code: string, chunk: any) {
+      // Replace __objectFreeze with a simple function that returns the object
+      const newCode = code.replace(/__objectFreeze/g, 'function(obj) { return obj; }');
+      return {
+        code: newCode,
+        map: null // Return null to indicate no sourcemap changes
+      };
+    },
+  };
+};
+
 export const extendscriptConfig = (
   extendscriptEntry: string,
   outPath: string,
@@ -37,10 +52,19 @@ export const extendscriptConfig = (
         exclude: /node_modules/,
         babelrc: false,
         babelHelpers: "inline",
-        presets: ["@babel/preset-env", "@babel/preset-typescript"],
+        presets: [
+          ["@babel/preset-env", {
+            loose: true,
+            modules: false,
+            targets: {
+              browsers: ["ie 11"]
+            }
+          }],
+          "@babel/preset-typescript"
+        ],
         plugins: [
           "@babel/plugin-syntax-dynamic-import",
-          "@babel/plugin-proposal-class-properties",
+          ["@babel/plugin-proposal-class-properties", { loose: true }],
         ],
       }),
       jsxPonyfill(),
@@ -49,6 +73,7 @@ export const extendscriptConfig = (
         globalThis: GLOBAL_THIS,
       }),
       jsxBin(isPackage ? cepConfig.zxp.jsxBin : cepConfig.build?.jsxBin),
+      replaceObjectFreeze(),
     ],
   };
 

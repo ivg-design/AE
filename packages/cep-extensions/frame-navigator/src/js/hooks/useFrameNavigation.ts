@@ -15,11 +15,21 @@ export const useFrameNavigation = () => {
 
   const updateFrameInfo = useCallback(async () => {
     if (isRunningInCEP) {
+      console.log('updateFrameInfo: Running in CEP mode');
       const info = await getCurrentFrameInfo();
+      console.log('updateFrameInfo: Got info:', info);
       if (info) {
         setFrameInfo(info);
         if (lastUserInput === null) {
           setInputValue(isFrameMode ? padNumber(info.frame, 5) : info.timecode);
+        }
+      } else {
+        console.log('updateFrameInfo: No frame info returned, using default');
+        // Set default values when no comp is open
+        const defaultInfo = { frame: 0, frameRate: 24, timecode: '00:00:00:00' };
+        setFrameInfo(defaultInfo);
+        if (lastUserInput === null) {
+          setInputValue(isFrameMode ? '00000' : '00:00:00:00');
         }
       }
     } else {

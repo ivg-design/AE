@@ -26,7 +26,9 @@ export const framesToTimecode = (frames: number, frameRate: number): string => {
 
 export const getCurrentFrameInfo = async (): Promise<FrameInfo | null> => {
   try {
+    console.log('Calling getCurrentFrameInfo...');
     const result = await evalTS('getCurrentFrameInfo');
+    console.log('getCurrentFrameInfo result:', result);
     return result as FrameInfo;
   } catch (error) {
     console.error('Error getting current frame info:', error);

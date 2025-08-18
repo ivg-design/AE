@@ -1,4 +1,35 @@
-// @include './lib/json2.js'
+// Simple JSON polyfill for ExtendScript
+//@ts-nocheck
+if (typeof JSON === 'undefined') {
+  JSON = {
+    stringify: function(obj: any): string {
+      if (obj === null) return 'null';
+      if (obj === undefined) return undefined;
+      if (typeof obj === 'string') return '"' + obj.replace(/"/g, '\\"') + '"';
+      if (typeof obj === 'number' || typeof obj === 'boolean') return String(obj);
+      if (obj instanceof Array) {
+        var arr = [];
+        for (var i = 0; i < obj.length; i++) {
+          arr.push(JSON.stringify(obj[i]));
+        }
+        return '[' + arr.join(',') + ']';
+      }
+      if (typeof obj === 'object') {
+        var pairs = [];
+        for (var key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            pairs.push('"' + key + '":' + JSON.stringify(obj[key]));
+          }
+        }
+        return '{' + pairs.join(',') + '}';
+      }
+      return '{}';
+    },
+    parse: function(str: string): any {
+      return eval('(' + str + ')');
+    }
+  };
+}
 
 import { ns } from "../shared/shared";
 
@@ -82,6 +113,17 @@ switch (getAppNameSafely()) {
         
         // Also register for direct access in evalScript (without namespace)
         host[key] = (aeft as any)[key];
+      }
+    }
+    
+    // Debug: Log what's registered
+    //@ts-ignore
+    if (typeof $.writeln !== "undefined") {
+      //@ts-ignore
+      $.writeln("Registered functions in namespace '" + ns + "':");
+      for (const key in host[ns]) {
+        //@ts-ignore
+        $.writeln(" - " + key + ": " + typeof host[ns][key]);
       }
     }
     break;

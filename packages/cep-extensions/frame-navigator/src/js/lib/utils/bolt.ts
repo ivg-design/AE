@@ -3,7 +3,7 @@ import Vulcan, { VulcanMessage } from "../cep/vulcan";
 import { ns } from "../../../shared/shared";
 import { fs } from "../cep/node";
 
-export const csi = new CSInterface();
+export const csi = typeof window !== 'undefined' && window.cep ? new CSInterface() : null as any;
 export const vulcan = new Vulcan();
 
 // jsx utils
@@ -77,31 +77,42 @@ export const evalTS = <
   return new Promise(function (resolve, reject) {
     const formattedArgs = args
       .map((arg) => {
-        console.log(JSON.stringify(arg));
         return `${JSON.stringify(arg)}`;
       })
       .join(",");
+    const script = `(function(){
+          try{
+            var host = typeof $ !== 'undefined' ? $ : window;
+            if (!host["${ns}"]) {
+              return JSON.stringify({error: "Namespace ${ns} not found"});
+            }
+            if (!host["${ns}"].${functionName}) {
+              return JSON.stringify({error: "Function ${functionName} not found in namespace"});
+            }
+            var res = host["${ns}"].${functionName}(${formattedArgs});
+            return JSON.stringify(res);
+          }catch(e){
+            return JSON.stringify({error: e.toString(), line: e.line});
+          }
+        })()`;
     csi.evalScript(
-      `try{
-          var host = typeof $ !== 'undefined' ? $ : window;
-          var res = host["${ns}"].${functionName}(${formattedArgs});
-          JSON.stringify(res);
-        }catch(e){
-          e.fileName = new File(e.fileName).fsName;
-          JSON.stringify(e);
-        }`,
+      script,
       (res: string) => {
+        console.log(`evalTS ${functionName} raw result:`, res);
         try {
           //@ts-ignore
           if (res === "undefined") return resolve();
           const parsed = JSON.parse(res);
           if (parsed.name === "ReferenceError") {
-            console.error("REFERENCE ERROR");
+            console.error("REFERENCE ERROR for", functionName);
+            console.error("Full error:", parsed);
             reject(parsed);
           } else {
+            console.log(`evalTS ${functionName} parsed result:`, parsed);
             resolve(parsed);
           }
         } catch (error) {
+          console.error(`evalTS ${functionName} parse error:`, error, 'Raw result was:', res);
           reject(res);
         }
       }
@@ -203,8 +214,60 @@ export const initBolt = (log = true) => {
     const jsxSrc = `${extRoot}/jsx/index.js`;
     const jsxBinSrc = `${extRoot}/jsx/index.jsxbin`;
     if (fs.existsSync(jsxSrc)) {
-      if (log) console.log(jsxSrc);
+      if (log) console.log('Loading JSX from:', jsxSrc);
       evalFile(jsxSrc);
+      
+      // Test if JSX loaded successfully
+      setTimeout(() => {
+        csi.evalScript('1+1', (result: string) => {
+          console.log('JSX basic test (1+1):', result);
+        });
+        
+        // Test if our namespace exists
+        csi.evalScript('typeof $["com.frame-navigator.cep"]', (result: string) => {
+          console.log('Namespace exists:', result);
+        });
+        
+        // Test direct function call
+        csi.evalScript('typeof getCurrentFrameInfo', (result: string) => {
+          console.log('Direct getCurrentFrameInfo exists:', result);
+        });
+        
+        // Test namespace function
+        csi.evalScript('typeof $["com.frame-navigator.cep"].getCurrentFrameInfo', (result: string) => {
+          console.log('Namespace getCurrentFrameInfo exists:', result);
+        });
+        
+        // Try calling it directly
+        csi.evalScript('getCurrentFrameInfo()', (result: string) => {
+          console.log('Direct call result (no JSON.stringify):', result);
+        });
+        
+        // Try with JSON.stringify
+        csi.evalScript('JSON.stringify(getCurrentFrameInfo())', (result: string) => {
+          console.log('Direct call result (with JSON.stringify):', result);
+        });
+        
+        // Test if JSON exists
+        csi.evalScript('typeof JSON', (result: string) => {
+          console.log('typeof JSON:', result);
+        });
+        
+        // Test JSON.stringify directly
+        csi.evalScript('typeof JSON.stringify', (result: string) => {
+          console.log('typeof JSON.stringify:', result);
+        });
+        
+        // Try with $.global.JSON
+        csi.evalScript('typeof $.global.JSON', (result: string) => {
+          console.log('typeof $.global.JSON:', result);
+        });
+        
+        // Try calling through $
+        csi.evalScript('JSON.stringify($.getCurrentFrameInfo())', (result: string) => {
+          console.log('$ call result:', result);
+        });
+      }, 100);
     } else if (fs.existsSync(jsxBinSrc)) {
       if (log) console.log(jsxBinSrc);
       evalFile(jsxBinSrc);
@@ -223,6 +286,14 @@ export const openLinkInBrowser = (url: string) => {
 };
 
 export const getAppBackgroundColor = () => {
+  // Return default dark color if not in CEP environment
+  if (typeof window.__adobe_cep__ === 'undefined') {
+    return {
+      rgb: { r: 38, g: 38, b: 38 },
+      hex: '#262626',
+    };
+  }
+  
   const { green, blue, red } = JSON.parse(
     window.__adobe_cep__.getHostEnvironment() as string
   ).appSkinInfo.panelBackgroundColor.color;
@@ -245,12 +316,14 @@ export const subscribeBackgroundColor = (callback: (color: string) => void) => {
   };
   // get current color
   callback(getColor());
-  // listen for changes
-  csi.addEventListener(
-    "com.adobe.csxs.events.ThemeColorChanged",
-    () => callback(getColor()),
-    {}
-  );
+  // listen for changes only if in CEP environment
+  if (csi) {
+    csi.addEventListener(
+      "com.adobe.csxs.events.ThemeColorChanged",
+      () => callback(getColor()),
+      {}
+    );
+  }
 };
 
 // vulcan

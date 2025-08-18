@@ -1,13 +1,15 @@
 import CSInterface from '../lib/cep/csinterface';
 
-// Create singleton instance
-const csi = new CSInterface();
+// Create singleton instance only in CEP environment
+const csi = typeof window !== 'undefined' && window.cep ? new CSInterface() : null;
 
 export const WindowManager = {
   /**
    * Initialize the window with headless settings
    */
   initialize: () => {
+    if (!csi) return; // Skip if not in CEP environment
+    
     try {
       csi.setWindowTitle("");
       csi.setPanelFlyoutMenu("");
@@ -21,6 +23,8 @@ export const WindowManager = {
    * Close the extension window
    */
   close: () => {
+    if (!csi) return; // Skip if not in CEP environment
+    
     try {
       csi.closeExtension();
     } catch (error) {
@@ -32,6 +36,8 @@ export const WindowManager = {
    * Get current window visibility
    */
   isVisible: (): boolean => {
+    if (!csi) return false; // Return false if not in CEP environment
+    
     try {
       return csi.isWindowVisible();
     } catch (error) {
@@ -44,6 +50,8 @@ export const WindowManager = {
    * Get current window title
    */
   getTitle: (): string => {
+    if (!csi) return ''; // Return empty string if not in CEP environment
+    
     try {
       return csi.getWindowTitle();
     } catch (error) {

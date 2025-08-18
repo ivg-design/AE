@@ -1,5 +1,10 @@
 // After Effects Frame Navigator Utility Functions
 
+// Simple test function to verify communication
+export const testConnection = (): string => {
+  return "ExtendScript connection successful!";
+};
+
 // Function to pad number with leading zeros
 export const padNumber = (num: number, size: number): string => {
   let s = num.toString();
@@ -36,19 +41,34 @@ export const timecodeToFrames = (timecode: string, frameRate: number): number =>
 };
 
 // Get current frame information
-export const getCurrentFrameInfo = (): { frame: number, frameRate: number, timecode: string } | null => {
-  if (app.project.activeItem && app.project.activeItem instanceof CompItem) {
-    const comp = app.project.activeItem;
-    const currentFrame = Math.round(comp.time * comp.frameRate);
-    const timecode = framesToTimecode(currentFrame, comp.frameRate);
-    
+export const getCurrentFrameInfo = (): { frame: number, frameRate: number, timecode: string } => {
+  try {
+    if (app.project && app.project.activeItem && app.project.activeItem instanceof CompItem) {
+      const comp = app.project.activeItem;
+      const currentFrame = Math.round(comp.time * comp.frameRate);
+      const timecode = framesToTimecode(currentFrame, comp.frameRate);
+      
+      return {
+        frame: currentFrame,
+        frameRate: comp.frameRate,
+        timecode: timecode
+      };
+    }
+  } catch (e) {
+    // Return error info for debugging
     return {
-      frame: currentFrame,
-      frameRate: comp.frameRate,
-      timecode: timecode
+      frame: -1,
+      frameRate: 24,
+      timecode: "ERROR: " + e.toString()
     };
   }
-  return null;
+  
+  // Return default values when no comp is open
+  return {
+    frame: 0,
+    frameRate: 24,
+    timecode: "00:00:00:00"
+  };
 };
 
 // Navigate to a specific frame
