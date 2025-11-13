@@ -1,12 +1,12 @@
 # Documentation Table of Contents
 
 ## Overview
-- [README](/README.md) - Project overview and quick start
-- [CHANGELOG](/CHANGELOG.md) - Version history and changes
-- [CLAUDE.md](/CLAUDE.md) - AI assistant context and guidelines
+- [README](../README.md) - Project overview and quick start
+- [CHANGELOG](../CHANGELOG.md) - Version history and changes
+- [CLAUDE.md](../CLAUDE.md) - AI assistant context and guidelines
 
 ## Script Documentation
-- [Script Functionality Catalog](SCRIPT_FUNCTIONALITY_CATALOG.md) - Complete list of all 31 scripts with descriptions
+- [Script Functionality Catalog](development/SCRIPT_FUNCTIONALITY_CATALOG.md) - Complete list of all 31 scripts with descriptions
 - [Naming Convention](NAMING_CONVENTION_FINAL.md) - Script naming guidelines
 - [Clever Naming Proposals](CLEVER_NAMING_PROPOSALS.md) - Alternative naming ideas
 
@@ -26,46 +26,46 @@
 ## Script Categories
 
 ### Animation (3 scripts)
-- PathMaster - Path following animations
-- Linearizer - Property linking system
-- Limb-a-tron - IK rigging system
+- [PathMaster](../packages/ae-scripts/src/animation/PathMaster.jsx) - Path following animations
+- [Linearizer](../packages/ae-scripts/src/animation/Linearizer.jsx) - Property linking system
+- [Limb-a-tron](../packages/ae-scripts/src/animation/Limb-a-tron.jsx) - IK rigging system
 
 ### Composition (4 scripts)
-- Guiderator - Guide placement with calculator
-- Slidotron_16x9 - Horizontal slider compositions
-- Slidotron_9x16 - Vertical slider compositions
-- Split-o-matic_9x16 - Split-screen templates
+- [Guiderator](../packages/ae-scripts/src/composition/Guiderator.jsx) - Guide placement with calculator
+- [Slidotron_16x9](../packages/ae-scripts/src/composition/Slidotron_16x9.jsx) - Horizontal slider compositions
+- [Slidotron_9x16](../packages/ae-scripts/src/composition/Slidotron_9x16.jsx) - Vertical slider compositions
+- [Split-o-matic_9x16](../packages/ae-scripts/src/composition/Split-o-matic_9x16.jsx) - Split-screen templates
 
 ### Effects (4 scripts)
-- ChromaBlenderizer - Color interpolation
-- sfxMaster - Audio control system
-- BurstMate - Stroke burst effects
-- Sync-o-tron - Audio-visual sync
+- [ChromaBlenderizer](../packages/ae-scripts/src/effects/ChromaBlenderizer.jsx) - Color interpolation
+- [sfxMaster](../packages/ae-scripts/src/effects/sfxMaster.jsx) - Audio control system
+- [BurstMate](../packages/ae-scripts/src/effects/BurstMate.jsx) - Stroke burst effects
+- [Sync-o-tron](../packages/ae-scripts/src/effects/Sync-o-tron.jsx) - Audio-visual sync
 
 ### Keyframes (3 scripts)
-- KeyBot - Keyframe value modification
-- KeyCloneMatic - Keyframe duplication
-- Valuatron - Expression baking
+- [KeyBot](../packages/ae-scripts/src/keyframes/KeyBot.jsx) - Keyframe value modification
+- [KeyCloneMatic](../packages/ae-scripts/src/keyframes/KeyCloneMatic.jsx) - Keyframe duplication
+- [Valuatron](../packages/ae-scripts/src/keyframes/Valuatron.jsx) - Expression baking
 
 ### Layers (7 scripts)
-- NullBot - Automatic null creation
-- OrderMaster - Layer reordering
-- Parent-o-bot - Multi-parent system
-- Rectangulator - Rectangle conversion
-- SubtitleForge - Subtitle presets
-- TextMate - Text highlighting
-- TimeWarp-a-tron - Time remapping
+- [NullBot](../packages/ae-scripts/src/layers/NullBot.jsx) - Automatic null creation
+- [OrderMaster](../packages/ae-scripts/src/layers/OrderMaster.jsx) - Layer reordering
+- [Parent-o-bot](../packages/ae-scripts/src/layers/Parent-o-bot.jsx) - Multi-parent system
+- [Rectangulator](../packages/ae-scripts/src/layers/Rectangulator.jsx) - Rectangle conversion
+- [SubtitleForge](../packages/ae-scripts/src/layers/SubtitleForge.jsx) - Subtitle presets
+- [TextMate](../packages/ae-scripts/src/layers/TextMate.jsx) - Text highlighting
+- [TimeWarp-a-tron](../packages/ae-scripts/src/layers/TimeWarp-a-tron.jsx) - Time remapping
 
 ### Paths (6 scripts)
-- Centralizer - Path center guides
-- Distributron - Layer distribution
-- Originator - Origin centering
-- PathDuplitron - Motion path copying
-- Trace-o-matic - Mask to shape conversion
-- VertexMaster - Vertex control
+- [Centralizer](../packages/ae-scripts/src/paths/Centralizer.jsx) - Path center guides
+- [Distributron](../packages/ae-scripts/src/paths/Distributron.jsx) - Layer distribution
+- [Originator](../packages/ae-scripts/src/paths/Originator.jsx) - Origin centering
+- [PathDuplitron](../packages/ae-scripts/src/paths/PathDuplitron.jsx) - Motion path copying
+- [Trace-o-matic](../packages/ae-scripts/src/paths/Trace-o-matic.jsx) - Mask to shape conversion
+- [VertexMaster](../packages/ae-scripts/src/paths/VertexMaster.jsx) - Vertex control
 
 ### Utilities (4 scripts)
-- Iteratron - Property interpolation
-- Onionizer - Onion skinning
-- RandoMatic - Randomization
-- Triminator - Trim paths
+- [Iteratron](../packages/ae-scripts/src/utilities/Iteratron.jsx) - Property interpolation
+- [Onionizer](../packages/ae-scripts/src/utilities/Onionizer.jsx) - Onion skinning
+- [RandoMatic](../packages/ae-scripts/src/utilities/RandoMatic.jsx) - Randomization
+- [Triminator](../packages/ae-scripts/src/utilities/Triminator.jsx) - Trim paths

@@ -10,12 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Comprehensive monorepo structure with `packages/` organization
 - 3 new scripts recovered from dist folder:
-  - **Linearizer** - Property linking with driver-based interpolation
-  - **Distributron** - Layer distribution along shape paths  
-  - **Trace-o-matic** - Mask to shape conversion with keyframes
+  - **[Linearizer](packages/ae-scripts/src/animation/Linearizer.jsx)** - Property linking with driver-based interpolation
+  - **[Distributron](packages/ae-scripts/src/paths/Distributron.jsx)** - Layer distribution along shape paths  
+  - **[Trace-o-matic](packages/ae-scripts/src/paths/Trace-o-matic.jsx)** - Mask to shape conversion with keyframes
 - Complete JSDoc documentation for all 31 scripts
-- GitHub project for script maintenance and development
-- Individual tracking issues for each script (#2-#39)
+- [GitHub project](https://github.com/users/ivg-design/projects/6) for script maintenance and development
+- Individual tracking issues for each script ([#2](https://github.com/ivg-design/JSX/issues/2)-[#39](https://github.com/ivg-design/JSX/issues/39))
 
 ### Changed
 - Reorganized all scripts into categorized folders (animation, composition, effects, keyframes, layers, paths, utilities)
@@ -28,8 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved frame-navigator to packages/cep-extensions/
 
 ### Fixed
-- Documentation inconsistencies in SCRIPT_FUNCTIONALITY_CATALOG.md
-- Missing script descriptions in README.md
+- Documentation inconsistencies in [SCRIPT_FUNCTIONALITY_CATALOG.md](docs/development/SCRIPT_FUNCTIONALITY_CATALOG.md)
+- Missing script descriptions in [README.md](README.md)
 - Incorrect script counts (now correctly shows 31 scripts)
 
 ### Removed

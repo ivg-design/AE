@@ -1,0 +1,6 @@
+{
+  "mode": "cef",
+  "cefPort": 8860,
+  "outputDir": "./devmirror-logs",
+  "autoOpenBrowser": true
+}
