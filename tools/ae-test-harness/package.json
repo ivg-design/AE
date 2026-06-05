@@ -1,0 +1,23 @@
+{
+  "name": "@jsx-workspace/ae-test-harness",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Test harness for After Effects ExtendScript (.jsx) catalog scripts: static analysis, expression checks, functional host simulation, ScriptUI capture, visualization, and reporting.",
+  "scripts": {
+    "test:ae": "vitest run",
+    "test:ae:static": "node src/cli/index.js static",
+    "test:ae:expressions": "node src/cli/index.js expressions",
+    "test:ae:functional": "node src/cli/index.js functional",
+    "test:ae:ui": "node src/cli/index.js ui",
+    "test:ae:report": "node src/cli/index.js report",
+    "test:ae:ae-smoke": "node src/cli/index.js ae-smoke"
+  },
+  "devDependencies": {
+    "vitest": "^2",
+    "acorn": "^8",
+    "acorn-walk": "^8",
+    "playwright": "^1",
+    "rimraf": "^5"
+  }
+}
