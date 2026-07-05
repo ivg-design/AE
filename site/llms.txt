@@ -1,0 +1,68 @@
+# IVG Toolkit — After Effects scripts
+
+> IVG Toolkit is a free, MIT-licensed collection of 32 production-ready Adobe After Effects scripts (.jsx) for motion design — rigging, keyframes, paths, shapes, effects, and audio — plus a dockable IVGD Command Bar panel and a Build-a-bar generator that packages a custom toolbar of the scripts you pick. Browse and download at https://forge.mograph.life/apps/ae/.
+
+## Site
+
+- [Catalog](https://forge.mograph.life/apps/ae/): all 32 scripts with icons, taglines, and a detail view, plus the Build-a-bar bundle generator.
+- [Documentation](https://forge.mograph.life/apps/ae/docs.html): per-script docs — what it does, controls, usage, notes, requirements.
+- [Download all (.zip)](https://forge.mograph.life/apps/ae/download/ae-scripts.zip): every script plus the IVGD Command Bar.
+- [Source (GitHub)](https://github.com/ivg-design/ae): repository, README, and changelog.
+
+## Animation scripts
+
+- [Limb-a-tron](https://forge.mograph.life/apps/ae/docs.html?s=limb-a-tron): Rig a two-segment IK/FK limb in seconds — drag one null to bend it, tune everything from one Limb Control effect, and bake it when done.
+- [Linearizer](https://forge.mograph.life/apps/ae/docs.html?s=linearizer): Drive existing keyframed animation from any slider, position, or rotation — scrubbing the driver scrubs the animation.
+- [PathMaster](https://forge.mograph.life/apps/ae/docs.html?s=pathmaster): Animate a layer's Position along any shape-layer path — retime, re-ease, trim, loop or ping-pong it afterwards from a single layer marker.
+
+## Composition scripts
+
+- [Guiderator](https://forge.mograph.life/apps/ae/docs.html?s=guiderator): Drop exact ruler guides by typing a number — or a formula like 1920/2 — into a dockable panel, then click H or V.
+- [Slidotron_16x9](https://forge.mograph.life/apps/ae/docs.html?s=slidotron-16x9): Build a horizontal slide-reveal rig in one click — two nested 4K comps, mirrored alpha mattes, and one 0–100 "CTRL" slider plays the transition.
+- [Slidotron_9x16](https://forge.mograph.life/apps/ae/docs.html?s=slidotron-9x16): Build a vertical 9:16 slide-reveal rig in one click — two nested 1080×1920 comps, mirrored mattes, and one 0–100 "CTRL" slider plays the transition.
+
+## Effects scripts
+
+- [BurstMate](https://forge.mograph.life/apps/ae/docs.html?s=burstmate): Drop a fully rigged radial stroke burst into your comp — every color, length, density, and dash tuned from one StrokeBurst control panel.
+- [ChromaBlenderizer](https://forge.mograph.life/apps/ae/docs.html?s=chromablenderizer): Ramp a color range across selected fills, strokes, and effect colors — pick Start/End, then apply a linear blend or random scatter in one click.
+- [sfxMaster](https://forge.mograph.life/apps/ae/docs.html?s=sfxmaster): Mix Voice Over, Sound Effects, and Music from three master sliders — audio layers auto-categorized by marker comments and wired in one pass.
+- [Sync-o-tron](https://forge.mograph.life/apps/ae/docs.html?s=sync-o-tron): Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio Reactor template.
+
+## Keyframes scripts
+
+- [Elast-o-matic](https://forge.mograph.life/apps/ae/docs.html?s=elast-o-matic): Add elastic overshoot or gravity bounce after any keyframe — hold Cmd/Ctrl at launch to switch variants, tune everything in Effect Controls.
+- [KeyBot](https://forge.mograph.life/apps/ae/docs.html?s=keybot): Batch-edit selected keyframe values with =, +, −, ×, ÷ per axis — timing, easing, and interpolation stay untouched.
+- [KeyCloneMatic](https://forge.mograph.life/apps/ae/docs.html?s=keyclonematic): Repeat a hand-tuned keyframe set down the timeline at a fixed or decaying interval — values, easing, and spatial tangents cloned faithfully.
+- [Valuatron](https://forge.mograph.life/apps/ae/docs.html?s=valuatron): Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo.
+
+## Layers scripts
+
+- [Controllerizer](https://forge.mograph.life/apps/ae/docs.html?s=controllerizer): Gather any selected properties from any layers onto one Controller Null as matching expression controls, pre-set to current values.
+- [NullBot](https://forge.mograph.life/apps/ae/docs.html?s=nullbot): Parent a group of layers to one master null at their average position — move, scale, or rotate the whole group from a single handle.
+- [Opac-o-bot](https://forge.mograph.life/apps/ae/docs.html?s=opac-o-bot): Parenting for Opacity — selected layers' Opacity follows their parent via expression, the one property AE parenting ignores.
+- [OrderMaster](https://forge.mograph.life/apps/ae/docs.html?s=ordermaster): Reverse or shuffle the stacking order of a contiguous run of selected layers, or the contiguous shape groups inside one shape layer.
+- [Parent-o-bot](https://forge.mograph.life/apps/ae/docs.html?s=parent-o-bot): Blend a layer's Position, Scale, Rotation, and Opacity toward up to two parent layers, each with its own 0–100% influence slider.
+- [Rectangulator](https://forge.mograph.life/apps/ae/docs.html?s=rectangulator): Convert a parametric rectangle into a bezier shape with independent per-corner rounding and a 9-point anchor grid, driven by one effect.
+- [Reseterator](https://forge.mograph.life/apps/ae/docs.html?s=reseterator): Zero the transform origin of selected layers — layer anchor to [0,0,0], every nested shape-group anchor and position to [0,0].
+- [SubtitleForge](https://forge.mograph.life/apps/ae/docs.html?s=subtitleforge): Build a full caption rig in one run — text plus a self-sizing box with stroke and drop shadow, all driven from one Subtitle Setup effect.
+- [TextMate](https://forge.mograph.life/apps/ae/docs.html?s=textmate): Type a word and highlight every case-sensitive occurrence of it in a text layer, each with its own Range Selector on a new animator.
+- [TimeWarp-a-tron](https://forge.mograph.life/apps/ae/docs.html?s=timewarp-a-tron): Drive a layer's Time Remap from a 0–100 slider that scrubs a user-defined in/out frame range, framerate-correct and keyframe-free.
+
+## Paths scripts
+
+- [Centralizer](https://forge.mograph.life/apps/ae/docs.html?s=centralizer): Drop center and bounding-box guides around anything — one shape, a multiselected group of shapes, text, footage or a precomp.
+- [Distributron](https://forge.mograph.life/apps/ae/docs.html?s=distributron): Spread a comp's layers evenly along a shape path, each auto-rotating to follow the curve, all steered live from one CTRL null.
+- [Originator](https://forge.mograph.life/apps/ae/docs.html?s=originator): Recenter a shape layer's bezier path origin on (0,0) so it scales and rotates predictably — instantly for one path, via a picker for several.
+- [Trace-o-matic](https://forge.mograph.life/apps/ae/docs.html?s=trace-o-matic): Convert a layer's masks into a new shape layer with hold-keyframed paths and opacity, all styled at once by five master fill/stroke controls.
+- [VertexMaster](https://forge.mograph.life/apps/ae/docs.html?s=vertexmaster): Turn a bezier path's vertices and tangents into null-object handles you can keyframe and parent, or flip to Follow mode to track an animated path.
+
+## Utilities scripts
+
+- [Iteratron](https://forge.mograph.life/apps/ae/docs.html?s=iteratron): Spread a property evenly across a layer stack — link a start value and an end value, and every layer in between gets its interpolated step.
+- [RandoMatic](https://forge.mograph.life/apps/ae/docs.html?s=randomatic): Replace every selected keyframe's value with a fresh uniform-random number inside a per-axis range you type in — timing and easing untouched.
+- [Triminator](https://forge.mograph.life/apps/ae/docs.html?s=triminator): Add a Trim Paths effect — pre-keyframed 0→100% for an instant reveal — to a shape layer's contents or to the specific shape groups you select.
+
+## About
+
+- [IVG Design hub](https://forge.mograph.life/): other tools by the same author.
+- License: MIT. Requires Adobe After Effects CC 2019 or later; scripts target ES3/ExtendScript.
