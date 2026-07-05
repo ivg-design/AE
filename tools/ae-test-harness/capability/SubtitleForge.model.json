@@ -1,0 +1,300 @@
+{
+  "name": "SubtitleForge",
+  "category": "layers",
+  "ui": "HEADLESS",
+
+  "consumes": {
+    "selection": ["comp"],
+    "minimum": "1 active CompItem (no layer selection required)",
+    "description": "Reads app.project.activeItem; must be a CompItem. No pre-existing layers need to be selected — the script creates all layers itself."
+  },
+
+  "controls": [],
+
+  "functions": [
+    "create a SUBTITLE text layer with Inter-Medium font at 50px",
+    "set a timed MarkerValue on the SUBTITLE layer to drive subtitle text via expressions",
+    "apply the embedded 'Subtitle Setup' FFX pseudo-effect preset to the SUBTITLE layer",
+    "add a 'Enable Type On' Checkbox Control effect to the SUBTITLE layer",
+    "create a TXTBox shape layer with a rectangle group (fill, stroke, roundness)",
+    "execute Layer Styles commands (3739 + 9000) to enable drop-shadow on TXTBox",
+    "set drop-shadow properties on TXTBox via AE Layer Styles API",
+    "write AE expressions on SUBTITLE and TXTBox layers that drive text content, font size/color, box size/color/roundness, stroke, fill-opacity, position, layer opacity, and all drop-shadow parameters from the Subtitle Setup effect sliders",
+    "wrap all operations in a single undo group named 'SubtitleForge'"
+  ],
+
+  "scriptSim": {
+    "scenario": "success — creates SUBTITLE text layer and TXTBox shape layer in active comp",
+    "inputs": "Active CompItem 'Subtitle Comp' (1920×1080, 15 s, 24 fps); no pre-existing layers; no layer selection",
+    "operations": [
+      { "kind": "beginUndoGroup",  "target": "SubtitleForge" },
+      { "kind": "createLayer",     "target": "SUBTITLE" },
+      { "kind": "setMarker",       "target": "SUBTITLE/ADBE Marker" },
+      { "kind": "setValue",        "target": "SUBTITLE/ADBE Text Properties/ADBE Text Document" },
+      { "kind": "setValue",        "target": "SUBTITLE/ADBE Text Properties" },
+      { "kind": "fileWrite",       "target": "" },
+      { "kind": "applyPreset",     "target": "SUBTITLE" },
+      { "kind": "setValue",        "target": "SUBTITLE/ADBE Transform Group/ADBE Opacity" },
+      { "kind": "createLayer",     "target": "TXTBox" },
+      { "kind": "setValue",        "target": "TXTBox/ADBE Root Vectors Group" },
+      { "kind": "executeCommand",  "target": "3739" },
+      { "kind": "executeCommand",  "target": "9000" },
+      { "kind": "setValue",        "target": "TXTBox/ADBE Layer Styles" },
+      { "kind": "setExpression",   "target": "SUBTITLE/ADBE Text Properties/ADBE Text Document" },
+      { "kind": "setExpression",   "target": "SUBTITLE/ADBE Transform Group/ADBE Opacity" },
+      { "kind": "setExpression",   "target": "TXTBox/ADBE Root Vectors Group" },
+      { "kind": "setExpression",   "target": "TXTBox/ADBE Transform Group/ADBE Position" },
+      { "kind": "setExpression",   "target": "TXTBox/ADBE Transform Group/ADBE Opacity" },
+      { "kind": "setExpression",   "target": "TXTBox/ADBE Layer Styles" },
+      { "kind": "endUndoGroup",    "target": "" }
+    ]
+  },
+
+  "expressions": [
+    {
+      "target": "SUBTITLE/ADBE Text Properties/ADBE Text Document",
+      "controlBinding": {
+        "control": "Subtitle Setup",
+        "param": "Font Color / Font Size",
+        "range": [12, 120]
+      },
+      "expression": "m = thisLayer;\nn=0;\nif (m.marker.numKeys > 0){\n  n = m.marker.nearestKey(time).index;\n  if (m.marker.key(n).time > time) n--;\n}\nif (n > 0 && m.marker.key(n).duration+m.marker.key(n).time>time) {\n    var myComment = m.marker.key(n).comment;\n    var myStyle = text.sourceText.style;\n    var myColor = effect(\"Subtitle Setup\")(\"Font Color\");\n    var newColor = [myColor[0], myColor[1], myColor[2]];\n    var newStyle = myStyle.setFontSize(effect(\"Subtitle Setup\")(\"Font Size\"))\n                            .setFillColor(newColor)\n                            .setText(myComment);\n    text.sourceText = newStyle;\n} else  {\"\"}",
+      "sim": {
+        "variable": "time",
+        "range": [0, 15],
+        "steps": 40,
+        "note": "Sweeps comp time to show when marker windows are active and subtitle text appears"
+      }
+    },
+    {
+      "target": "SUBTITLE/ADBE Text Properties/ADBE Text Animators/ADBE Text Animator/ADBE Text Selectors/ADBE Text Selector/ADBE Text Percent Start",
+      "controlBinding": {
+        "control": "Enable Type On",
+        "param": "Checkbox",
+        "range": [0, 1]
+      },
+      "expression": "m = thisLayer;\nn=0;\nlen = thisComp.duration;\nvar checkbox = thisLayer.effect(\"Enable Type On\")(\"Checkbox\").value;\nif (checkbox == 1) {\n    if (m.marker.numKeys > 0){\n        n = m.marker.nearestKey(time).index;\n            if (m.marker.key(n).time > time) n--;\n    if(n > 0){\n        mt = m.marker.key(n).time;\n    if(time < mt+len){\n        driverMin = m.marker.key(n).time;\n        driverMax = m.marker.key(n).time+(marker.key(n).duration/5);\n        outputMin = 0;\n        outputMax = 100;\n        linear(time, driverMin, driverMax, outputMin, outputMax);\n            }else value;\n        }else value;\n    }else value;\n}else value;",
+      "sim": {
+        "variable": "time",
+        "range": [0, 15],
+        "steps": 40,
+        "note": "Sweeps time; when Enable Type On checkbox is 1 and a marker exists at t=0.1, animates Percent Start 0→100 over marker.duration/5"
+      }
+    },
+    {
+      "target": "SUBTITLE/ADBE Transform Group/ADBE Opacity",
+      "controlBinding": {
+        "control": "Subtitle Setup",
+        "param": "Font Opacity",
+        "range": [0, 100]
+      },
+      "expression": "effect(\"Subtitle Setup\")(\"Font Opacity\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 40,
+        "note": "Plots layer opacity as Font Opacity slider is swept 0→100"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Root Vectors Group/ADBE Vector Group/ADBE Vectors Group/ADBE Vector Shape - Rect/ADBE Vector Rect Size",
+      "controlBinding": {
+        "control": "Subtitle Setup",
+        "param": "Offset X / Offset Y",
+        "range": [0, 200]
+      },
+      "expression": "var t = thisComp.layer(\"SUBTITLE\").sourceRectAtTime();\nx = t.width+thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Offset X\");\ny = t.height+thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Offset Y\");\n[x,y]",
+      "sim": {
+        "variable": "time",
+        "range": [0, 15],
+        "steps": 40,
+        "note": "Sweeps time to sample sourceRectAtTime of SUBTITLE; box size tracks text bounding rect plus Offset X/Y padding"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Root Vectors Group/ADBE Vector Group/ADBE Vectors Group/ADBE Vector Shape - Rect/ADBE Vector Rect Roundness",
+      "controlBinding": {
+        "control": "Subtitle Setup",
+        "param": "Box Roundness",
+        "range": [0, 100]
+      },
+      "expression": "thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Box Roundness\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 40,
+        "note": "Plots rect roundness as Box Roundness slider is swept 0→100"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Root Vectors Group/ADBE Vector Group/ADBE Vectors Group/ADBE Vector Graphic - Stroke/ADBE Vector Stroke Color",
+      "controlBinding": null,
+      "expression": "thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Stroke Color\")",
+      "sim": {
+        "variable": "time",
+        "range": [0, 15],
+        "steps": 40,
+        "note": "Color read-through — returns RGB array from Stroke Color param at each time step"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Root Vectors Group/ADBE Vector Group/ADBE Vectors Group/ADBE Vector Graphic - Stroke/ADBE Vector Stroke Width",
+      "controlBinding": {
+        "control": "Subtitle Setup",
+        "param": "Stroke Width",
+        "range": [0, 20]
+      },
+      "expression": "if (thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Stroke\")==0) {0} else {thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Stroke Width\")}",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 20],
+        "steps": 40,
+        "note": "Returns 0 when Stroke toggle is off; otherwise plots Stroke Width slider 0→20"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Root Vectors Group/ADBE Vector Group/ADBE Vectors Group/ADBE Vector Graphic - Fill/ADBE Vector Fill Color",
+      "controlBinding": null,
+      "expression": "thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Box Color\")",
+      "sim": {
+        "variable": "time",
+        "range": [0, 15],
+        "steps": 40,
+        "note": "Color read-through — returns RGB array from Box Color param at each time step"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Root Vectors Group/ADBE Vector Group/ADBE Vectors Group/ADBE Vector Graphic - Fill/ADBE Vector Fill Opacity",
+      "controlBinding": {
+        "control": "Subtitle Setup",
+        "param": "Opacity",
+        "range": [0, 100]
+      },
+      "expression": "thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Opacity\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 40,
+        "note": "Plots box fill opacity as Opacity slider is swept 0→100"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Transform Group/ADBE Position",
+      "controlBinding": null,
+      "expression": "t = parent.sourceRectAtTime();\ny = content(\"Rectangle 1\").content(\"Rectangle Path 1\").size[1]/2;\nx =0;\n[x+t.width/2,t.top+t.height/2]",
+      "sim": {
+        "variable": "time",
+        "range": [0, 15],
+        "steps": 40,
+        "note": "Sweeps time to show TXTBox position tracking SUBTITLE bounding rect center"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Transform Group/ADBE Opacity",
+      "controlBinding": null,
+      "expression": "m = thisComp.layer(\"SUBTITLE\");\nn=0;\nif (m.marker.numKeys > 0){\n  n = m.marker.nearestKey(time).index;\n  if (m.marker.key(n).time > time) n--;\n}\nif (n > 0 && m.marker.key(n).duration+m.marker.key(n).time>time) {\n    100\n} else  {0}",
+      "sim": {
+        "variable": "time",
+        "range": [0, 15],
+        "steps": 40,
+        "note": "Returns 100 when inside a SUBTITLE marker window, 0 otherwise — sweeps time to show box visibility gating"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Layer Styles/dropShadow/color",
+      "controlBinding": null,
+      "expression": "thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Shadow Color\")",
+      "sim": {
+        "variable": "time",
+        "range": [0, 15],
+        "steps": 40,
+        "note": "Color read-through — returns RGB array from Shadow Color param at each time step"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Layer Styles/dropShadow/opacity",
+      "controlBinding": {
+        "control": "Subtitle Setup",
+        "param": "Shadow Opacity",
+        "range": [0, 100]
+      },
+      "expression": "if (thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Shadow\")==0) {0} else {thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Shadow Opacity\")}",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 40,
+        "note": "Returns 0 when Shadow toggle is off; otherwise plots Shadow Opacity slider 0→100"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Layer Styles/dropShadow/localLightingAngle",
+      "controlBinding": {
+        "control": "Subtitle Setup",
+        "param": "Angle",
+        "range": [0, 360]
+      },
+      "expression": "thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Angle\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 360],
+        "steps": 40,
+        "note": "Plots drop-shadow angle as Angle slider is swept 0→360 degrees"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Layer Styles/dropShadow/distance",
+      "controlBinding": {
+        "control": "Subtitle Setup",
+        "param": "Distance",
+        "range": [0, 50]
+      },
+      "expression": "thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Distance\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 50],
+        "steps": 40,
+        "note": "Plots drop-shadow distance as Distance slider is swept 0→50 pixels"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Layer Styles/dropShadow/chokeMatte",
+      "controlBinding": {
+        "control": "Subtitle Setup",
+        "param": "Spread",
+        "range": [0, 100]
+      },
+      "expression": "thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Spread\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 40,
+        "note": "Plots drop-shadow spread (choke matte) as Spread slider is swept 0→100"
+      }
+    },
+    {
+      "target": "TXTBox/ADBE Layer Styles/dropShadow/blur",
+      "controlBinding": {
+        "control": "Subtitle Setup",
+        "param": "Size",
+        "range": [0, 100]
+      },
+      "expression": "thisComp.layer(\"SUBTITLE\").effect(\"Subtitle Setup\")(\"Size\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 40,
+        "note": "Plots drop-shadow blur (size) as Size slider is swept 0→100 pixels"
+      }
+    }
+  ],
+
+  "notes": [
+    "HEADLESS: no ScriptUI dialog — runs immediately on the active comp with zero user interaction.",
+    "The 'Subtitle Setup' effect is a pseudo-effect applied from an embedded FFX binary (subtitleControllerFFX) written to Folder.temp at runtime; the binary encodes all slider/color/checkbox params.",
+    "Subtitle text is driven entirely by MarkerValue comments on the SUBTITLE layer — add markers with comment text to display subtitles.",
+    "The 'Enable Type On' Checkbox Control effect toggles the type-on animation; when unchecked, ADBE Text Percent Start returns its static value.",
+    "app.executeCommand(3739) is a workaround for a CC2017–CC2020 bug where Layer Styles would not apply unless triggered via command first.",
+    "AE globals required at runtime: ParagraphJustification, PropertyValueType, KeyframeEase, KeyframeInterpolationType, MarkerValue — these are unavailable in the sandbox without stubs.",
+    "Fixture confidence is 'medium' because the FFX binary application path (Folder.temp write + applyPreset) and Layer Styles command workaround cannot be fully simulated in the test sandbox."
+  ]
+}

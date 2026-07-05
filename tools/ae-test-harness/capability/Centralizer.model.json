@@ -1,0 +1,103 @@
+{
+  "name": "Centralizer",
+  "category": "paths",
+  "ui": "DIALOG",
+  "consumes": {
+    "selection": ["layers", "comp"],
+    "minimum": "1 active comp + 1 selected layer (ShapeLayer with ≥1 path, TextLayer, or AVLayer)",
+    "description": "Reads the active CompItem and its first selected layer. For ShapeLayer: traverses Contents to extract all ADBE Vector Group and ADBE Vector Shape-Group properties into a tree for UI display; user picks a path via the tree view, then reads that path's vertex points at the current time to compute bounding-box coordinates. For TextLayer: calls sourceRectAtTime to determine bounding rect. For AVLayer: reads layer.width, layer.height, layer.scale, and layer.position to derive bounds. Also reads layer.anchorPoint when adding anchor-center guides."
+  },
+  "controls": [
+    {
+      "name": "Path Tree",
+      "type": "listbox",
+      "role": "displays hierarchical shape groups and paths from the selected shape layer; user selects the target path to centralise",
+      "default": null
+    },
+    {
+      "name": "Center",
+      "type": "checkbox",
+      "role": "when checked, adds two guides at the layer anchor point (vertical + horizontal center)",
+      "default": true
+    },
+    {
+      "name": "BoundingBox",
+      "type": "checkbox",
+      "role": "when checked, adds four guides at the path bounding-box edges (minX, maxX, minY, maxY)",
+      "default": false
+    },
+    {
+      "name": "BBox Center",
+      "type": "checkbox",
+      "role": "when checked, adds two guides at the computed path centroid (centerX, centerY)",
+      "default": false
+    },
+    {
+      "name": "Proceed",
+      "type": "button",
+      "role": "validates selection, adds slider-control effects with bound expressions to compute path geometry, harvests coordinate values, adds composition guides, then closes the dialog",
+      "default": null
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "closes the dialog without adding any guides",
+      "default": null
+    }
+  ],
+  "functions": [
+    "guard: alerts and exits when no active CompItem is present",
+    "guard: alerts and exits when no layers are selected in the active comp",
+    "guard: alerts and exits when a ShapeLayer contains no shape groups or paths",
+    "extract shape group and path hierarchy from ShapeLayer Contents via recursive traversal of ADBE Vector Group and ADBE Vector Shape-Group properties",
+    "display interactive tree-view palette for selecting a path within the shape layer hierarchy",
+    "build a fully-qualified AE expression path string for the user-selected path by walking the treeview selection upwards to the layer root",
+    "add six ADBE Slider Control effects (Center X, Center Y, Min X, Max X, Min Y, Max Y) to the shape layer",
+    "write a bounding-box + centroid expression onto each slider that reads the selected path's vertex points, accumulates group-level transform offsets, applies parent-layer toComp conversion, and dispatches the correct coordinate via thisProperty.propertyGroup(1).name",
+    "harvest evaluated slider values (post-expression) and adjust for layer scale",
+    "add composition-level guides based on checked options: center guides at anchor point, bounding-box guides at min/max X/Y, and bbox-center guides at computed centroid",
+    "handle TextLayer geometry via sourceRectAtTime and toComp projection for bounding-box calculation",
+    "handle AVLayer geometry via layer.width/height, scale, and position for bounding-box calculation",
+    "support KBar integration: run Center or BoundingBox operations headlessly from kbar.button.argument without showing the palette",
+    "wrap all guide-addition mutations in a single undo group named 'Add Guides' (or 'Add Center Guides' / 'Add Bounding Box Guides' in kbar mode)"
+  ],
+  "scriptSim": {
+    "scenario": "success — AV layer selected, center and bounding box guides added",
+    "inputs": "Active comp 'Main Comp' (1920×1080, 24fps); single selected AV layer 'Footage Layer' at position [960, 540], scale [100, 100], source size 1920×1080; no kbar context; script runs non-interactively (AVLayer branch, no UI shown)",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Add Guides", "value": "Add Guides" },
+      { "kind": "executeCommand", "target": "comp.addGuide — vertical center guide (orientation=1)", "value": 960 },
+      { "kind": "executeCommand", "target": "comp.addGuide — horizontal center guide (orientation=0)", "value": 540 },
+      { "kind": "executeCommand", "target": "comp.addGuide — left bounding-box guide (orientation=1)", "value": 0 },
+      { "kind": "executeCommand", "target": "comp.addGuide — right bounding-box guide (orientation=1)", "value": 1920 },
+      { "kind": "executeCommand", "target": "comp.addGuide — top bounding-box guide (orientation=0)", "value": 0 },
+      { "kind": "executeCommand", "target": "comp.addGuide — bottom bounding-box guide (orientation=0)", "value": 1080 },
+      { "kind": "endUndoGroup", "target": "Add Guides" }
+    ]
+  },
+  "expressions": [
+    {
+      "target": "ShapeLayer/Effects/Center X/Slider",
+      "controlBinding": null,
+      "expression": "var pathProperty = thisComp.layer(\"Shape Layer 1\")(\"Contents\")(\"Group 1\")(\"Contents\")(\"Path 1\")(\"Path\");\nvar points = pathProperty.points();\nvar numPoints = points.length;\nvar minX = points[0][0];\nvar maxX = points[0][0];\nvar minY = points[0][1];\nvar maxY = points[0][1];\nfor (var i = 1; i < numPoints; i++) {\n    var x = points[i][0];\n    var y = points[i][1];\n    if (x < minX) minX = x;\n    if (x > maxX) maxX = x;\n    if (y < minY) minY = y;\n    if (y > maxY) maxY = y;\n}\nvar centerX = (minX + maxX) / 2;\nvar centerY = (minY + maxY) / 2;\nvar center = [centerX, centerY];\nvar accumulatedPosition = [0, 0];\nvar accumulatedAnchor = [0, 0];\nvar level = 1;\ntry {\n    while (pathProperty.propertyGroup(level) !== null) {\n        var group = pathProperty.propertyGroup(level);\n        if (group.matchName !== 'ADBE Vector Group') {\n            var groupTransform = group.transform;\n            if (groupTransform) {\n                var groupPosition = groupTransform.position.value;\n                var groupAnchor = groupTransform.anchorPoint.value;\n                accumulatedPosition[0] += groupPosition[0] - groupAnchor[0];\n                accumulatedPosition[1] += groupPosition[1] - groupAnchor[1];\n            }\n        }\n        level++;\n    }\n} catch (e) {}\nvar adjustedCenterX = center[0] + accumulatedPosition[0];\nvar adjustedCenterY = center[1] + accumulatedPosition[1];\nvar adjustedCenter = [adjustedCenterX, adjustedCenterY];\nvar adjustedMinX = minX + accumulatedPosition[0];\nvar adjustedMaxX = maxX + accumulatedPosition[0];\nvar adjustedMinY = minY + accumulatedPosition[1];\nvar adjustedMaxY = maxY + accumulatedPosition[1];\nif (thisLayer.hasParent) {\n    adjustedCenter = thisLayer.toComp(adjustedCenter);\n    adjustedMinX = thisLayer.toComp([adjustedMinX, 0])[0];\n    adjustedMaxX = thisLayer.toComp([adjustedMaxX, 0])[0];\n    adjustedMinY = thisLayer.toComp([0, adjustedMinY])[1];\n    adjustedMaxY = thisLayer.toComp([0, adjustedMaxY])[1];\n}\nvar sliderName = thisProperty.propertyGroup(1).name;\nif (sliderName === 'Center X') adjustedCenter[0];\nelse if (sliderName === 'Center Y') adjustedCenter[1];\nelse if (sliderName === 'Min X') adjustedMinX;\nelse if (sliderName === 'Max X') adjustedMaxX;\nelse if (sliderName === 'Min Y') adjustedMinY;\nelse if (sliderName === 'Max Y') adjustedMaxY;\nelse 0;",
+      "sim": {
+        "variable": "time",
+        "range": [0, 5],
+        "steps": 41,
+        "note": "Sweeps composition time from 0 to 5 seconds; output is the Center X coordinate of the selected path's bounding-box centroid as it changes with an animated path. The same expression body (differing only in the final sliderName dispatch) is applied identically to the Center Y, Min X, Max X, Min Y, and Max Y sliders."
+      }
+    }
+  ],
+  "notes": [
+    "UI mode is declared DIALOG in @ui frontmatter; the showUI function creates Window('palette', ...) at runtime — the harness treats it as DIALOG per frontmatter.",
+    "The palette is only shown for ShapeLayer selections. TextLayer and AVLayer inputs bypass the UI entirely and immediately add guides.",
+    "Six ADBE Slider Control effects (Center X, Center Y, Min X, Max X, Min Y, Max Y) are added to the layer and remain after execution — the removal code is commented out in the source.",
+    "The same expression string is written to all six sliders; each slider self-identifies via thisProperty.propertyGroup(1).name to return the appropriate coordinate.",
+    "The expression accumulates group-level transform offsets by walking propertyGroup() levels and inspecting group.matchName; only groups where matchName !== 'ADBE Vector Group' contribute transform offsets.",
+    "When the shape layer has a parent, adjustedCenter and the individual axis coordinates are projected to composition space via thisLayer.toComp().",
+    "Harvested slider values are additionally scaled by layer.scale before being used as guide positions.",
+    "KBar integration: when kbar.button.argument is 'Center' or 'BoundingBox', the script runs headlessly on TextLayer/AVLayer without opening any UI.",
+    "addGuide is a CompItem method; it is not available in all AE versions — requires CS6 or later with guide support enabled.",
+    "The fixture success scenario covers the AVLayer non-kbar path only; ShapeLayer path requires AE runtime for treeview interaction and path vertex evaluation."
+  ]
+}

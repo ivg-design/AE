@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IVG Toolkit — 32 After Effects scripts</title>
+  <meta name="description" content="32 production-ready After Effects scripts for rigging, keyframes, paths, effects and audio. Free under MIT." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/site.css?v=6" />
+</head>
+<body>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-glow-2"></div>
+    <canvas id="heroCanvas" class="hero-canvas" aria-hidden="true"></canvas>
+    <div class="container">
+      <div class="eyebrow">
+        <i data-lucide="sparkles"></i>
+        <span>IVG DESIGN · FREEWARE TOOLKIT</span>
+      </div>
+      <h1>32 scripts that delete the tedious parts of After&nbsp;Effects.</h1>
+      <p class="subhead">Production-ready tools for rigging, keyframes, paths, effects and audio — built over years of motion work and free under MIT. Grab the whole panel, or just the one tool you need.</p>
+      <div class="cta-row">
+        <button class="btn btn-accent" data-open="download"><i data-lucide="download"></i>Download all (.zip)</button>
+        <a class="btn btn-ghost" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener"><i data-lucide="github"></i>Browse on GitHub</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ LIBRARY ============ -->
+  <section class="library" id="library">
+    <div class="container">
+      <div class="section-head">
+        <div class="sh-l">
+          <span class="kicker">01 — THE LIBRARY</span>
+          <h2>Every tool, one click away</h2>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="hint-pill"><i data-lucide="mouse-pointer-click"></i>Click any script to open its full docs</span>
+          <button class="hint-pill" data-open="palette"><i data-lucide="search"></i>Quick search<span class="kbd" style="padding:3px 8px;font-size:11px">⌘ K</span></button>
+        </div>
+      </div>
+      <div class="app-window">
+        <div class="titlebar">
+          <div class="titlebar-l">
+            <div class="mac-dots"><i></i><i></i><i></i></div>
+            <span class="titlebar-title">ivg-toolkit&nbsp;&nbsp;·&nbsp;&nbsp;browser</span>
+          </div>
+          <div class="titlebar-r">
+            <label class="win-search">
+              <i data-lucide="search"></i>
+              <input type="search" id="libSearch" placeholder="Search 32 scripts…" autocomplete="off" />
+            </label>
+            <div class="seg" role="tablist" aria-label="View">
+              <button id="viewList" class="active" aria-label="List view"><i data-lucide="list"></i></button>
+              <button id="viewGrid" aria-label="Grid view"><i data-lucide="layout-grid"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="win-body">
+          <nav class="sidebar" id="catList" aria-label="Categories">
+            <span class="side-h">CATEGORIES</span>
+            <!-- categories injected -->
+            <div class="side-grow"></div>
+            <div class="side-footer">
+              <span class="t"><i data-lucide="package"></i>Get everything</span>
+              <span class="s">All 32 scripts + the command bar.</span>
+              <button class="btn-sm" data-open="download"><i data-lucide="download"></i>Download .zip</button>
+            </div>
+          </nav>
+          <div class="content">
+            <div class="c-head">
+              <div class="l">
+                <span class="t" id="cHeadTitle">Layers</span>
+                <span class="ct" id="cHeadCount">7 scripts</span>
+              </div>
+              <span class="sort">sorted by name</span>
+            </div>
+            <div class="script-list" id="scriptList"></div>
+            <div class="script-grid" id="scriptGrid" hidden></div>
+          </div>
+        </div>
+        <div class="win-foot">
+          <span class="l">32 scripts · 7 categories · all MIT</span>
+          <span class="r">↩ open docs&nbsp;&nbsp;&nbsp;&nbsp;⌘D download</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMMAND BAR / BUNDLE BUILDER ============ -->
+  <section class="builder" id="builder">
+    <div class="container">
+      <div class="section-head">
+        <div class="sh-l">
+          <span class="kicker">02 — THE COMMAND BAR</span>
+          <h2>Build-a-bar</h2>
+        </div>
+        <span class="hint-pill"><i data-lucide="package-plus"></i>Pick scripts → get a dockable AE panel bundle</span>
+      </div>
+      <div class="kbar">
+        <div class="builder-head">
+          <div class="builder-copy">
+            <span class="t">Check the tools you want — get a ready-to-dock bundle.</span>
+            <span class="d">The zip contains the dockable <b>IVGD&nbsp;Command&nbsp;Bar</b> panel plus your scripts in an <code>ivg-scripts</code> subfolder. Drop both into <span class="mono">ScriptUI&nbsp;Panels</span>: only the command bar appears in AE's Window menu, and its buttons reflow when docked vertical, horizontal, or as a grid.</span>
+          </div>
+          <div class="builder-actions">
+            <button class="seg-btn" id="selAll"><i data-lucide="check-check"></i>Select all</button>
+            <button class="seg-btn" id="selNone"><i data-lucide="x"></i>Clear</button>
+          </div>
+        </div>
+        <div class="kbar-grid" id="builderGrid"></div>
+        <div class="builder-foot">
+          <div class="builder-foot-l">
+            <span class="cnt" id="builderCount">0 of 32 selected</span>
+            <span class="builder-note">Prefer the menus? Any .jsx from the bundle also works dropped straight into the Scripts folder.</span>
+          </div>
+          <button class="btn btn-accent" id="buildBundle"><i data-lucide="package"></i>Download bundle (.zip)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INSTALL ============ -->
+  <section class="install">
+    <div class="container">
+      <div class="install-head">
+        <span class="kicker">03 — GET STARTED</span>
+        <h2>Install in three steps</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="num">01</span>
+          <span class="t">Download</span>
+          <span class="d">Grab the .jsx for the tool you need — or the full .zip of all 32.</span>
+        </div>
+        <div class="step">
+          <span class="num">02</span>
+          <span class="t">Drop it in</span>
+          <span class="d">Move it to your After Effects ▸ Scripts folder, or use File ▸ Scripts ▸ Run Script File.</span>
+        </div>
+        <div class="step">
+          <span class="num">03</span>
+          <span class="t">Run it</span>
+          <span class="d">Launch from the Scripts menu (or ScriptUI Panels for dockable tools). Done.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="cta">
+    <div class="container">
+      <div class="cta-panel">
+        <h2>Get the whole toolkit.</h2>
+        <p>32 production-ready After Effects scripts, free under MIT. One download, no sign-up.</p>
+        <div class="btns">
+          <button class="btn btn-white" data-open="download"><i data-lucide="download"></i>Download all (.zip)</button>
+          <a class="btn btn-glass" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener"><i data-lucide="github"></i>View source</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container">
+      <span class="credit">Made by IVG Design · Free &amp; open-source under MIT</span>
+      <a class="repo" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener">github.com/ivg-design/ae</a>
+    </div>
+  </footer>
+
+  <!-- ============ DETAIL MODAL ============ -->
+  <div class="overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-label="Script details">
+    <div class="modal" id="detailModal"><!-- injected --></div>
+  </div>
+
+  <!-- ============ COMMAND PALETTE ============ -->
+  <div class="overlay" id="paletteOverlay" role="dialog" aria-modal="true" aria-label="Command palette">
+    <div class="palette">
+      <div class="pal-search">
+        <i data-lucide="search"></i>
+        <input type="text" id="palInput" placeholder="Search scripts and actions…" autocomplete="off" />
+        <span class="esc">esc</span>
+      </div>
+      <div class="pal-results" id="palResults"></div>
+      <div class="pal-foot">
+        <span>↑↓ navigate</span><span>↵ open</span><span>⌘D download</span><span>esc close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DOWNLOAD MODAL ============ -->
+  <div class="overlay" id="downloadOverlay" role="dialog" aria-modal="true" aria-label="Download the toolkit">
+    <div class="dlm">
+      <div class="dlm-header">
+        <div class="dlm-id">
+          <div class="dlm-tile"><i data-lucide="package"></i></div>
+          <div>
+            <div class="dlm-title">Download the toolkit</div>
+            <div class="dlm-sub">32 scripts · MIT · no sign-up</div>
+          </div>
+        </div>
+        <button class="modal-close" data-close><i data-lucide="x"></i></button>
+      </div>
+      <div class="dlm-body">
+        <div class="dlm-all">
+          <div class="r">
+            <div>
+              <div class="t">Everything</div>
+              <div class="d">The IVGD Command Bar panel plus all 32 scripts, ready to drop into ScriptUI Panels.</div>
+            </div>
+            <span class="sz" id="zipSize">≈ 280 KB</span>
+          </div>
+          <a class="btn-dl" href="download/ae-scripts.zip" download><i data-lucide="download"></i>Download ae-scripts.zip</a>
+        </div>
+        <div class="dlm-or"><i></i><span>or</span><i></i></div>
+        <button class="dlm-ind" data-goto-library>
+          <div class="tile"><i data-lucide="file-code"></i></div>
+          <div class="c">
+            <span class="t">Grab individual scripts</span>
+            <span class="d">Browse the library and download single .jsx files.</span>
+          </div>
+          <span class="sp"></span>
+          <span class="link">Open library →</span>
+        </button>
+        <div class="dlm-git">
+          <span class="l">PREFER GIT?</span>
+          <div class="term">
+            <span>git clone https://github.com/ivg-design/ae</span>
+            <button data-copy="git clone https://github.com/ivg-design/ae" aria-label="Copy clone command"><i data-lucide="copy"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="dlm-foot"><i data-lucide="shield-check"></i>No sign-up · no tracking · MIT licensed</div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="vendor/lucide.min.js"></script>
+  <script src="vendor/jszip.min.js"></script>
+  <script src="js/hero.js?v=6"></script>
+  <script src="js/app.js?v=6"></script>
+</body>
+</html>

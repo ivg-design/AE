@@ -1,0 +1,27 @@
+{
+  "name": "VertexMaster",
+  "screenshot": "dashboard/assets/ui/VertexMaster.png",
+  "uiTreePath": null,
+  "expressionCurves": [
+    {
+      "target": "Shape Layer 1 Vertex 1/Transform/Position",
+      "xLabel": "Vertex Control (vertex index 1–4)",
+      "yLabel": "Position x (comp space, px)",
+      "samples": []
+    },
+    {
+      "target": "Shape Layer 1/Contents/Path 1/Path 1/Path",
+      "xLabel": "time (s)",
+      "yLabel": "path output (component 0)",
+      "samples": []
+    }
+  ],
+  "notes": [
+    "UI mode is DIALOG; script builds a dialog with a treeview (path list), three checkboxes (Vertex, InTangent, OutTangent), and Create/Cancel buttons.",
+    "UITree captured from the success scenario; rendered via SDB to a 332×292 CSS px PNG at 2x device scale (14304 bytes).",
+    "Expression 0 ('Shape Layer 1 Vertex 1/Transform/Position'): sweeps Vertex Control slider from 1 to 4 (vertex indices on a 4-vertex ellipse). The expression calls thisComp.layer('Shape Layer 1').toComp() to transform path vertex coordinates from shape-group space to comp space. The expr-eval engine returns a stub object for thisComp.layer() that is not callable, so all 4 samples error with 'thisComp.layer(...) is not a function'. Samples left empty — expression requires the live AE runtime.",
+    "Expression 1 ('Shape Layer 1/Contents/Path 1/Path 1/Path'): sweeps time 0–5 s over 41 steps. The expression enumerates all comp layers and calls toWorld()/fromWorld() for coordinate transforms, then calls createPath() (an AE built-in). All 41 steps error with 'thisComp.layer(...) is not a function'. Samples left empty — expression requires the live AE runtime.",
+    "Both expressions are AE-runtime-only: they depend on toComp(), fromWorld(), createPath(), and multi-layer enumeration that cannot be simulated by the portable expr-eval engine.",
+    "Screenshot dimensions: 332 CSS px wide × 292 CSS px tall (664×584 physical px at 2x scale, 14304 bytes)."
+  ]
+}

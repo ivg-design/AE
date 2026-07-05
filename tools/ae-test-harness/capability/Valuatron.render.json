@@ -1,0 +1,10 @@
+{
+  "name": "Valuatron",
+  "screenshot": null,
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "HEADLESS script — no ScriptUI window is created; screenshot and uiTreePath are null by design.",
+    "expressions[] is empty in the model; no expression curves were sampled."
+  ]
+}

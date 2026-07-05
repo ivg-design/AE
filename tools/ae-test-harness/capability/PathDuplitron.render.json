@@ -1,0 +1,12 @@
+{
+  "name": "PathDuplitron",
+  "screenshot": "dashboard/assets/ui/PathDuplitron.png",
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "UI mode is PANEL; script builds a 'palette' Window with Copy, Paste, and Close buttons.",
+    "UITree captured from success scenario (copy tangents via shape layer intermediate); rendered via SDB to a 132×142 px PNG at 2x device scale (14474 bytes).",
+    "Expressions array is empty — no expression curves to compute.",
+    "Screenshot dimensions: 132 CSS px wide × 142 CSS px tall (264×284 physical px at 2x scale)."
+  ]
+}

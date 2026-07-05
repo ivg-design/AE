@@ -1,0 +1,42 @@
+{
+  "name": "Triminator",
+  "category": "utilities",
+  "ui": "HEADLESS",
+  "consumes": {
+    "selection": ["layers", "comp"],
+    "minimum": "1 active composition + 1 selected shape layer",
+    "description": "Reads the active CompItem and its selectedLayers array. For each shape layer (matchName 'ADBE Vector Layer'), reads layer.selectedProperties to collect NAMED_GROUP properties; if none, targets the layer's 'ADBE Root Vectors Group'. Also reads ScriptUI.environment.keyboardState.shiftKey at startup to determine whether keyframes should be written."
+  },
+  "controls": [],
+  "functions": [
+    "detect active composition and guard against missing comp or empty selection",
+    "skip non-shape layers (matchName !== 'ADBE Vector Layer') silently",
+    "collect selected NAMED_GROUP properties from each shape layer to determine target groups",
+    "add a Trim Paths property ('ADBE Vector Filter - Trim') to each target group's contents",
+    "when Shift key is not held, write keyframes on Trim Start and Trim End animating from 0% to 100% over the first second of the layer",
+    "wrap all mutations in a single undo group named 'Add Trim Paths'"
+  ],
+  "scriptSim": {
+    "scenario": "success – add Trim Paths with keyframes to root vectors group",
+    "inputs": "Active comp 'Trim Comp' (1920×1080, 10 s, 24 fps); one Shape Layer selected ('Shape Layer 1', inPoint=0, outPoint=10); no shape groups selected; Shift key not held (addKeys=true)",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Add Trim Paths" },
+      { "kind": "executeCommand", "target": "Shape Layer 1/Contents/ADBE Vector Filter - Trim" },
+      { "kind": "addKeyframe", "target": "Shape Layer 1/Contents/ADBE Vector Filter - Trim/ADBE Vector Trim Start", "value": 0 },
+      { "kind": "addKeyframe", "target": "Shape Layer 1/Contents/ADBE Vector Filter - Trim/ADBE Vector Trim Start", "value": 100 },
+      { "kind": "addKeyframe", "target": "Shape Layer 1/Contents/ADBE Vector Filter - Trim/ADBE Vector Trim End", "value": 0 },
+      { "kind": "addKeyframe", "target": "Shape Layer 1/Contents/ADBE Vector Filter - Trim/ADBE Vector Trim End", "value": 100 },
+      { "kind": "endUndoGroup", "target": "Add Trim Paths" }
+    ]
+  },
+  "expressions": [],
+  "notes": [
+    "HEADLESS: no ScriptUI dialog is shown; the script runs immediately when invoked.",
+    "Shift-key detection uses ScriptUI.environment.keyboardState.shiftKey evaluated at startup; holding Shift suppresses all keyframe generation.",
+    "Only layers whose matchName equals 'ADBE Vector Layer' (shape layers) are processed; all other layer types are silently skipped.",
+    "When no shape groups are selected, Trim Paths is applied to the layer's root vectors group ('ADBE Root Vectors Group'); when groups are selected only those groups' contents ('ADBE Vectors Group') are targeted.",
+    "Keyframes animate from 0% to 100% at times [layer.inPoint, layer.inPoint + 1] — a fixed 1-second ramp starting at the layer's in-point.",
+    "Both Trim Start and Trim End receive identical keyframe sets (0→100), creating a simultaneous reveal; downstream timing adjustment is expected.",
+    "The script is compatible with batch-selected layers and groups across a single pass."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "KeyCloneMatic",
+  "screenshot": "dashboard/assets/ui/KeyCloneMatic.png",
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "Screenshot rendered via SDB: 198x346px (19 items)",
+    "SDB device scale factor: 2 (retina). PNG at /Users/ivg/github/ae-script-catalog/ae/tools/ae-test-harness/dashboard/assets/ui/KeyCloneMatic.png",
+    "expressions[] is empty in the model; no expression curves were sampled."
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "name": "Slidotron_16x9",
+  "category": "composition",
+  "ui": "HEADLESS",
+
+  "consumes": {
+    "selection": ["comp"],
+    "minimum": "1 active CompItem in the project panel",
+    "description": "Reads the active project item (must be a CompItem). Uses its name to build expression references, then adds layers and sub-compositions into it."
+  },
+
+  "controls": [],
+
+  "functions": [
+    "creates a 4K (3840x2160) 'Sliders 16x9' composition at 60fps",
+    "creates a 4K (3840x2160) 'Slide 16x9' composition at 60fps",
+    "adds 'Sliders 16x9' comp as a layer in the active comp",
+    "adds a 'CTRL' Slider Control effect to the Sliders 16x9 layer with an initial value of 116",
+    "creates 'Mask L' and 'Mask R' shape layers (disabled) inside Sliders 16x9",
+    "adds two instances of 'Slide 16x9' as alpha track matte layers beneath Mask L and Mask R",
+    "sets parent-child relationships so each Slide 16x9 layer inherits its mask's position",
+    "writes linear-interpolation expressions on Mask L and Mask R X-position, driven by the CTRL slider (0–100 → left/right reveal positions)"
+  ],
+
+  "scriptSim": {
+    "scenario": "success — builds 16x9 slider rig from active comp",
+    "inputs": "Active comp 'My Project' (1920x1080, 30fps, 30s); no layers selected",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Slidotron 16x9" },
+      { "kind": "setValue", "target": "Sliders 16x9 / CTRL / Slider", "value": 116 },
+      { "kind": "setValue", "target": "Mask L / Rectangle Path 1 / Size", "value": [1920, 2160] },
+      { "kind": "setValue", "target": "Mask L / Anchor Point", "value": [-1242.208, -11.172, 0] },
+      { "kind": "setValue", "target": "Mask L / Position X", "value": 1920 },
+      { "kind": "setValue", "target": "Mask L / Scale", "value": [-100, 100, 100] },
+      { "kind": "setValue", "target": "Mask R / Rectangle Path 1 / Size", "value": [1920, 2160] },
+      { "kind": "setValue", "target": "Mask R / Anchor Point", "value": [-1242.208, -11.172, 0] },
+      { "kind": "setValue", "target": "Mask R / Position X", "value": 1920 },
+      { "kind": "setExpression", "target": "Mask L / ADBE Transform Group / ADBE Position_0" },
+      { "kind": "setExpression", "target": "Mask R / ADBE Transform Group / ADBE Position_0" },
+      { "kind": "endUndoGroup", "target": "Slidotron 16x9" }
+    ]
+  },
+
+  "expressions": [
+    {
+      "target": "Sliders 16x9 / Mask L / ADBE Transform Group / ADBE Position_0",
+      "controlBinding": null,
+      "expression": "d = comp(\"My Project\").layer(\"Sliders 16x9\").effect(\"CTRL\")(\"Slider\");\niMin = 0;\niMax = 100;\noMin = -5;\noMax = 1920;\nlinear(d, iMin, iMax, oMin, oMax)",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps the CTRL slider from 0 to 100; maps to X position range -5 (fully left) to 1920 (center) for Mask L"
+      }
+    },
+    {
+      "target": "Sliders 16x9 / Mask R / ADBE Transform Group / ADBE Position_0",
+      "controlBinding": null,
+      "expression": "d = comp(\"My Project\").layer(\"Sliders 16x9\").effect(\"CTRL\")(\"Slider\");\niMin = 0;\niMax = 100;\noMin = 3840;\noMax = 1920;\nlinear(d, iMin, iMax, oMin, oMax)",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps the CTRL slider from 0 to 100; maps to X position range 3840 (fully right) to 1920 (center) for Mask R"
+      }
+    }
+  ],
+
+  "notes": [
+    "HEADLESS — runs immediately on the active comp with no UI dialog.",
+    "Output comps are fixed at 3840x2160, 60fps, 600s regardless of the input comp dimensions.",
+    "Background color of generated comps is dark gray [38, 38, 38] (≈ 0.149 normalized).",
+    "Mask L and Mask R shape layers are disabled (enabled=false) by default; they act as alpha mattes only.",
+    "The CTRL slider initial value is 116 (outside the expression's 0–100 input range), placing Mask L at x≈1920 and Mask R past 1920*2 at creation time.",
+    "Expressions reference the active comp by name at script run-time; renaming that comp afterward will break the expression linkage.",
+    "Slide 16x9 is added twice — once under each mask — so both left and right slide panels share the same source content comp.",
+    "The script uses carriage-return (\\r) as a line separator in expression strings (AE ExtendScript convention)."
+  ]
+}

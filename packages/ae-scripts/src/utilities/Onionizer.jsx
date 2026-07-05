@@ -1,54 +1,56 @@
 /**
- * Onionizer - Professional Onion Skinning System for Shape Layers in Adobe After Effects
+ * Onionizer - Experimental Onion Skinning Setup for Shape Layers in Adobe After Effects
  * 
- * Creates sophisticated onion skinning effects for shape layers by duplicating compositions
- * and establishing multiple time-offset instances with customizable stroke, fill, and
- * transparency effects. Formerly known as CelMate - now enhanced for professional animation workflows.
+ * Creates a prototype onion-skin setup by duplicating the active composition, adding a
+ * controller null, and placing seven time-remapped CelSkin instances in the original comp.
+ * Formerly known as CelMate.
  * 
  * @name Onionizer
  * @author IVG Design
- * @version 2.0.0
- * @date 2025-08-13
+ * @version 2.0.1
+ * @date 2026-06-02
  * @license MIT
  * @ui HEADLESS
  * 
  * @description
- * Onionizer automates the creation of onion skinning systems essential for traditional animation
- * workflows in After Effects. The tool analyzes selected layers and properties, creates duplicate
- * compositions with specialized naming conventions, and establishes time-remapped instances that
- * provide visual feedback for frame-by-frame animation work with shape layers.
+ * Onionizer analyzes selected layers/properties, duplicates the active composition as "CelSkin",
+ * adds an "Onionizer" controller null to the original comp, and adds seven time-remapped CelSkin
+ * layers with Stroke and Fill effects. This script is currently an unfinished prototype: controller
+ * parameters, time offsets, and selected-property expression linking are not fully implemented.
  * 
  * @functionality
  * • Analyzes selected layers and their properties in the active composition
  * • Creates duplicate "CelSkin" composition for onion skin effect management
- * • Establishes controller null layer for centralized effect management
- * • Generates multiple time-offset instances of the CelSkin composition
- * • Applies customizable stroke, fill, and transparency effects to onion skin layers
+ * • Establishes controller null layer for future centralized effect management
+ * • Generates seven time-remapped instances of the CelSkin composition
+ * • Applies Stroke and Fill effects to onion skin layers
  * • Integrates PropQuery module for advanced property analysis and management
- * • Maintains original composition integrity while creating onion skin system
+ * • Avoids writing placeholder expressions to original selected properties
  * 
  * @usage
  * 1. Open your animation composition and select the shape layers for onion skinning
  * 2. Select specific properties within those layers that you want to visualize
  * 3. Run the script - no user interface required for streamlined workflow
- * 4. The script automatically creates the "CelSkin" composition and controller setup
- * 5. Review the generated onion skin layers in the timeline
- * 6. Adjust controller parameters to fine-tune onion skin appearance and timing
- * 7. Continue your animation work with visual feedback from previous/next frames
+ * 4. The script automatically creates the "CelSkin" composition, controller null, and CelSkin layers
+ * 5. Manually configure timing, color, opacity, and other controls as needed
  * 
  * @requirements
  * • Adobe After Effects CS6 or later with shape layer support
  * • Active composition must be selected with at least one shape layer
- * • PropQuery.js module must be available in the modules directory
+ * • PropQuery.js module must be available through the script include path
  * • Selected layers must have keyframeable properties for effective onion skinning
  * 
  * @notes
  * • Script includes PropQuery module for comprehensive property analysis
- * • CelSkin composition maintains reference to original animation layers
- * • Controller null layer provides centralized management of onion skin parameters
- * • Time-remapping ensures frame-accurate onion skin positioning
+ * • CelSkin composition is a duplicate, not a live expression-linked proxy
+ * • Controller null is created but no controller parameters are added yet
+ * • Time remapping is enabled but offsets are not assigned yet
  * • Compatible with complex shape layer hierarchies and nested compositions
- * • Onion skin opacity and color can be adjusted through controller parameters
+ * • Earlier 2.0.0 builds wrote the placeholder expression "expression goes here" to selected properties
+ *
+ * @changelog
+ * - 2.0.1 (2026-06-02): Removed destructive placeholder expression assignment and corrected documentation to prototype status.
+ * - 2.0.0 (2025-08-13): Renamed to Onionizer during repository standardization.
  */
 
 //@include 'modules/PropQuery.js'
@@ -166,9 +168,6 @@ app.beginUndoGroup("Onionizer: The Onionizer for Shape Layers");
             }
             tempPropertyObject = tempPropertyObject.parentProperty;  //
         }
-
-        // currentPropertyObject is still the original property object
-        currentPropertyObject.expression = "expression goes here";  // 
 
         // Now, propertyObject should be the Property or PropertyGroup object you're looking for
     }

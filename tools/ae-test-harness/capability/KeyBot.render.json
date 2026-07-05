@@ -1,0 +1,12 @@
+{
+  "name": "KeyBot",
+  "screenshot": "dashboard/assets/ui/KeyBot.png",
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "UI mode is PANEL; script builds a palette window in the harness (thisObj is not a real Panel). UITree captured from harness ScriptUI runtime and rendered via SDB.",
+    "Render dimensions: 402x90px (deviceScaleFactor=2, logical ~201x45px). PNG 13474 bytes.",
+    "No expressions defined — expressionCurves is empty.",
+    "16 SDB items rendered: palette root + 2 top-level groups + 3 edittext fields + 2 sub-groups + 3 checkboxes + 5 buttons."
+  ]
+}

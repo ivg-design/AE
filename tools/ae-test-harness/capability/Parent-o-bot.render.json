@@ -1,0 +1,87 @@
+{
+  "name": "Parent-o-bot",
+  "screenshot": "dashboard/assets/ui/Parent-o-bot.png",
+  "uiTreePath": null,
+  "expressionCurves": [
+    {
+      "target": "Transform/Position",
+      "xLabel": "Position Influence",
+      "yLabel": "Position X (px)",
+      "samples": [
+        {"x":0,"y":400},{"x":2.5,"y":414},{"x":5,"y":428},{"x":7.5,"y":442},
+        {"x":10,"y":456},{"x":12.5,"y":470},{"x":15,"y":484},{"x":17.5,"y":498},
+        {"x":20,"y":512},{"x":22.5,"y":526},{"x":25,"y":540},{"x":27.5,"y":554},
+        {"x":30,"y":568},{"x":32.5,"y":582},{"x":35,"y":596},{"x":37.5,"y":610},
+        {"x":40,"y":624},{"x":42.5,"y":638},{"x":45,"y":652},{"x":47.5,"y":666},
+        {"x":50,"y":680},{"x":52.5,"y":694},{"x":55,"y":708},{"x":57.5,"y":722},
+        {"x":60,"y":736},{"x":62.5,"y":750},{"x":65,"y":764},{"x":67.5,"y":778},
+        {"x":70,"y":792},{"x":72.5,"y":806},{"x":75,"y":820},{"x":77.5,"y":834},
+        {"x":80,"y":848},{"x":82.5,"y":862},{"x":85,"y":876},{"x":87.5,"y":890},
+        {"x":90,"y":904},{"x":92.5,"y":918},{"x":95,"y":932},{"x":97.5,"y":946},
+        {"x":100,"y":960}
+      ]
+    },
+    {
+      "target": "Transform/Scale",
+      "xLabel": "Scale Influence",
+      "yLabel": "Scale X (%)",
+      "samples": [
+        {"x":0,"y":100},{"x":2.5,"y":102.5},{"x":5,"y":105},{"x":7.5,"y":107.5},
+        {"x":10,"y":110},{"x":12.5,"y":112.5},{"x":15,"y":115},{"x":17.5,"y":117.5},
+        {"x":20,"y":120},{"x":22.5,"y":122.5},{"x":25,"y":125},{"x":27.5,"y":127.5},
+        {"x":30,"y":130},{"x":32.5,"y":132.5},{"x":35,"y":135},{"x":37.5,"y":137.5},
+        {"x":40,"y":140},{"x":42.5,"y":142.5},{"x":45,"y":145},{"x":47.5,"y":147.5},
+        {"x":50,"y":150},{"x":52.5,"y":152.5},{"x":55,"y":155},{"x":57.5,"y":157.5},
+        {"x":60,"y":160},{"x":62.5,"y":162.5},{"x":65,"y":165},{"x":67.5,"y":167.5},
+        {"x":70,"y":170},{"x":72.5,"y":172.5},{"x":75,"y":175},{"x":77.5,"y":177.5},
+        {"x":80,"y":180},{"x":82.5,"y":182.5},{"x":85,"y":185},{"x":87.5,"y":187.5},
+        {"x":90,"y":190},{"x":92.5,"y":192.5},{"x":95,"y":195},{"x":97.5,"y":197.5},
+        {"x":100,"y":200}
+      ]
+    },
+    {
+      "target": "Transform/Rotation",
+      "xLabel": "Rotation Influence",
+      "yLabel": "Rotation (deg)",
+      "samples": [
+        {"x":0,"y":0},{"x":2.5,"y":1.125},{"x":5,"y":2.25},{"x":7.5,"y":3.375},
+        {"x":10,"y":4.5},{"x":12.5,"y":5.625},{"x":15,"y":6.75},{"x":17.5,"y":7.875},
+        {"x":20,"y":9},{"x":22.5,"y":10.125},{"x":25,"y":11.25},{"x":27.5,"y":12.375},
+        {"x":30,"y":13.5},{"x":32.5,"y":14.625},{"x":35,"y":15.75},{"x":37.5,"y":16.875},
+        {"x":40,"y":18},{"x":42.5,"y":19.125},{"x":45,"y":20.25},{"x":47.5,"y":21.375},
+        {"x":50,"y":22.5},{"x":52.5,"y":23.625},{"x":55,"y":24.75},{"x":57.5,"y":25.875},
+        {"x":60,"y":27},{"x":62.5,"y":28.125},{"x":65,"y":29.25},{"x":67.5,"y":30.375},
+        {"x":70,"y":31.5},{"x":72.5,"y":32.625},{"x":75,"y":33.75},{"x":77.5,"y":34.875},
+        {"x":80,"y":36},{"x":82.5,"y":37.125},{"x":85,"y":38.25},{"x":87.5,"y":39.375},
+        {"x":90,"y":40.5},{"x":92.5,"y":41.625},{"x":95,"y":42.75},{"x":97.5,"y":43.875},
+        {"x":100,"y":45}
+      ]
+    },
+    {
+      "target": "Transform/Opacity",
+      "xLabel": "Opacity Influence",
+      "yLabel": "Opacity (%)",
+      "samples": [
+        {"x":0,"y":100},{"x":2.5,"y":98.75},{"x":5,"y":97.5},{"x":7.5,"y":96.25},
+        {"x":10,"y":95},{"x":12.5,"y":93.75},{"x":15,"y":92.5},{"x":17.5,"y":91.25},
+        {"x":20,"y":90},{"x":22.5,"y":88.75},{"x":25,"y":87.5},{"x":27.5,"y":86.25},
+        {"x":30,"y":85},{"x":32.5,"y":83.75},{"x":35,"y":82.5},{"x":37.5,"y":81.25},
+        {"x":40,"y":80},{"x":42.5,"y":78.75},{"x":45,"y":77.5},{"x":47.5,"y":76.25},
+        {"x":50,"y":75},{"x":52.5,"y":73.75},{"x":55,"y":72.5},{"x":57.5,"y":71.25},
+        {"x":60,"y":70},{"x":62.5,"y":68.75},{"x":65,"y":67.5},{"x":67.5,"y":66.25},
+        {"x":70,"y":65},{"x":72.5,"y":63.75},{"x":75,"y":62.5},{"x":77.5,"y":61.25},
+        {"x":80,"y":60},{"x":82.5,"y":58.75},{"x":85,"y":57.5},{"x":87.5,"y":56.25},
+        {"x":90,"y":55},{"x":92.5,"y":53.75},{"x":95,"y":52.5},{"x":97.5,"y":51.25},
+        {"x":100,"y":50}
+      ]
+    }
+  ],
+  "notes": [
+    "UI mode is DIALOG; UITree captured via harness ScriptUI runtime. Dialog title: Parent-o-bot. Controls: StaticText ('Select only one or two layers!'), ListBox (layers), Group with Cancel + OK buttons.",
+    "Screenshot rendered at 2x device scale factor via SDB service; final PNG is 436x322 px (217x160 CSS).",
+    "Expression curves computed analytically for the single-parent scenario (parent1.index=1, target.index=2). The active branch is: linear(influence/100, 0, 1, ownValue, parentValue). Sweep context: target Position=[400,300], Scale=[100,100], Rotation=0, Opacity=100; parent Position=[960,540], Scale=[200,200], Rotation=45, Opacity=50.",
+    "The expr-eval runtime cannot return values from if/else block branches (AE expression dialect constraint), so curves are computed directly from the deterministic linear() formula that the active branch resolves to in the single-parent case.",
+    "Scale curve uses the proportional adjustment path: since parent1Scale=[200,200] and parent2Layer=null, adjustedScaleX = (100/200)*200 = 100, which equals originalScale, so the blended result is the same as the simple linear interpolation from 100 to 200.",
+    "uiTreePath is null because no separate UITree JSON file was written; the tree was captured in-memory and used directly for the SDB render."
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "name": "TimeWarp-a-tron",
+  "screenshot": "/Users/ivg/github/ae-script-catalog/ae/tools/ae-test-harness/dashboard/assets/ui/TimeWarp-a-tron.png",
+  "uiTreePath": "/Users/ivg/github/ae-script-catalog/ae/tools/ae-test-harness/dashboard/assets/ui/TimeWarp-a-tron.uitree.json",
+  "expressionCurves": [
+    {
+      "target": "Footage Layer/Time Remap",
+      "xLabel": "Slider (0–100)",
+      "yLabel": "Time (seconds)",
+      "samples": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 2.5,
+          "y": 0.0625
+        },
+        {
+          "x": 5,
+          "y": 0.125
+        },
+        {
+          "x": 7.5,
+          "y": 0.1875
+        },
+        {
+          "x": 10,
+          "y": 0.25
+        },
+        {
+          "x": 12.5,
+          "y": 0.3125
+        },
+        {
+          "x": 15,
+          "y": 0.375
+        },
+        {
+          "x": 17.5,
+          "y": 0.4375
+        },
+        {
+          "x": 20,
+          "y": 0.5
+        },
+        {
+          "x": 22.5,
+          "y": 0.5625
+        },
+        {
+          "x": 25,
+          "y": 0.625
+        },
+        {
+          "x": 27.5,
+          "y": 0.6875
+        },
+        {
+          "x": 30,
+          "y": 0.75
+        },
+        {
+          "x": 32.5,
+          "y": 0.8125
+        },
+        {
+          "x": 35,
+          "y": 0.875
+        },
+        {
+          "x": 37.5,
+          "y": 0.9375
+        },
+        {
+          "x": 40,
+          "y": 1
+        },
+        {
+          "x": 42.5,
+          "y": 1.0625
+        },
+        {
+          "x": 45,
+          "y": 1.125
+        },
+        {
+          "x": 47.5,
+          "y": 1.1875
+        },
+        {
+          "x": 50,
+          "y": 1.25
+        },
+        {
+          "x": 52.5,
+          "y": 1.3125
+        },
+        {
+          "x": 55,
+          "y": 1.375
+        },
+        {
+          "x": 57.5,
+          "y": 1.4375
+        },
+        {
+          "x": 60,
+          "y": 1.5
+        },
+        {
+          "x": 62.5,
+          "y": 1.5625
+        },
+        {
+          "x": 65,
+          "y": 1.625
+        },
+        {
+          "x": 67.5,
+          "y": 1.6875
+        },
+        {
+          "x": 70,
+          "y": 1.75
+        },
+        {
+          "x": 72.5,
+          "y": 1.8125
+        },
+        {
+          "x": 75,
+          "y": 1.875
+        },
+        {
+          "x": 77.5,
+          "y": 1.9375
+        },
+        {
+          "x": 80,
+          "y": 2
+        },
+        {
+          "x": 82.5,
+          "y": 2.0625
+        },
+        {
+          "x": 85,
+          "y": 2.125
+        },
+        {
+          "x": 87.5,
+          "y": 2.1875
+        },
+        {
+          "x": 90,
+          "y": 2.25
+        },
+        {
+          "x": 92.5,
+          "y": 2.3125
+        },
+        {
+          "x": 95,
+          "y": 2.375
+        },
+        {
+          "x": 97.5,
+          "y": 2.4375
+        },
+        {
+          "x": 100,
+          "y": 2.5
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Rendered at 302x182px (device scale 2x), 11 SDB items.",
+    "Expression curve sweeps the Slider Control (0–100) → linear time-remap output (seconds) with In/Out Range=[0,60] at 24fps.",
+    "At controlValue=0 output=0.0s (inOutRange[0]/24=0s); at controlValue=100 output=2.5s (inOutRange[1]/24=60/24=2.5s)."
+  ]
+}

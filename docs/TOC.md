@@ -6,6 +6,8 @@
 - [CLAUDE.md](../CLAUDE.md) - AI assistant context and guidelines
 
 ## Script Documentation
+- [Per-Script Reference Docs](scripts/README.md) - One in-depth doc per script (what it does, how it works, controls, usage, edge cases)
+- [Audit & Fix Report 2026-07-04](audit-and-fixes-2026-07-04.md) - Full-catalog audit: 49 verified findings, 29 fixed, remaining minors
 - [Script Functionality Catalog](development/SCRIPT_FUNCTIONALITY_CATALOG.md) - Complete list of all 31 scripts with descriptions
 - [Naming Convention](NAMING_CONVENTION_FINAL.md) - Script naming guidelines
 - [Clever Naming Proposals](CLEVER_NAMING_PROPOSALS.md) - Alternative naming ideas
@@ -28,7 +30,7 @@
 ### Animation (3 scripts)
 - [PathMaster](../packages/ae-scripts/src/animation/PathMaster.jsx) - Path following animations
 - [Linearizer](../packages/ae-scripts/src/animation/Linearizer.jsx) - Property linking system
-- [Limb-a-tron](../packages/ae-scripts/src/animation/Limb-a-tron.jsx) - IK rigging system
+- [Limb-a-tron](../packages/ae-scripts/src/animation/Limb-a-tron.jsx) - IK/FK limb rig with regular/noodle body modes
 
 ### Composition (4 scripts)
 - [Guiderator](../packages/ae-scripts/src/composition/Guiderator.jsx) - Guide placement with calculator
@@ -37,7 +39,7 @@
 - [Split-o-matic_9x16](../packages/ae-scripts/src/composition/Split-o-matic_9x16.jsx) - Split-screen templates
 
 ### Effects (4 scripts)
-- [ChromaBlenderizer](../packages/ae-scripts/src/effects/ChromaBlenderizer.jsx) - Color interpolation
+- [ChromaBlenderizer](../packages/ae-scripts/src/effects/ChromaBlenderizer.jsx) - Modeless color interpolation palette
 - [sfxMaster](../packages/ae-scripts/src/effects/sfxMaster.jsx) - Audio control system
 - [BurstMate](../packages/ae-scripts/src/effects/BurstMate.jsx) - Stroke burst effects
 - [Sync-o-tron](../packages/ae-scripts/src/effects/Sync-o-tron.jsx) - Audio-visual sync

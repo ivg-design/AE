@@ -1,0 +1,10 @@
+{
+  "name": "NullBot",
+  "screenshot": null,
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "Script is HEADLESS — no ScriptUI dialog or panel is displayed; screenshot and uiTree are null by design.",
+    "expressions[] is empty — no AE expressions are written by this script; expressionCurves is empty by design."
+  ]
+}

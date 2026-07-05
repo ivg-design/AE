@@ -1,19 +1,43 @@
-// Expressions for rectangulator_v2.jsx
+// Expressions for Rectangulator.jsx
 // Organized by functionality with proper indentation and comments
+//
+// All control references target the "Rectangulator Controls" pseudo effect
+// applied by the script (see rectangulatorControllerBinary). Control names
+// must match the FFX binary exactly, including the trailing space in
+// "Anchor Point " and the "Bottom Right Left Corner Rounding" name.
 
 var expressions = {
     // Path expression for creating the rounded rectangle shape
     path: "// Custom rounded rectangle with individual corner control\n" +
     "try {\n" +
     "    // Get effect values\n" +
-    "    width = effect(\"Width\")(\"Slider\");\n" +
-    "    height = effect(\"Height\")(\"Slider\");\n" +
-    "    tlPercent = effect(\"Top Left Roundness %\")(\"Slider\");\n" +
-    "    trPercent = effect(\"Top Right Roundness %\")(\"Slider\");\n" +
-    "    brPercent = effect(\"Bottom Right Roundness %\")(\"Slider\");\n" +
-    "    blPercent = effect(\"Bottom Left Roundness %\")(\"Slider\");\n" +
-    "    posOffset = effect(\"Position Offset\")(\"Point\");\n" +
-    "    anchorType = effect(\"Anchor Point\")(\"Menu\");\n" +
+    "    var ctl = null;\n" +
+    "    try { ctl = effect(\"Rectangulator Controls\"); } catch (eCtl) {}\n" +
+    "    var P = function (n1, n2, def) {\n" +
+    "        if (ctl) {\n" +
+    "            try { return ctl(n1).value; } catch (e1) {}\n" +
+    "            if (n2) { try { return ctl(n2).value; } catch (e2) {} }\n" +
+    "        }\n" +
+    "        return def;\n" +
+    "    };\n" +
+    "    width = P(\"Rectangle Width (px)\", null, 100);\n" +
+    "    height = P(\"Rectangle Height (px)\", null, 100);\n" +
+    "    tlPercent = P(\"Top Left Corner Rounding\", null, 0);\n" +
+    "    trPercent = P(\"Top Right Corner Rounding\", null, 0);\n" +
+    "    brPercent = P(\"Bottom Right Left Corner Rounding\", \"Bottom Right Corner Rounding\", 0);\n" +
+    "    blPercent = P(\"Bottom Left Corner Rounding\", null, 0);\n" +
+    "    anchorType = P(\"Anchor Point \", \"Anchor Point\", -1);\n" +
+    "    if (anchorType === -1) {\n" +
+    "        anchorType = 5;\n" +
+    "        try {\n" +
+    "            for (var q = 1; q <= ctl.numProperties; q++) {\n" +
+    "                try {\n" +
+    "                    var nm = ctl(q).name;\n" +
+    "                    if (nm && nm.toLowerCase().indexOf(\"anchor\") !== -1) { anchorType = ctl(q).value; break; }\n" +
+    "                } catch (eq) {}\n" +
+    "            }\n" +
+    "        } catch (eScan) {}\n" +
+    "    }\n" +
     "\n" +
     "    // Calculate the maximum roundness based on the smallest dimension\n" +
     "    maxRound = Math.min(width, height);\n" +
@@ -244,9 +268,29 @@ var expressions = {
     // Anchor point expression for positioning the anchor point
     anchorPoint: "// Anchor point expression\n" +
     "try {\n" +
-    "    w = effect(\"Width\")(\"Slider\") / 2;\n" +
-    "    h = effect(\"Height\")(\"Slider\") / 2;\n" +
-    "    anchorType = effect(\"Anchor Point\")(\"Menu\");\n" +
+    "    var ctl = null;\n" +
+    "    try { ctl = effect(\"Rectangulator Controls\"); } catch (eCtl) {}\n" +
+    "    var P = function (n1, n2, def) {\n" +
+    "        if (ctl) {\n" +
+    "            try { return ctl(n1).value; } catch (e1) {}\n" +
+    "            if (n2) { try { return ctl(n2).value; } catch (e2) {} }\n" +
+    "        }\n" +
+    "        return def;\n" +
+    "    };\n" +
+    "    w = P(\"Rectangle Width (px)\", null, 100) / 2;\n" +
+    "    h = P(\"Rectangle Height (px)\", null, 100) / 2;\n" +
+    "    anchorType = P(\"Anchor Point \", \"Anchor Point\", -1);\n" +
+    "    if (anchorType === -1) {\n" +
+    "        anchorType = 5;\n" +
+    "        try {\n" +
+    "            for (var q = 1; q <= ctl.numProperties; q++) {\n" +
+    "                try {\n" +
+    "                    var nm = ctl(q).name;\n" +
+    "                    if (nm && nm.toLowerCase().indexOf(\"anchor\") !== -1) { anchorType = ctl(q).value; break; }\n" +
+    "                } catch (eq) {}\n" +
+    "            }\n" +
+    "        } catch (eScan) {}\n" +
+    "    }\n" +
     "    result = [0, 0];\n" +
     "\n" +
     "    if (anchorType == 1) result = [-w, -h];      // Top Left\n" +
@@ -265,116 +309,17 @@ var expressions = {
     "    [0, 0];\n" +
     "}",
 
-    // Position expression for handling position changes and anchor point updates
-    position: "try {\n" +
-    "    // Get current values\n" +
-    "    var width = effect(\"Width\")(\"Slider\");\n" +
-    "    var height = effect(\"Height\")(\"Slider\");\n" +
-    "    var posOffset = effect(\"Position Offset\")(\"Point\");\n" +
-    "    var anchorType = effect(\"Anchor Point\")(\"Menu\");\n" +
-    "    var w = width/2;\n" +
-    "    var h = height/2;\n" +
-    "    var result = value.slice(); // Default to current position\n" +
-    "    \n" +
-    "    // Initialize and track state\n" +
-    "    if (typeof __state === 'undefined') {\n" +
-    "        __state = {\n" +
-    "            lastWidth: width,\n" +
-    "            lastHeight: height,\n" +
-    "            lastAnchorType: anchorType,\n" +
-    "            lastPosOffset: [posOffset[0], posOffset[1]],\n" +
-    "            basePos: value.slice(), // Remember initial position\n" +
-    "            visiblePos: value.slice()\n" +
-    "        };\n" +
-    "    }\n" +
-    "    \n" +
-    "    // Track changes\n" +
-    "    var widthDelta = width - __state.lastWidth;\n" +
-    "    var heightDelta = height - __state.lastHeight;\n" +
-    "    var anchorChanged = (anchorType != __state.lastAnchorType);\n" +
-    "    var offsetChanged = (posOffset[0] != __state.lastPosOffset[0] || posOffset[1] != __state.lastPosOffset[1]);\n" +
-    "    \n" +
-    "    // Start with current position\n" +
-    "    var newPos = __state.visiblePos.slice();\n" +
-    "    \n" +
-    "    // Handle position offset changes directly - this must be applied regardless of other changes\n" +
-    "    if (offsetChanged) {\n" +
-    "        // Apply the precise delta between the current and last offset values\n" +
-    "        var offsetDeltaX = posOffset[0] - __state.lastPosOffset[0];\n" +
-    "        var offsetDeltaY = posOffset[1] - __state.lastPosOffset[1];\n" +
-    "        newPos[0] += offsetDeltaX;\n" +
-    "        newPos[1] += offsetDeltaY;\n" +
-    "        __state.lastPosOffset = [posOffset[0], posOffset[1]];\n" +
-    "    }\n" +
-    "    \n" +
-    "    // Helper function to get anchor offsets\n" +
-    "    function getAnchorOffset(type) {\n" +
-    "        var offset = [0, 0];\n" +
-    "        \n" +
-    "        if (type == 1) offset = [-w, -h]; // Top Left\n" +
-    "        else if (type == 2) offset = [0, -h]; // Top Center\n" +
-    "        else if (type == 3) offset = [w, -h]; // Top Right\n" +
-    "        else if (type == 4) offset = [-w, 0]; // Middle Left\n" +
-    "        else if (type == 5) offset = [0, 0]; // Middle Center\n" +
-    "        else if (type == 6) offset = [w, 0]; // Middle Right\n" +
-    "        else if (type == 7) offset = [-w, h]; // Bottom Left\n" +
-    "        else if (type == 8) offset = [0, h]; // Bottom Center\n" +
-    "        else if (type == 9) offset = [w, h]; // Bottom Right\n" +
-    "        \n" +
-    "        return offset;\n" +
-    "    }\n" +
-    "    \n" +
-    "    // Apply size changes based on anchor type\n" +
-    "    if (widthDelta !== 0 || heightDelta !== 0) {\n" +
-    "        if (anchorType == 1) { // Top Left - no adjustment\n" +
-    "            // No change\n" +
-    "        } else if (anchorType == 2) { // Top Center\n" +
-    "            newPos[0] -= widthDelta/2;\n" +
-    "        } else if (anchorType == 3) { // Top Right\n" +
-    "            newPos[0] -= widthDelta;\n" +
-    "        } else if (anchorType == 4) { // Middle Left\n" +
-    "            newPos[1] -= heightDelta/2;\n" +
-    "        } else if (anchorType == 5) { // Middle Center\n" +
-    "            newPos[0] -= widthDelta/2;\n" +
-    "            newPos[1] -= heightDelta/2;\n" +
-    "        } else if (anchorType == 6) { // Middle Right\n" +
-    "            newPos[0] -= widthDelta;\n" +
-    "            newPos[1] -= heightDelta/2;\n" +
-    "        } else if (anchorType == 7) { // Bottom Left\n" +
-    "            newPos[1] -= heightDelta;\n" +
-    "        } else if (anchorType == 8) { // Bottom Center\n" +
-    "            newPos[0] -= widthDelta/2;\n" +
-    "            newPos[1] -= heightDelta;\n" +
-    "        } else if (anchorType == 9) { // Bottom Right\n" +
-    "            newPos[0] -= widthDelta;\n" +
-    "            newPos[1] -= heightDelta;\n" +
-    "        }\n" +
-    "    }\n" +
-    "    \n" +
-    "    // Handle anchor point changes to match After Effects behavior\n" +
-    "    if (anchorChanged) {\n" +
-    "        var oldAnchorOffset = getAnchorOffset(__state.lastAnchorType);\n" +
-    "        var newAnchorOffset = getAnchorOffset(anchorType);\n" +
-    "        \n" +
-    "        // IMPORTANT: In After Effects, we need to use the same values (not negated)\n" +
-    "        var anchorDiffX = newAnchorOffset[0] - oldAnchorOffset[0];\n" +
-    "        var anchorDiffY = newAnchorOffset[1] - oldAnchorOffset[1];\n" +
-    "        \n" +
-    "        // Apply adjustment to maintain visual position\n" +
-    "        newPos[0] += anchorDiffX;\n" +
-    "        newPos[1] += anchorDiffY;\n" +
-    "    }\n" +
-    "    \n" +
-    "    // Store state for next time\n" +
-    "    __state.lastWidth = width;\n" +
-    "    __state.lastHeight = height;\n" +
-    "    __state.lastAnchorType = anchorType;\n" +
-    "    __state.visiblePos = newPos.slice();\n" +
-    "    \n" +
-    "    result = newPos;\n" +
-    "} catch (err) {\n" +
-    "    // Error fallback - just keep current position\n" +
-    "}\n" +
-    "result;"
+    // Position expression — stateless passthrough.
+    // The Anchor Point expression above already pins the selected corner in
+    // place as Width/Height change, so Position needs no compensation here.
+    // A previous version accumulated anchor/size offsets in a persistent
+    // "__state" object, but After Effects evaluates each expression in a fresh
+    // context (undeclared globals do NOT persist between evaluations), so that
+    // state re-initialized on every evaluation — it was inert under the default
+    // JS engine and non-deterministic under the legacy engine. Returning the
+    // property's own (static or keyframed) value keeps Position fully
+    // animatable and deterministic under both engines.
+    position: "// Stateless position passthrough (see Rectangulator.jsx notes)\n" +
+    "value;"
 };
 

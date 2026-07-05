@@ -1,0 +1,216 @@
+{
+  "name": "Limb-a-tron",
+  "category": "animation",
+  "ui": "DIALOG",
+
+  "consumes": {
+    "selection": ["comp", "layers"],
+    "minimum": "1 active composition (no layers selected for creation mode; a Limb-a-tron controller or shape layer selected for bake mode)",
+    "description": "Creation mode: reads the active CompItem for dimensions (width/height) to place the shape layer and controller null at comp centre. Bake mode: reads the selected layer(s) to locate the LimbControlsV3 pseudo-effect, then traverses the full parent-chain and all keyframes on the controller null and shape layer."
+  },
+
+  "controls": [
+    {
+      "name": "Limb Name",
+      "type": "text",
+      "role": "sets the name used for the shape layer, controller null, and pseudo-effect instance; also injected into every expression string at build time",
+      "default": ""
+    },
+    {
+      "name": "OK",
+      "type": "button",
+      "role": "confirms limb name entry and triggers rig creation",
+      "default": null
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "dismisses the name dialog without creating a rig",
+      "default": null
+    },
+    {
+      "name": "Yes (bake confirm)",
+      "type": "button",
+      "role": "confirms bake-and-remove-controller operation on a selected Limb-a-tron rig",
+      "default": null
+    },
+    {
+      "name": "No (bake confirm)",
+      "type": "button",
+      "role": "dismisses the bake confirmation dialog without baking",
+      "default": null
+    }
+  ],
+
+  "functions": [
+    "guards when no active composition is present",
+    "guards when selected layers are not a Limb-a-tron rig",
+    "shows a name-input dialog for new rig creation",
+    "creates a named shape layer with Regular Limb and Noodle Limb vector groups",
+    "creates a controller null layer with a LimbControlsV3 pseudo effect applied from a temp FFX binary",
+    "wires IK-angle, adjusted-length, and pop-prevent expressions onto the controller null pseudo-effect sliders",
+    "wires elbow and wrist comp-space / layer-space position expressions onto the controller null",
+    "wires shape-path expressions (regular and noodle body) onto the shape layer vector groups",
+    "wires fill color and fill opacity expressions linked to the controller pseudo-effect",
+    "wires linked stroke-pass expressions (color, width, trim start/end/offset) for regular and noodle render passes",
+    "wraps all mutations in a named undo group",
+    "detects existing Limb-a-tron rigs from selected layers via pseudo-effect introspection",
+    "shows a bake-confirm dialog when a rig is selected",
+    "bakes animated body-path expressions to per-frame keyframes with Hermite simplification",
+    "freezes static appearance properties (fill color, stroke width, trim ranges) as static values",
+    "removes inactive render group (Regular or Noodle) after baking based on Noodle Mode state",
+    "optionally removes the controller null layer after a confirmed bake"
+  ],
+
+  "scriptSim": {
+    "scenario": "success — create new limb rig",
+    "inputs": "Empty composition (1920×1080, 24 fps, 5 s). No layers selected. User types 'Arm' into the name edittext then clicks OK.",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "app", "value": "Limb-a-tron" },
+      { "kind": "createLayer", "target": "Arm" },
+      { "kind": "setValue", "target": "Arm/Transform/Position" },
+      { "kind": "createLayer", "target": "Arm CTRL" },
+      { "kind": "setValue", "target": "Arm CTRL/Transform/Position" },
+      { "kind": "fileWrite", "target": "temp/LimbControlsV3.ffx" },
+      { "kind": "applyPreset", "target": "Arm CTRL" },
+      { "kind": "setExpression", "target": "Arm/ADBE Root Vectors Group/Regular Limb/ADBE Vectors Group/Path 1/ADBE Vector Shape" },
+      { "kind": "setExpression", "target": "Arm/ADBE Root Vectors Group/Regular Limb/ADBE Vectors Group/ADBE Vector Graphic - Fill/ADBE Vector Fill Color" },
+      { "kind": "setExpression", "target": "Arm/ADBE Root Vectors Group/Regular Limb/ADBE Vectors Group/ADBE Vector Graphic - Fill/ADBE Vector Fill Opacity" },
+      { "kind": "setExpression", "target": "Arm/ADBE Root Vectors Group/Noodle Limb/ADBE Vectors Group/Path 1/ADBE Vector Shape" },
+      { "kind": "setExpression", "target": "Arm/ADBE Root Vectors Group/Noodle Limb/ADBE Vectors Group/ADBE Vector Graphic - Fill/ADBE Vector Fill Color" },
+      { "kind": "setExpression", "target": "Arm/ADBE Root Vectors Group/Noodle Limb/ADBE Vectors Group/ADBE Vector Graphic - Fill/ADBE Vector Fill Opacity" },
+      { "kind": "setExpression", "target": "Arm CTRL/Effects/Arm Limb Control/Elbow (comp space)" },
+      { "kind": "setExpression", "target": "Arm CTRL/Effects/Arm Limb Control/Elbow (layer space)" },
+      { "kind": "setExpression", "target": "Arm CTRL/Effects/Arm Limb Control/Wrist  (comp space)" },
+      { "kind": "setExpression", "target": "Arm CTRL/Effects/Arm Limb Control/Wrist  (layer space)" },
+      { "kind": "setExpression", "target": "Arm CTRL/Effects/Arm Limb Control/IK Angles" },
+      { "kind": "setExpression", "target": "Arm CTRL/Effects/Arm Limb Control/Adjusted U/L Limb Lengths" },
+      { "kind": "setExpression", "target": "Arm CTRL/Effects/Arm Limb Control/Proximity / Pop Prevent Factor" },
+      { "kind": "endUndoGroup", "target": "app" }
+    ]
+  },
+
+  "expressions": [
+    {
+      "target": "Arm/ADBE Root Vectors Group/Regular Limb/ADBE Vectors Group/Path 1/ADBE Vector Shape",
+      "controlBinding": {
+        "control": "IK Angles",
+        "param": "IK Angles",
+        "range": [-180, 180]
+      },
+      "expression": "var ctrlLayer = thisComp.layer(\"Arm CTRL\");\nvar effect = ctrlLayer.effect(\"Arm Limb Control\");\nfunction effectValue(name, defaultValue) {\n    try {\n        return effect(name).value;\n    } catch (err) {\n        return defaultValue;\n    }\n}\nfunction emptyClosedPath() {\n    var pts = [[0, 0], [0, 0], [0, 0]];\n    var tans = [[0, 0], [0, 0], [0, 0]];\n    return createPath(pts, tans, tans, true);\n}\nvar resultPath;\nfunction clampValue(value, minValue, maxValue) { return Math.min(Math.max(value, minValue), maxValue); }\nfunction add(a, b) { return [a[0] + b[0], a[1] + b[1]]; }\nfunction sub(a, b) { return [a[0] - b[0], a[1] - b[1]]; }\nfunction mul(a, amount) { return [a[0] * amount, a[1] * amount]; }\nfunction interpolate(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; }\nfunction length2(a) { return Math.sqrt(a[0] * a[0] + a[1] * a[1]); }\nfunction normalize(a, fallback) { var len = length2(a); return len < 0.001 ? fallback : [a[0] / len, a[1] / len]; }\nfunction rotateVector(point, angle) {\n    return [point[0] * Math.cos(angle) - point[1] * Math.sin(angle), point[0] * Math.sin(angle) + point[1] * Math.cos(angle)];\n}\nfunction normal(a) { return [-a[1], a[0]]; }\nvar SIDE_STEPS = 4; var CAP_STEPS = 8; var ELBOW_STEPS = 6;\nvar FIXED_REGULAR_VERTEX_COUNT = (CAP_STEPS + 1) + SIDE_STEPS + ELBOW_STEPS + SIDE_STEPS + CAP_STEPS + SIDE_STEPS + ELBOW_STEPS + SIDE_STEPS;\nif (effectValue(\"Noodle Mode\", 0) == 1) {\n    resultPath = createPath([[0,0],[0,0],[0,0]], [[0,0],[0,0],[0,0]], [[0,0],[0,0],[0,0]], true);\n} else {\n    var adjustedLimbLengths = effectValue(\"Adjusted U/L Limb Lengths\", [effectValue(\"Upper Limb Length\", 50), effectValue(\"Lower Limb Length\", 50)]);\n    var upperLimbLength = Math.max(adjustedLimbLengths[0], 0.001);\n    var lowerLimbLength = Math.max(adjustedLimbLengths[1], 0.001);\n    var ikAngles = effectValue(\"IK Angles\", [0, 0]);\n    var upperRot = degreesToRadians(ikAngles[0]); var lowerRot = degreesToRadians(ikAngles[1]);\n    var d1 = normalize([Math.sin(-upperRot), Math.cos(-upperRot)], [0, 1]);\n    var d2 = normalize([Math.sin(-lowerRot), Math.cos(-lowerRot)], d1);\n    var shoulder = [0, 0]; var elbow = mul(d1, upperLimbLength); var wrist = add(elbow, mul(d2, lowerLimbLength));\n    resultPath = createPath([shoulder, elbow, wrist], [[0,0],[0,0],[0,0]], [[0,0],[0,0],[0,0]], true);\n}\nresultPath;",
+      "sim": {
+        "variable": "controlValue",
+        "range": [-90, 90],
+        "steps": 41,
+        "note": "Sweeps the upper IK angle from -90° to +90° (simulating the CTRL null orbiting around the shoulder), showing how the unified regular limb body path changes shape as the arm bends."
+      }
+    },
+    {
+      "target": "Arm CTRL/Effects/Arm Limb Control/IK Angles",
+      "controlBinding": {
+        "control": "IK Angles",
+        "param": "IK Angles",
+        "range": [-180, 180]
+      },
+      "expression": "var ctrlLayer = thisComp.layer(\"Arm CTRL\");\nvar adjustedLimbLengths = ctrlLayer.effect(\"Arm Limb Control\")(\"Adjusted U/L Limb Lengths\").value;\nvar upperLimbLength = adjustedLimbLengths[0];\nvar lowerLimbLength = adjustedLimbLengths[1];\nvar disableIK = ctrlLayer.effect(\"Arm Limb Control\")(\"Disable IK\").value;\nvar upperLimbAngle = ctrlLayer.effect(\"Arm Limb Control\")(\"Upper Limb Angle\").value;\nvar lowerLimbAngle = ctrlLayer.effect(\"Arm Limb Control\")(\"Lower Limb Angle\").value;\nvar ikDirection = ctrlLayer.effect(\"Arm Limb Control\")(\"IK Direction\").value;\nif (disableIK == 1) {\n    var ikAngles = [upperLimbAngle, upperLimbAngle + lowerLimbAngle];\n} else {\n    var goalLayer = ctrlLayer;\n    function ensure2DArray(value) {\n        if (value instanceof Array) {\n            if (value.length > 2) {\n                return [value[0], value[1]];\n            }\n        }\n        return value;\n    }\n    function worldPosition(target) {\n        var pos = target.toWorld(target.anchorPoint);\n        return ensure2DArray(pos);\n    }\n    function calculateRotationAngle(pointA, pointB) {\n        var diff = ensure2DArray(pointB - pointA);\n        return Math.atan2(diff[1], diff[0]);\n    }\n    var limbLayer = thisComp.layer(\"Arm\");\n    var upperLimbStartPos = worldPosition(limbLayer);\n    var goalPos = worldPosition(goalLayer);\n    var upperToGoalVector = ensure2DArray(goalPos - upperLimbStartPos);\n    var distanceToGoal = length(upperToGoalVector);\n    var jointAngle2 = - (ikDirection > 0 ? -1 : 1) * Math.acos(clamp((upperToGoalVector[0] * upperToGoalVector[0] + upperToGoalVector[1] * upperToGoalVector[1] - upperLimbLength * upperLimbLength - lowerLimbLength * lowerLimbLength) / (2 * upperLimbLength * lowerLimbLength), -1, 1));\n    var jointAngle1 = Math.atan2(-upperToGoalVector[0] * (upperLimbLength + lowerLimbLength * Math.cos(jointAngle2)) - upperToGoalVector[1] * (lowerLimbLength * Math.sin(jointAngle2)), upperToGoalVector[1] * (upperLimbLength + lowerLimbLength * Math.cos(jointAngle2)) - upperToGoalVector[0] * (lowerLimbLength * Math.sin(jointAngle2)));\n    var upperLimbRotation = radiansToDegrees(jointAngle1);\n    var lowerLimbRotation = radiansToDegrees(jointAngle2 + jointAngle1);\n    var limbLayerRotation = limbLayer.transform.rotation.value;\n    upperLimbRotation -= limbLayerRotation;\n    lowerLimbRotation -= limbLayerRotation;\n    var cumulativeParentRotation = 0;\n    var currentLayer = limbLayer;\n    for (var i = 0; i < 4; i++) {\n        if (currentLayer.hasParent) {\n            currentLayer = currentLayer.parent;\n            cumulativeParentRotation += currentLayer.transform.rotation.value;\n        } else {\n            break;\n        }\n    }\n    upperLimbRotation -= cumulativeParentRotation;\n    lowerLimbRotation -= cumulativeParentRotation;\n    var ikAngles = [upperLimbRotation, lowerLimbRotation];\n}\nikAngles;",
+      "sim": {
+        "variable": "time",
+        "range": [0, 4.958333],
+        "steps": 40,
+        "note": "Sweeps across the 5-second composition (119 frames at 24 fps) to show how IK angles evolve over time as the controller null is animated — output is a [upperAngle, lowerAngle] 2D vector."
+      }
+    },
+    {
+      "target": "Arm CTRL/Effects/Arm Limb Control/Proximity / Pop Prevent Factor",
+      "controlBinding": {
+        "control": "Pop Prevent",
+        "param": "Pop Prevent",
+        "range": [0, 100]
+      },
+      "expression": "var ctrlLayer = thisComp.layer(\"Arm CTRL\");\nvar limbLayer = thisComp.layer(\"Arm\");\nvar upperLimbLength = ctrlLayer.effect(\"Arm Limb Control\")(\"Upper Limb Length\").value;\nvar lowerLimbLength = ctrlLayer.effect(\"Arm Limb Control\")(\"Lower Limb Length\").value;\nvar popAvert = ctrlLayer.effect(\"Arm Limb Control\")(\"Pop Prevent\").value / 100;\nvar disableIK = ctrlLayer.effect(\"Arm Limb Control\")(\"Disable IK\").value;\nif (disableIK == 1) { [0, 1]; } else {\nvar goal = ctrlLayer;\nvar ikDirection = ctrlLayer.effect(\"Arm Limb Control\")(\"IK Direction\").value;\nvar ikDirectionMultiplier = Math.abs(ikDirection) / 100;\nfunction ensure2DArray(value) {\n    if (value instanceof Array) {\n        if (value.length > 2) { return [value[0], value[1]]; }\n    }\n    return value;\n}\nfunction worldPosition(layer) {\n    var pos = layer.toWorld(layer.anchorPoint);\n    return ensure2DArray(pos);\n}\nfunction linearInterpolation(t, tMin, tMax, value1, value2) {\n    if (t <= tMin) return value1;\n    if (t >= tMax) return value2;\n    return value1 + (value2 - value1) * (t - tMin) / (tMax - tMin);\n}\nvar upperLimbInitialPos = worldPosition(limbLayer);\nvar goalPos = worldPosition(goal);\nvar upperToGoalDist = length(ensure2DArray(goalPos - upperLimbInitialPos));\nvar upperToLowerDist = upperLimbLength;\nvar lowerToGoalDist = lowerLimbLength;\nvar totalLimbLength = upperToLowerDist + lowerToGoalDist;\nvar distanceToGoal = upperToGoalDist;\nvar proximityFactor = linearInterpolation(Math.abs(distanceToGoal - totalLimbLength / 2), 0, totalLimbLength / 2, 0, 1);\nvar popPreventFactor = linearInterpolation(linearInterpolation(proximityFactor * proximityFactor * proximityFactor, 0, 1, 0.833, 1), 0, 1, (1 - popAvert), 1);\nvar result = [proximityFactor, popPreventFactor];\nresult;\n}",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps Pop Prevent slider from 0 (no anti-pop) to 100 (maximum anti-pop), showing how the pop-prevent factor damps near-full-extension snapping."
+      }
+    },
+    {
+      "target": "Arm CTRL/Effects/Arm Limb Control/Adjusted U/L Limb Lengths",
+      "controlBinding": {
+        "control": "Pop Prevent",
+        "param": "Pop Prevent",
+        "range": [0, 100]
+      },
+      "expression": "var ctrlLayer = thisComp.layer(\"Arm CTRL\");\nvar limbLayer = thisComp.layer(\"Arm\");\nvar upperLimbLength = ctrlLayer.effect(\"Arm Limb Control\")(\"Upper Limb Length\").value;\nvar lowerLimbLength = ctrlLayer.effect(\"Arm Limb Control\")(\"Lower Limb Length\").value;\nvar popPreventFactor = ctrlLayer.effect(\"Arm Limb Control\")(\"Proximity / Pop Prevent Factor\").value[1];\nvar disableIK = ctrlLayer.effect(\"Arm Limb Control\")(\"Disable IK\").value;\nif (disableIK == 1) { [upperLimbLength, lowerLimbLength]; } else {\nvar ikDirection = ctrlLayer.effect(\"Arm Limb Control\")(\"IK Direction\").value;\nvar ikDirectionMultiplier = Math.abs(ikDirection) / 100;\nfunction ensure2DArray(value) {\n    if (value instanceof Array) {\n        if (value.length > 2) { return [value[0], value[1]]; }\n    }\n    return value;\n}\nfunction worldPosition(layer) {\n    var pos = layer.toWorld(layer.anchorPoint);\n    return ensure2DArray(pos);\n}\nvar upperLimbInitialPos = worldPosition(limbLayer);\nvar goalPos = worldPosition(ctrlLayer);\nvar distanceToGoal = length(ensure2DArray(goalPos - upperLimbInitialPos));\nvar totalLimbLength = upperLimbLength + lowerLimbLength;\nif (distanceToGoal > totalLimbLength) {\n    var adjustedUpperLimbLength = upperLimbLength;\n    var adjustedLowerLimbLength = lowerLimbLength;\n} else {\n    var antiPopAdjustedLength = totalLimbLength * popPreventFactor;\n    var upperLimbLengthAdjusted = antiPopAdjustedLength * (upperLimbLength / totalLimbLength);\n    var lowerLimbLengthAdjusted = antiPopAdjustedLength * (lowerLimbLength / totalLimbLength);\n    var directionBlend = ikDirectionMultiplier;\n    var upperLimbLengthBlended = (upperLimbLengthAdjusted * directionBlend) + ((upperLimbLengthAdjusted / (upperLimbLengthAdjusted + lowerLimbLengthAdjusted)) * distanceToGoal) * (1 - directionBlend);\n    var lowerLimbLengthBlended = (lowerLimbLengthAdjusted * directionBlend) + ((lowerLimbLengthAdjusted / (upperLimbLengthAdjusted + lowerLimbLengthAdjusted)) * distanceToGoal) * (1 - directionBlend);\n    var adjustedUpperLimbLength = upperLimbLengthBlended;\n    var adjustedLowerLimbLength = lowerLimbLengthBlended;\n}\n[adjustedUpperLimbLength, adjustedLowerLimbLength];\n}",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps Pop Prevent 0–100 to show how adjusted upper/lower limb lengths contract as the anti-pop factor softens the full-extension singularity."
+      }
+    },
+    {
+      "target": "Arm CTRL/Effects/Arm Limb Control/Elbow (layer space)",
+      "controlBinding": null,
+      "expression": "function calculateLimbPositions(ctrlLayerName, limbLayerName) {\n    var ctrlLayer = thisComp.layer(ctrlLayerName);\n    var limbLayer = thisComp.layer(limbLayerName);\n    var adjustedLengths = ctrlLayer.effect(\"Arm Limb Control\")(\"Adjusted U/L Limb Lengths\").value;\n    var upperLimbLength = adjustedLengths[0];\n    var ikAngles = ctrlLayer.effect(\"Arm Limb Control\")(\"IK Angles\").value;\n    var upperLimbRotation = degreesToRadians(ikAngles[0]);\n    var lowerLimbRotation = degreesToRadians(ikAngles[1]);\n    return [\n        upperLimbLength * Math.sin(-upperLimbRotation),\n        upperLimbLength * Math.cos(-upperLimbRotation)\n    ];\n}\ncalculateLimbPositions(\"Arm CTRL\", \"Arm\");",
+      "sim": {
+        "variable": "time",
+        "range": [0, 4.958333],
+        "steps": 40,
+        "note": "Samples the elbow layer-space position over the composition duration, showing how the elbow point tracks the IK solution as the controller is animated."
+      }
+    },
+    {
+      "target": "Arm CTRL/Effects/Arm Limb Control/Wrist  (layer space)",
+      "controlBinding": null,
+      "expression": "function calculateLimbPositions(ctrlLayerName, limbLayerName) {\n    var ctrlLayer = thisComp.layer(ctrlLayerName);\n    var limbLayer = thisComp.layer(limbLayerName);\n    var adjustedLengths = ctrlLayer.effect(\"Arm Limb Control\")(\"Adjusted U/L Limb Lengths\").value;\n    var upperLimbLength = adjustedLengths[0];\n    var lowerLimbLength = adjustedLengths[1];\n    var ikAngles = ctrlLayer.effect(\"Arm Limb Control\")(\"IK Angles\").value;\n    var upperLimbRotation = degreesToRadians(ikAngles[0]);\n    var lowerLimbRotation = degreesToRadians(ikAngles[1]);\n    var elbowX = upperLimbLength * Math.sin(-upperLimbRotation);\n    var elbowY = upperLimbLength * Math.cos(-upperLimbRotation);\n    return [\n        elbowX + lowerLimbLength * Math.sin(-lowerLimbRotation),\n        elbowY + lowerLimbLength * Math.cos(-lowerLimbRotation)\n    ];\n}\ncalculateLimbPositions(\"Arm CTRL\", \"Arm\");",
+      "sim": {
+        "variable": "time",
+        "range": [0, 4.958333],
+        "steps": 40,
+        "note": "Samples the wrist layer-space position over the composition duration, tracking the IK end-effector position."
+      }
+    },
+    {
+      "target": "Arm/ADBE Root Vectors Group/Regular Limb/ADBE Vectors Group/ADBE Vector Graphic - Fill/ADBE Vector Fill Color",
+      "controlBinding": {
+        "control": "Arm Fill Color",
+        "param": "Arm Fill Color",
+        "range": [0, 1]
+      },
+      "expression": "thisComp.layer('Arm CTRL').effect('Arm Limb Control')('Arm Fill Color')",
+      "sim": {
+        "variable": "time",
+        "range": [0, 4.958333],
+        "steps": 40,
+        "note": "Reads Arm Fill Color from the controller pseudo-effect directly; result is constant unless the control is keyframed."
+      }
+    },
+    {
+      "target": "Arm/ADBE Root Vectors Group/Regular Limb/ADBE Vectors Group/ADBE Vector Graphic - Fill/ADBE Vector Fill Opacity",
+      "controlBinding": {
+        "control": "Arm Fill Opacity",
+        "param": "Arm Fill Opacity",
+        "range": [0, 100]
+      },
+      "expression": "thisComp.layer('Arm CTRL').effect('Arm Limb Control')('Arm Fill Opacity')",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps Arm Fill Opacity 0–100 to confirm the fill opacity passes through linearly from the controller slider."
+      }
+    }
+  ],
+
+  "notes": [
+    "The script runs in two exclusive modes: creation mode (no layers selected) and bake mode (Limb-a-tron rig selected). The same dialog/entry point dispatches both.",
+    "The LimbControlsV3 pseudo effect is shipped as a compiled binary (base-64 in the JSX) written to a temp .ffx file and applied via applyPreset — this requires 'Allow Scripts to Write Files' in AE preferences.",
+    "All expression strings are built at rig-creation time with the limb name interpolated directly into the source, so every expression references its controller null and shape layer by the exact name chosen in the dialog.",
+    "Bake mode collects every keyframe time across the full parent chain (up to 4 levels), resamples to per-frame times, then uses Hermite simplification (shapeError threshold) to prune redundant keys.",
+    "The regularLimbExpression builds a dense sampled polyline with cap arcs, elbow arc, and side-curvature bell curves — vertex count is fixed at (CAP_STEPS+1)+SIDE_STEPS+ELBOW_STEPS+SIDE_STEPS+CAP_STEPS+SIDE_STEPS+ELBOW_STEPS+SIDE_STEPS to keep the closed path topologically stable across all poses.",
+    "Noodle mode and Regular mode are mutually exclusive: the active mode path expression returns a real shape while the inactive path returns an empty fixed-size zero path."
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Originator",
+  "screenshot": "dashboard/assets/ui/Originator.png",
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "Script ui mode is DIALOG — UITree was captured from the multi-path success scenario (success – multiple shape paths via dialog selection) via runFixtureScenario; the single-path scenario auto-centers headlessly without showing a dialog.",
+    "PNG rendered via SDB service at 366×530 px (52 553 bytes, device scale factor 2 = 732×1060 CSS px equivalent); file is sane.",
+    "expressions[] is empty — no AE expressions are written by this script; expressionCurves is empty by design.",
+    "The treeview shows Path 1 and Path 2 items with a 'Center Selected' confirm button and a Cancel button; dialog title is 'Center Shape Path Origin'.",
+    "Single-path layers are processed headlessly (auto-center, no dialog) — only layers with 2+ shape paths reach the dialog branch."
+  ]
+}

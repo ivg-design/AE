@@ -1,0 +1,72 @@
+{
+  "name": "TextMate",
+  "category": "layers",
+  "ui": "DIALOG",
+  "consumes": {
+    "selection": ["layers", "comp", "text"],
+    "minimum": "1 active CompItem + exactly 1 selected text layer containing Source Text",
+    "description": "Reads the active CompItem; reads comp.selectedLayers[0] and checks for a 'Source Text' property; reads the full text string from the TextDocument value to perform the case-sensitive string search; accesses 'ADBE Text Properties' → 'ADBE Text Animators' property group on the selected layer."
+  },
+  "controls": [
+    {
+      "name": "textInput",
+      "type": "text",
+      "role": "sets the case-sensitive search term to highlight inside the selected text layer",
+      "default": ""
+    },
+    {
+      "name": "OK",
+      "type": "button",
+      "role": "captures the search term and triggers the highlight-animator creation workflow",
+      "default": null
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "closes the dialog without creating any animators",
+      "default": null
+    }
+  ],
+  "functions": [
+    "guard: alerts and exits when no active CompItem is present",
+    "guard: alerts and exits when the number of selected layers is not exactly one",
+    "guard: alerts and exits when the selected layer has no Source Text property",
+    "show a DIALOG prompting the user to enter a case-sensitive search term",
+    "guard: alerts and exits when the search term field is empty after dialog close",
+    "search the full text string for all occurrences of the search term (case-sensitive)",
+    "calculate adjusted character indices for each match by subtracting carriage-return counts before each position",
+    "guard: alerts and exits when no occurrences of the search term are found",
+    "add a text animator ('ADBE Text Animator') named 'Highlight Animator (<term>)' to the selected text layer's Animators group",
+    "add a Fill Color property ('ADBE Text Fill Color') to the new animator and set it to a randomly selected non-repeating color from a 12-color palette",
+    "for each text occurrence: add a Range Selector ('ADBE Text Selector'), set units to index mode (value 2), and set Start Offset and End Offset to the adjusted character indices",
+    "alert the user with the count of highlighted instances found",
+    "wrap all mutations in a single undo group named 'TextMate'"
+  ],
+  "scriptSim": {
+    "scenario": "highlight two occurrences of search term",
+    "inputs": "Active comp 'Text Comp' (1920×1080, 24fps, 10s); text layer 'Title Text' selected with Source Text 'Hello world, Hello AE'; user types 'Hello' and clicks OK",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "TextMate" },
+      { "kind": "setValue", "target": "Text/Animators/Highlight Animator (Hello)/name", "value": "Highlight Animator (Hello)" },
+      { "kind": "setValue", "target": "Text/Animators/Highlight Animator (Hello)/Properties/Fill Color", "value": "[r, g, b] (random palette color)" },
+      { "kind": "setValue", "target": "Text/Animators/Highlight Animator (Hello)/Selectors/1/Advanced/Units", "value": 2 },
+      { "kind": "setValue", "target": "Text/Animators/Highlight Animator (Hello)/Selectors/1/Start Offset", "value": 0 },
+      { "kind": "setValue", "target": "Text/Animators/Highlight Animator (Hello)/Selectors/1/End Offset", "value": 5 },
+      { "kind": "setValue", "target": "Text/Animators/Highlight Animator (Hello)/Selectors/2/Advanced/Units", "value": 2 },
+      { "kind": "setValue", "target": "Text/Animators/Highlight Animator (Hello)/Selectors/2/Start Offset", "value": 13 },
+      { "kind": "setValue", "target": "Text/Animators/Highlight Animator (Hello)/Selectors/2/End Offset", "value": 18 },
+      { "kind": "alert", "target": "Found 2 instance(s) of 'Hello'." },
+      { "kind": "endUndoGroup", "target": "TextMate" }
+    ]
+  },
+  "expressions": [],
+  "notes": [
+    "Text search is strictly case-sensitive; there is no option to make it case-insensitive.",
+    "Carriage-return characters (char code 13) are excluded from character index calculations so that Range Selector indices match AE's character-level units.",
+    "Color selection rotates through a fixed palette of 12 high-contrast RGB colors; consecutive highlights are guaranteed to use different colors via lastColorIndex tracking.",
+    "All existing text animations, keyframes, and formatting are preserved — the script only adds new animators.",
+    "The script writes no AE expressions; expressions[] is empty.",
+    "cancelButton.onClick closes the dialog without setting searchTerm, so the subsequent empty-term guard fires and alerts 'No search term entered. Exiting.' — the undo group opened at the top of main() is not closed in this early-exit path.",
+    "The script requires Adobe After Effects CS6 or later."
+  ]
+}

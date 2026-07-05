@@ -1,0 +1,150 @@
+{
+  "name": "ChromaBlenderizer",
+  "category": "effects",
+  "ui": "PALETTE",
+
+  "consumes": {
+    "selection": ["properties", "comp"],
+    "minimum": "1 active CompItem + 2 selected COLOR-type properties",
+    "description": "Reads app.project.activeItem (must be a CompItem) at script launch and again at apply time. At apply time reads comp.selectedProperties and filters to those whose propertyValueType === PropertyValueType.COLOR. Requires at least 2 such color properties to proceed."
+  },
+
+  "controls": [
+    {
+      "name": "Start Color",
+      "type": "color",
+      "role": "opens AdobeColorPicker to set the range start color; updates config.startHue, config.saturation, config.startBrightness",
+      "default": [1, 1, 1]
+    },
+    {
+      "name": "End Color",
+      "type": "color",
+      "role": "opens AdobeColorPicker to set the range end color; updates config.endHue, config.saturation, config.endBrightness",
+      "default": [1, 1, 1]
+    },
+    {
+      "name": "Start Hue",
+      "type": "slider",
+      "role": "sets the hue of the first generated color in Color Gamut mode (0–1 maps to 0–360 degrees)",
+      "default": 0,
+      "range": [0, 1]
+    },
+    {
+      "name": "End Hue",
+      "type": "slider",
+      "role": "sets the hue of the last generated color in Color Gamut mode (0–1 maps to 0–360 degrees)",
+      "default": 0,
+      "range": [0, 1]
+    },
+    {
+      "name": "Shared Saturation",
+      "type": "slider",
+      "role": "sets the saturation shared by both start and end colors in Color Gamut mode (0–1)",
+      "default": 0,
+      "range": [0, 1]
+    },
+    {
+      "name": "Start Brightness",
+      "type": "slider",
+      "role": "sets the brightness of the first generated color (0–1)",
+      "default": 1,
+      "range": [0, 1]
+    },
+    {
+      "name": "End Brightness",
+      "type": "slider",
+      "role": "sets the brightness of the last generated color (0–1)",
+      "default": 1,
+      "range": [0, 1]
+    },
+    {
+      "name": "Randomize Colors",
+      "type": "checkbox",
+      "role": "when checked, assigns each target a random color within the start/end range instead of a linearly interpolated one",
+      "default": false
+    },
+    {
+      "name": "Grayscale",
+      "type": "radio",
+      "role": "selects Grayscale mode: ignores hue and saturation, interpolates or randomizes brightness only",
+      "default": false
+    },
+    {
+      "name": "Color Gamut",
+      "type": "radio",
+      "role": "selects Color Gamut mode: uses hue (shortest-path interpolation), shared saturation, and brightness to generate colors",
+      "default": true
+    },
+    {
+      "name": "Refresh Count",
+      "type": "button",
+      "role": "counts currently selected AE color properties and updates the property-count display without applying changes",
+      "default": null
+    },
+    {
+      "name": "What Counts?",
+      "type": "button",
+      "role": "shows an informational alert describing which AE property types qualify as color targets",
+      "default": null
+    },
+    {
+      "name": "Apply Colors",
+      "type": "button",
+      "role": "applies the generated color range to all currently selected color properties using beginUndoGroup/endUndoGroup",
+      "default": null
+    },
+    {
+      "name": "Close",
+      "type": "button",
+      "role": "closes the modeless palette",
+      "default": null
+    }
+  ],
+
+  "functions": [
+    "validate active composition on launch and abort with alert if none found",
+    "open modeless palette that remains visible while user selects AE properties",
+    "accept start/end color via bundled AdobeColorPicker swatch dialog",
+    "set start/end hue, shared saturation, and per-color brightness via HSB sliders",
+    "count and display selected COLOR-type properties on demand (Refresh Count)",
+    "interpolate colors linearly across selected color properties using shortest-path hue interpolation",
+    "distribute random colors within the start/end range across selected color properties",
+    "generate grayscale values by interpolating brightness with zero saturation",
+    "generate color-gamut values using HSB-to-RGB conversion",
+    "apply computed RGB values to each selected color property via property.setValue()",
+    "wrap all mutations in a single undo group named 'ChromaBlenderizer'"
+  ],
+
+  "scriptSim": {
+    "scenario": "success – linear color gamut applied to 2 fill color properties",
+    "inputs": "Active comp 'Chroma Comp' (1920×1080, 24fps, 10s) with two shape layers. Shape A Fill Color (red [1,0,0,1]) and Shape B Fill Color (blue [0,0,1,1]) are both in comp.selectedProperties. All config defaults: startHue=0, endHue=0, saturation=0, startBrightness=1, endBrightness=1 (both colors will be white). User clicks Apply Colors.",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "ChromaBlenderizer" },
+      {
+        "kind": "setValue",
+        "target": "Shape A/Contents/Group 1/Fill 1/Color",
+        "value": [1, 1, 1, 1]
+      },
+      {
+        "kind": "setValue",
+        "target": "Shape B/Contents/Group 1/Fill 1/Color",
+        "value": [1, 1, 1, 1]
+      },
+      { "kind": "endUndoGroup", "target": "ChromaBlenderizer" }
+    ]
+  },
+
+  "expressions": [],
+
+  "notes": [
+    "PALETTE mode: the window is modeless — AE remains interactive while the script panel is open, allowing users to change their color-property selection between Apply passes.",
+    "The script writes no AE expressions; all color values are applied as static setValue() calls.",
+    "Start/End color defaults are white ([1,1,1]) because startHue=0, endHue=0, saturation=0, startBrightness=1, endBrightness=1 yields hsbToRgb(0,0,1)=[1,1,1,1].",
+    "Hue interpolation uses shortest-path (wraps through ±0.5 boundary) so e.g. startHue=0.9, endHue=0.1 travels through red rather than the long way around.",
+    "Randomize mode uses Math.random() so results are non-deterministic; the fixture tests linear (deterministic) mode only.",
+    "The Grayscale radio forces h=0, s=0 regardless of the HSB sliders; only brightness is interpolated.",
+    "A singleton guard prevents duplicate palette windows: if $.global.ChromaBlenderizerPalette already exists the old window is closed before a new one opens.",
+    "The bundled AdobeColorPicker (Smallpath v2.0) is inlined into the script as a vendored dependency; if it is unavailable the swatch buttons fall back to an alert directing the user to the HSB sliders.",
+    "endUndoGroup target is listed as 'ChromaBlenderizer' for fixture consistency; the actual AE call is app.endUndoGroup() with no argument."
+  ]
+}

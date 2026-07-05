@@ -1,0 +1,13 @@
+{
+  "name": "Guiderator",
+  "screenshot": "dashboard/assets/ui/Guiderator.png",
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "Script ui mode is PANEL — UITree was captured from the success scenario (add horizontal guide at 540) via runFixtureScenario.",
+    "PNG rendered via SDB service at 152×160 px (15 566 bytes); file is sane.",
+    "expressions[] is empty — no AE expressions are written by this script; expressionCurves is empty by design.",
+    "comp.addGuide() is not an OPERATION_KIND; the harness intercepts only the surrounding beginUndoGroup / endUndoGroup pair. expectedConfidence is 'low' for success scenarios.",
+    "The lock button icon (🔐) renders correctly in the captured UITree — label defaults to locked state as no viewer is present in the harness host."
+  ]
+}

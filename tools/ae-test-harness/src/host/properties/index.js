@@ -87,6 +87,19 @@ export function valueTypeCode(t) {
   }
 }
 
+function interpolationTypeCode(t) {
+  if (typeof t === 'number') return t;
+  switch (String(t || '').toUpperCase()) {
+    case 'BEZIER':
+      return 6613;
+    case 'HOLD':
+      return 6614;
+    case 'LINEAR':
+    default:
+      return 6612;
+  }
+}
+
 /** PropertyType-ish discriminator. */
 export const PropertyType = Object.freeze({
   PROPERTY: 'Property',
@@ -449,7 +462,13 @@ function createDynamicLeafNode({ name, matchName, path, parent, ctx }) {
       }
       return val;
     },
-    setInterpolationTypeAtKey() {},
+    setInterpolationTypeAtKey(keyIndex, inType, outType) {
+      const kf = keyframes[keyIndex - 1];
+      if (kf) {
+        kf.interpolationIn = inType;
+        kf.interpolationOut = outType !== undefined ? outType : inType;
+      }
+    },
     setTemporalEaseAtKey() {},
     setSpatialTangentsAtKey() {},
     setTemporalContinuousAtKey() {},
@@ -742,7 +761,13 @@ function createProperty(def, ctx) {
 
     /** AE keyframe interpolation/ease setters — accepted as no-ops (read-shape
      *  mutations the harness does not need to record as distinct op kinds). */
-    setInterpolationTypeAtKey() {},
+    setInterpolationTypeAtKey(keyIndex, inType, outType) {
+      const kf = keyframes[keyIndex - 1];
+      if (kf) {
+        kf.interpolationIn = inType;
+        kf.interpolationOut = outType !== undefined ? outType : inType;
+      }
+    },
     setTemporalEaseAtKey() {},
     setSpatialTangentsAtKey() {},
     setTemporalContinuousAtKey() {},
@@ -763,11 +788,13 @@ function createProperty(def, ctx) {
     /** AE keyframe interpolation/flag GETTERS — KeyCloneMatic's Keyframe ctor
      *  reads each one per key to clone it. Return deterministic AE defaults
      *  (LINEAR interpolation, no continuity/auto-bezier, neutral label/roving). */
-    keyInInterpolationType() {
-      return 6612; // KeyframeInterpolationType.LINEAR
+    keyInInterpolationType(keyIndex) {
+      const kf = keyframes[keyIndex - 1];
+      return interpolationTypeCode(kf && kf.interpolationIn);
     },
-    keyOutInterpolationType() {
-      return 6612;
+    keyOutInterpolationType(keyIndex) {
+      const kf = keyframes[keyIndex - 1];
+      return interpolationTypeCode(kf && kf.interpolationOut);
     },
     keyTemporalContinuous() {
       return false;
@@ -968,11 +995,20 @@ function createPropertyGroup(def, ctx) {
 
   // Build children now that `group` exists so each child can carry a correct
   // parentProperty / propertyDepth / propertyIndex (AE-style).
+  //
+  // AE: the layer IS the top-level property group — `rootGroup.parentProperty`
+  // returns the owning layer, and the layer itself has no parentProperty. The
+  // synthetic 'ADBE Root' wrapper created by buildProperties has no AE
+  // counterpart, so children of that wrapper parent to the owner layer instead
+  // (RefManager-style walks `while (p.parentProperty)` then rely on
+  // `layer.containingComp` to reach the comp, exactly as in AE).
+  const isSyntheticRoot = !(ctx && ctx.parentProperty);
+  const childParent = isSyntheticRoot && ctx && ctx.ownerLayer ? ctx.ownerLayer : group;
   children = childDefs.map((cd, i) =>
     buildProperty(cd, {
       ...ctx,
       pathPrefix: base.path,
-      parentProperty: group,
+      parentProperty: childParent,
       depth: depth + 1,
       propertyIndex: i + 1
     })

@@ -1,0 +1,10 @@
+{
+  "name": "Iteratron",
+  "screenshot": "/Users/ivg/github/ae-script-catalog/ae/tools/ae-test-harness/dashboard/assets/ui/Iteratron.png",
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "PNG dimensions: 217x127 (device scale factor 2, logical pixels)",
+    "expressions[] is empty — no expression curves to compute (script bakes values, writes no AE expressions)"
+  ]
+}

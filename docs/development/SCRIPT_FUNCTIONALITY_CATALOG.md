@@ -13,9 +13,9 @@
 - **Use Case**: Property linking, complex animation control, driver-based interpolation
 
 ### 3. **[Limb-a-tron.jsx](../../packages/ae-scripts/src/animation/Limb-a-tron.jsx)**
-- **Function**: Creates complete IK (Inverse Kinematics) rig for character limbs
-- **Features**: Shape layer with upper/lower limbs, control null with pseudo effects, IK calculations, manual angle control, curvature controls, pop prevention
-- **Use Case**: Character animation, robotic arms, any two-segment IK chain
+- **Function**: Creates and bakes an IK/FK limb rig for character limbs
+- **Features**: Controller null with embedded LimbControlsV3 pseudo effect, IK and manual/FK angles, dynamic IK direction, adjusted lengths, pop prevention, regular and noodle body modes, side-curvature controls, linked outline/trim stroke passes, radial-safe folded-pose noodle outlines, and selected-rig intelligent bake/removal workflow
+- **Use Case**: Character limbs, noodle arms, robotic arms, and cleanup baking for animated two-segment rigs
 
 ## Composition Scripts
 
@@ -42,8 +42,8 @@
 ## Effects Scripts
 
 ### 8. **[ChromaBlenderizer.jsx](../../packages/ae-scripts/src/effects/ChromaBlenderizer.jsx)**
-- **Function**: Interpolates colors between start and end values across selected properties
-- **Features**: Custom color picker, linear interpolation, random color assignment
+- **Function**: Modeless palette that interpolates or randomizes colors between start and end values across selected AE color properties
+- **Features**: Bundled Smallpath AdobeColorPicker swatches, white default swatches, target property counter, tooltips, linear interpolation, random color assignment
 - **Use Case**: Create color gradients across multiple layers or properties
 
 ### 9. **[sfxMaster.jsx](../../packages/ae-scripts/src/effects/sfxMaster.jsx)**
@@ -173,6 +173,6 @@
 
 - **Total Scripts**: 31
 - **Categories**: 6 (Animation, Composition, Effects, Keyframes, Layers, Paths, Utilities)
-- **Most Complex**: Limb-a-tron (full IK rig system)
+- **Most Complex**: Limb-a-tron (IK/FK rig creation, noodle/regular body generation, and intelligent bake workflow)
 - **Most Used Patterns**: UI dialogs, tree views, expression generation
 - **Common Features**: Undo grouping, property validation, marker usage

@@ -1,0 +1,91 @@
+{
+  "name": "Slidotron_9x16",
+  "category": "composition",
+  "ui": "HEADLESS",
+
+  "consumes": {
+    "selection": ["comp"],
+    "minimum": "1 active CompItem selected in the Project panel",
+    "description": "Reads app.project.activeItem and requires it to be a CompItem. Uses its name to template the cross-comp expression references. No layer selection is needed."
+  },
+
+  "controls": [
+    {
+      "name": "CTRL",
+      "type": "slider",
+      "role": "drives horizontal slide position for Mask L and Mask R via expressions (0 = fully off-screen split, 100 = centered/overlapping)",
+      "default": 100,
+      "range": [0, 100]
+    }
+  ],
+
+  "functions": [
+    "create 'Sliders 9x16' composition (1080×1920, 60 fps, 2100 s) with dark-gray background",
+    "create 'Slide 9x16' composition (1080×1920, 60 fps, 2100 s) as a reusable slide template",
+    "add 'Sliders 9x16' layer to the active comp and attach a 'CTRL' Slider Control effect set to 100",
+    "add disabled shape layer 'Mask L' (540×1920 rectangle, mirrored via −100% scale) to 'Sliders 9x16'",
+    "add disabled shape layer 'Mask R' (540×1920 rectangle) to 'Sliders 9x16'",
+    "add two instances of 'Slide 9x16' as alpha track-matte targets of Mask L and Mask R respectively",
+    "parent each Slide 9x16 layer to its corresponding mask layer for coordinated movement",
+    "write expression on Mask L X-position: maps CTRL slider 0→100 to X position −5→540",
+    "write expression on Mask R X-position: maps CTRL slider 0→100 to X position 1085→540"
+  ],
+
+  "scriptSim": {
+    "scenario": "success — builds 9x16 slider rig from active comp",
+    "inputs": "Active comp 'Story Comp' (1080×1920, 60 fps) with no layers; no selection required",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Slidotron 9x16" },
+      { "kind": "setValue",       "target": "Sliders 9x16 > CTRL > Slider", "value": 100 },
+      { "kind": "setValue",       "target": "Mask L > ADBE Vector Rect Size", "value": [540, 1920] },
+      { "kind": "setValue",       "target": "Mask R > ADBE Vector Rect Size", "value": [540, 1920] },
+      { "kind": "setExpression",  "target": "Sliders 9x16 > Mask L > ADBE Position_0" },
+      { "kind": "setExpression",  "target": "Sliders 9x16 > Mask R > ADBE Position_0" },
+      { "kind": "endUndoGroup",   "target": "Slidotron 9x16" }
+    ]
+  },
+
+  "expressions": [
+    {
+      "target": "Sliders 9x16 / Mask L / ADBE Transform Group / ADBE Position_0",
+      "controlBinding": {
+        "control": "CTRL",
+        "param": "Slider",
+        "range": [0, 100]
+      },
+      "expression": "d = comp(\"Story Comp\").layer(\"Sliders 9x16\").effect(\"CTRL\")(\"Slider\")\riMin = 0;\riMax = 100;\roMin = -5;\roMax = 540;\rlinear(d, iMin, iMax, oMin, oMax)",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps the CTRL slider from 0 to 100; X position of Mask L moves from −5 (fully left, panel off-screen) to 540 (center, panel closed)"
+      }
+    },
+    {
+      "target": "Sliders 9x16 / Mask R / ADBE Transform Group / ADBE Position_0",
+      "controlBinding": {
+        "control": "CTRL",
+        "param": "Slider",
+        "range": [0, 100]
+      },
+      "expression": "d = comp(\"Story Comp\").layer(\"Sliders 9x16\").effect(\"CTRL\")(\"Slider\")\riMin = 0;\riMax = 100;\roMin = 1085;\roMax = 540;\rlinear(d, iMin, iMax, oMin, oMax)",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps the CTRL slider from 0 to 100; X position of Mask R moves from 1085 (fully right, panel off-screen) to 540 (center, panel closed)"
+      }
+    }
+  ],
+
+  "notes": [
+    "Script is HEADLESS — no ScriptUI dialog; runs immediately on the active comp.",
+    "Both mask layers are disabled (layer.enabled = false) by default; they serve as alpha track mattes, not visible elements.",
+    "The cross-comp expression references the active comp by name (templated at script-run time). Renaming the parent comp after running the script will break the expressions.",
+    "Output resolution is fixed at 1080×1920 at 60 fps regardless of the source comp settings.",
+    "Background color for both created comps is dark gray (RGB 38, 38, 38 ≈ [0.149, 0.149, 0.149]).",
+    "The CTRL slider is placed on the 'Sliders 9x16' layer inside the active comp and ranges 0–100; the expressions use linear() to map it to pixel positions.",
+    "Mask L uses −100% X scale to mirror the rectangle; Mask R uses default scale.",
+    "Content should be placed inside the 'Slide 9x16' composition after the rig is built."
+  ]
+}

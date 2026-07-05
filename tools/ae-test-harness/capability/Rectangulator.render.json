@@ -1,0 +1,399 @@
+{
+  "name": "Rectangulator",
+  "screenshot": null,
+  "uiTreePath": null,
+  "expressionCurves": [
+    {
+      "target": "Contents/Parametric Rectangle/ADBE Vector Shape - Group/ADBE Vector Shape",
+      "xLabel": "Rectangle Width (px)",
+      "yLabel": "Top-left vertex x = −width/2 (px)",
+      "samples": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 25,
+          "y": -12.5
+        },
+        {
+          "x": 50,
+          "y": -25
+        },
+        {
+          "x": 75,
+          "y": -37.5
+        },
+        {
+          "x": 100,
+          "y": -50
+        },
+        {
+          "x": 125,
+          "y": -62.5
+        },
+        {
+          "x": 150,
+          "y": -75
+        },
+        {
+          "x": 175,
+          "y": -87.5
+        },
+        {
+          "x": 200,
+          "y": -100
+        },
+        {
+          "x": 225,
+          "y": -112.5
+        },
+        {
+          "x": 250,
+          "y": -125
+        },
+        {
+          "x": 275,
+          "y": -137.5
+        },
+        {
+          "x": 300,
+          "y": -150
+        },
+        {
+          "x": 325,
+          "y": -162.5
+        },
+        {
+          "x": 350,
+          "y": -175
+        },
+        {
+          "x": 375,
+          "y": -187.5
+        },
+        {
+          "x": 400,
+          "y": -200
+        },
+        {
+          "x": 425,
+          "y": -212.5
+        },
+        {
+          "x": 450,
+          "y": -225
+        },
+        {
+          "x": 475,
+          "y": -237.5
+        },
+        {
+          "x": 500,
+          "y": -250
+        },
+        {
+          "x": 525,
+          "y": -262.5
+        },
+        {
+          "x": 550,
+          "y": -275
+        },
+        {
+          "x": 575,
+          "y": -287.5
+        },
+        {
+          "x": 600,
+          "y": -300
+        },
+        {
+          "x": 625,
+          "y": -312.5
+        },
+        {
+          "x": 650,
+          "y": -325
+        },
+        {
+          "x": 675,
+          "y": -337.5
+        },
+        {
+          "x": 700,
+          "y": -350
+        },
+        {
+          "x": 725,
+          "y": -362.5
+        },
+        {
+          "x": 750,
+          "y": -375
+        },
+        {
+          "x": 775,
+          "y": -387.5
+        },
+        {
+          "x": 800,
+          "y": -400
+        },
+        {
+          "x": 825,
+          "y": -412.5
+        },
+        {
+          "x": 850,
+          "y": -425
+        },
+        {
+          "x": 875,
+          "y": -437.5
+        },
+        {
+          "x": 900,
+          "y": -450
+        },
+        {
+          "x": 925,
+          "y": -462.5
+        },
+        {
+          "x": 950,
+          "y": -475
+        },
+        {
+          "x": 975,
+          "y": -487.5
+        },
+        {
+          "x": 1000,
+          "y": -500
+        }
+      ]
+    },
+    {
+      "target": "Contents/Parametric Rectangle/ADBE Vector Transform Group/ADBE Vector Anchor Point",
+      "xLabel": "Anchor Point menu value (1–9)",
+      "yLabel": "Anchor offset x (px)  [width=200, height=100]",
+      "samples": [
+        {
+          "x": 1,
+          "y": -100
+        },
+        {
+          "x": 2,
+          "y": 0
+        },
+        {
+          "x": 3,
+          "y": 100
+        },
+        {
+          "x": 4,
+          "y": -100
+        },
+        {
+          "x": 5,
+          "y": 0
+        },
+        {
+          "x": 6,
+          "y": 100
+        },
+        {
+          "x": 7,
+          "y": -100
+        },
+        {
+          "x": 8,
+          "y": 0
+        },
+        {
+          "x": 9,
+          "y": 100
+        }
+      ]
+    },
+    {
+      "target": "Contents/Parametric Rectangle/ADBE Vector Transform Group/ADBE Vector Position",
+      "xLabel": "Rectangle Width (px)",
+      "yLabel": "Position x compensation (px)  [anchor=Center, start pos=(0,0)]",
+      "samples": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 25,
+          "y": -12.5
+        },
+        {
+          "x": 50,
+          "y": -25
+        },
+        {
+          "x": 75,
+          "y": -37.5
+        },
+        {
+          "x": 100,
+          "y": -50
+        },
+        {
+          "x": 125,
+          "y": -62.5
+        },
+        {
+          "x": 150,
+          "y": -75
+        },
+        {
+          "x": 175,
+          "y": -87.5
+        },
+        {
+          "x": 200,
+          "y": -100
+        },
+        {
+          "x": 225,
+          "y": -112.5
+        },
+        {
+          "x": 250,
+          "y": -125
+        },
+        {
+          "x": 275,
+          "y": -137.5
+        },
+        {
+          "x": 300,
+          "y": -150
+        },
+        {
+          "x": 325,
+          "y": -162.5
+        },
+        {
+          "x": 350,
+          "y": -175
+        },
+        {
+          "x": 375,
+          "y": -187.5
+        },
+        {
+          "x": 400,
+          "y": -200
+        },
+        {
+          "x": 425,
+          "y": -212.5
+        },
+        {
+          "x": 450,
+          "y": -225
+        },
+        {
+          "x": 475,
+          "y": -237.5
+        },
+        {
+          "x": 500,
+          "y": -250
+        },
+        {
+          "x": 525,
+          "y": -262.5
+        },
+        {
+          "x": 550,
+          "y": -275
+        },
+        {
+          "x": 575,
+          "y": -287.5
+        },
+        {
+          "x": 600,
+          "y": -300
+        },
+        {
+          "x": 625,
+          "y": -312.5
+        },
+        {
+          "x": 650,
+          "y": -325
+        },
+        {
+          "x": 675,
+          "y": -337.5
+        },
+        {
+          "x": 700,
+          "y": -350
+        },
+        {
+          "x": 725,
+          "y": -362.5
+        },
+        {
+          "x": 750,
+          "y": -375
+        },
+        {
+          "x": 775,
+          "y": -387.5
+        },
+        {
+          "x": 800,
+          "y": -400
+        },
+        {
+          "x": 825,
+          "y": -412.5
+        },
+        {
+          "x": 850,
+          "y": -425
+        },
+        {
+          "x": 875,
+          "y": -437.5
+        },
+        {
+          "x": 900,
+          "y": -450
+        },
+        {
+          "x": 925,
+          "y": -462.5
+        },
+        {
+          "x": 950,
+          "y": -475
+        },
+        {
+          "x": 975,
+          "y": -487.5
+        },
+        {
+          "x": 1000,
+          "y": -500
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "HEADLESS script: no ScriptUI dialog; screenshot and uiTree are null.",
+    "Original AE expressions use bare (var-less) assignments that rely on sloppy-mode global scope; the expr-eval \"use strict\" sandbox causes them to throw inside the catch block, returning the fallback path. Clean adapter expressions reproduce the same output logic using explicit var declarations.",
+    "Expression[0] adapter sweeps width 0–1000 px (height=200, all corners 0%, anchor=Center); plots first bezier vertex x = −width/2, which varies linearly from 0 to −500.",
+    "Expression[1] adapter steps anchorType 1–9 (width=200, height=100); the x component of the anchor offset is −100 for left column, 0 for center column, +100 for right column.",
+    "Expression[2] adapter sweeps width 0–1000 with anchor=Center; position x compensation is −width/2 (linear from 0 to −500), keeping the rectangle visually pinned at center. The original is stateful (delta-based); this adapter shows the equivalent cumulative shift from starting position (0,0)."
+  ]
+}

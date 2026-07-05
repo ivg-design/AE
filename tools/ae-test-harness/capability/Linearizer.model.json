@@ -1,0 +1,105 @@
+{
+  "name": "Linearizer",
+  "category": "animation",
+  "ui": "DIALOG",
+  "consumes": {
+    "selection": ["layers", "keyframes", "properties", "comp"],
+    "minimum": "1 active comp + 1 target property with ≥2 keyframes + 1 driver property (1D scalar or multi-dimensional with dimension chosen)",
+    "description": "Reads the active CompItem; reads all pre-selected properties at script start for batch mode (falls back to interactive single-property selection); reads keyframe values and times from each target property; reads the driver property value and its full expression path; reads the driver layer name to locate the checkbox effect; reads the driver property dimension when multi-dimensional."
+  },
+  "controls": [
+    {
+      "name": "Select Target Property",
+      "type": "button",
+      "role": "captures the currently selected property as the target (interactive mode only; skipped when properties are pre-selected at launch)",
+      "default": null
+    },
+    {
+      "name": "Select Driver Property",
+      "type": "button",
+      "role": "captures the currently selected property as the driver; for 2D/3D/4D properties opens a dimension-picker dialog",
+      "default": null
+    },
+    {
+      "name": "Min Value",
+      "type": "text",
+      "role": "sets the minimum driver value that maps to the first target keyframe",
+      "default": "Min Value",
+      "range": [-1000000, 1000000]
+    },
+    {
+      "name": "Max Value",
+      "type": "text",
+      "role": "sets the maximum driver value that maps to the last target keyframe",
+      "default": "Max Value",
+      "range": [-1000000, 1000000]
+    },
+    {
+      "name": "Apply Linear Expression",
+      "type": "button",
+      "role": "validates inputs then writes the linear expression onto every target property and closes the palette",
+      "default": null
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "closes the palette without applying any expression",
+      "default": null
+    }
+  ],
+  "functions": [
+    "guard: alerts and exits when no active composition is present",
+    "guard: alerts and exits when any pre-selected property has fewer than 2 keyframes",
+    "capture target properties from pre-selected comp properties (batch mode) or from interactive button click (single mode)",
+    "capture driver property from selected comp property; for multi-dimensional drivers prompt the user to pick a dimension (X/Y/Z/W)",
+    "determine property dimensionality (1D/2D/3D) by probing test expressions with zero side-effect restore",
+    "traverse property hierarchy to build the fully-qualified AE expression path for the driver property",
+    "traverse property hierarchy to find the parent group name for naming the checkbox controller",
+    "add an ADBE Checkbox Control effect to the driver layer and name it 'Uniform Interpolation || <target description>'",
+    "capture all keyframe values and times from each target property",
+    "compute relative keyframe time fractions for proportional segment distribution",
+    "generate a 1D linear expression using mapSliderToValue (scalar lerp with clamping)",
+    "generate a 2D linear expression using mapSliderToValue2D (per-component lerp with clamping)",
+    "generate a 3D linear expression using mapSliderToValue3D (per-component lerp with clamping)",
+    "generate a shape-path (SHAPE) expression using linearArrayInterpolation (per-vertex/tangent lerp)",
+    "write the generated expression string onto each target property",
+    "wrap all mutations in a single undo group named 'Linearizer'"
+  ],
+  "scriptSim": {
+    "scenario": "success – 1D opacity linked to slider driver",
+    "inputs": "Active comp 'Main Comp' (1920×1080, 24fps, 10s); driver layer 'Driver Null' with a Slider Control effect (value 50); target layer 'Target Shape' with Opacity keyed at t=0→0%, t=2→50%, t=4→100%; Opacity pre-selected (batch mode); user selects driver Slider, enters Min=0 Max=100, clicks Apply",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Linearizer" },
+      { "kind": "setValue", "target": "Driver Null/Effects/Uniform Interpolation ||Target Shape>Transform>Opacity", "value": "Uniform Interpolation ||Target Shape>Transform>Opacity" },
+      { "kind": "setExpression", "target": "Target Shape/Transform/Opacity" },
+      { "kind": "endUndoGroup", "target": "Linearizer" }
+    ]
+  },
+  "expressions": [
+    {
+      "target": "Target Shape/Transform/Opacity",
+      "controlBinding": {
+        "control": "Min Value / Max Value",
+        "param": "Slider",
+        "range": [0, 100]
+      },
+      "expression": "function linearExpression(value, inputMin, inputMax, outputMin, outputMax) {\n  var normalizedValue = (value - inputMin) / (inputMax - inputMin);\n  var outputValue = outputMin + normalizedValue * (outputMax - outputMin);\n  return Math.max(Math.min(outputValue, Math.max(outputMin, outputMax)), Math.min(outputMin, outputMax));\n}\n\nvar controllingValue = thisComp.layer(\"Driver Null\")(\"Effects\")(\"Slider Control\")(\"Slider\").value;\nvar minVal = 0;\nvar maxVal = 100;\nif (controllingValue < minVal) controllingValue = minVal;\nif (controllingValue > maxVal) controllingValue = maxVal;\nvar segments = [[[0],[50]],[[50],[100]]];\nvar relativeTimes = [0,0.5,1];\nvar evenInterpolation = thisComp.layer('Driver Null')('Effects')('Uniform Interpolation ||Target Shape>Transform>Opacity')('Checkbox').value;\nfunction mapSliderToValue(controllingValue, segments, minVal, maxVal, relativeTimes, evenInterpolation) {\n  var numSegments = segments.length;\n  var mappedValue;\n  for (var i = 0; i < numSegments; i++) {\n    var segmentStart, segmentEnd, valueStart, valueEnd;\n    if (evenInterpolation) {\n      segmentStart = minVal + i * (maxVal - minVal) / numSegments;\n      segmentEnd = minVal + (i + 1) * (maxVal - minVal) / numSegments;\n      valueStart = segments[i][0][0];\n      valueEnd = segments[i][1][0];\n    } else {\n      segmentStart = minVal + relativeTimes[i] * (maxVal - minVal);\n      segmentEnd = minVal + relativeTimes[i + 1] * (maxVal - minVal);\n      valueStart = segments[i][0][0];\n      valueEnd = segments[i][1][0];\n    }\n    if (segmentStart === segmentEnd) {\n      segmentEnd += 0.0001;\n    }\n    if (controllingValue >= segmentStart && controllingValue <= segmentEnd) {\n      mappedValue = linearExpression(controllingValue, segmentStart, segmentEnd, valueStart, valueEnd);\n      break;\n    }\n  }\n  if (controllingValue < minVal) {\n    mappedValue = segments[0][0][0];\n  }\n  if (controllingValue > maxVal) {\n    mappedValue = segments[numSegments - 1][1][0];\n  }\n  return mappedValue;\n}\n\nvar mappedValue = mapSliderToValue(controllingValue, segments, minVal, maxVal, relativeTimes, evenInterpolation);\nvalue = mappedValue;",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps the Slider Control value from 0 to 100 (minVal→maxVal); output is the linearly interpolated Opacity value (0%→50%→100%) using the 3-keyframe piecewise mapping with relative time distribution (t=0→t=2→t=4 maps to segments [0,50] and [50,100])."
+      }
+    }
+  ],
+  "notes": [
+    "UI mode is declared DIALOG in @ui frontmatter but the live window is created with Window('palette') — the harness treats it as DIALOG per frontmatter.",
+    "Batch mode activates automatically when properties are pre-selected at script launch; single interactive mode is used otherwise.",
+    "The checkbox controller (ADBE Checkbox Control) is added to the driver layer and controls even-vs-relative interpolation from inside the generated expression.",
+    "Hold keyframes are not supported and will silently produce incorrect results.",
+    "3D/4D target properties are rejected with an alert at target-select time.",
+    "For multi-dimensional driver properties a secondary sub-dialog (Window 'dialog') prompts for X/Y/Z/W dimension selection; this sub-dialog is not exposed as a top-level control here.",
+    "Expressions are generated as ECMA 3-compatible strings using a custom serializeForExpression serializer (no JSON.stringify).",
+    "Shape path (SHAPE) targets produce a different expression body using linearArrayInterpolation over vertex/tangent arrays; the fixture success scenario covers the 1D (Opacity) case only."
+  ]
+}

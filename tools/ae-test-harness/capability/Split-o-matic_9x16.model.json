@@ -1,0 +1,180 @@
+{
+  "name": "Split-o-matic_9x16",
+  "category": "composition",
+  "ui": "HEADLESS",
+
+  "consumes": {
+    "selection": ["comp"],
+    "minimum": "1 active CompItem selected in the project panel",
+    "description": "Reads app.project.activeItem and casts it to CompItem. Uses the comp as the target for all layer additions. Also searches app.project.rootFolder for an existing '9x16 Template' folder item. Calls prompt() once (via getPrefix()) to collect an optional naming prefix for all generated layers."
+  },
+
+  "controls": [],
+
+  "functions": [
+    "validate that an active CompItem is selected (alerts and aborts otherwise)",
+    "prompt user once for an optional layer-name prefix",
+    "create or find a '9x16 Template' folder in the project root",
+    "add 10 shape layers to the active comp: S- PiP Content PSR, S- PiP MASK PSR, S- Top PSR, S- Bottom PSR, S- PiP Mask, S- PiP Mask Shadow, S- Mask Bottom, S- Mask Top, S- Z < Bottom PSR >, S- Z < Top PSR >, S- Z < PiP MASK PSR >",
+    "stamp Duik Controller/Zero MarkerValues onto guide layers at time 0",
+    "add Slider, Color, and Angle effect controls to S- PiP MASK PSR for mask size and PiP shadow parameters",
+    "configure shape geometry (rectangles, ellipses, custom bezier paths) and fills on each layer",
+    "wire parent-child relationships via setParentWithJump for PSR → Zero controllers and Mask layers → PSR",
+    "apply AE expressions to S- PiP Mask and S- PiP Mask Shadow rectangle size, transform, and Drop Shadow properties, binding them to sliders on S- PiP MASK PSR",
+    "rename all generated layers using the prefix collected from prompt, then call app.project.autoFixExpressions to update references",
+    "lock helper/Zero-point layers after setup",
+    "open the composition in the viewer"
+  ],
+
+  "scriptSim": {
+    "scenario": "success — builds split-screen rig with empty prefix",
+    "inputs": "Active comp 'Main 9x16' (1080×1920, 30 s, 60 fps); no pre-existing layers; prompt returns empty string for prefix",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Split-o-matic 9x16" },
+      { "kind": "prompt", "target": "prefix", "value": "" },
+      { "kind": "createLayer", "target": "S- PiP Content PSR" },
+      { "kind": "createLayer", "target": "S- PiP MASK PSR" },
+      { "kind": "createLayer", "target": "S- Top PSR" },
+      { "kind": "createLayer", "target": "S- Bottom PSR" },
+      { "kind": "createLayer", "target": "S- PiP Mask" },
+      { "kind": "createLayer", "target": "S- PiP Mask Shadow" },
+      { "kind": "createLayer", "target": "S- Mask Bottom" },
+      { "kind": "createLayer", "target": "S- Mask Top" },
+      { "kind": "createLayer", "target": "S- Z < Bottom PSR >" },
+      { "kind": "createLayer", "target": "S- Z < Top PSR >" },
+      { "kind": "setValueAtTime", "target": "ADBE Marker", "value": 0 },
+      { "kind": "addKeyframe", "target": "ADBE Marker" },
+      { "kind": "setValue", "target": "S- PiP MASK PSR / ADBE Effect Parade / Mask Size X / ADBE Slider Control-0001", "value": 466 },
+      { "kind": "setValue", "target": "S- PiP MASK PSR / ADBE Effect Parade / Mask Size Y / ADBE Slider Control-0001", "value": 413 },
+      { "kind": "setValue", "target": "S- PiP MASK PSR / ADBE Effect Parade / PiP Shadow Distance / ADBE Slider Control-0001", "value": 22 },
+      { "kind": "setParent", "target": "S- PiP Content PSR → S- PiP MASK PSR" },
+      { "kind": "setParent", "target": "S- PiP MASK PSR → S- Z < PiP MASK PSR >" },
+      { "kind": "setParent", "target": "S- Top PSR → S- Z < Top PSR >" },
+      { "kind": "setParent", "target": "S- Bottom PSR → S- Z < Bottom PSR >" },
+      { "kind": "setParent", "target": "S- PiP Mask → S- PiP MASK PSR" },
+      { "kind": "setParent", "target": "S- PiP Mask Shadow → S- PiP MASK PSR" },
+      { "kind": "setExpression", "target": "S- PiP Mask Shadow / ADBE Root Vectors Group/1/2/1/ADBE Vector Rect Size" },
+      { "kind": "setExpression", "target": "S- PiP Mask Shadow / ADBE Effect Parade/1/ADBE Drop Shadow-0001" },
+      { "kind": "setExpression", "target": "S- PiP Mask / ADBE Root Vectors Group/1/2/1/ADBE Vector Rect Size" },
+      { "kind": "setExpression", "target": "S- PiP Mask / ADBE Transform Group/ADBE Position" },
+      { "kind": "setExpression", "target": "S- PiP Mask Shadow / ADBE Transform Group/ADBE Position" },
+      { "kind": "endUndoGroup", "target": "Split-o-matic 9x16" }
+    ]
+  },
+
+  "expressions": [
+    {
+      "target": "S- PiP Mask Shadow / ADBE Root Vectors Group/Rectangle 1/2/Rectangle Path 1/ADBE Vector Rect Size",
+      "controlBinding": {
+        "control": "Mask Size X",
+        "param": "Slider",
+        "range": [0, 1000]
+      },
+      "expression": "x = thisComp.layer(\"S- PiP MASK PSR\").effect(\"Mask Size X\")(\"Slider\");\ry = thisComp.layer(\"S- PiP MASK PSR\").effect(\"Mask Size Y\")(\"Slider\");\r[x,y]",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 1000],
+        "steps": 41,
+        "note": "Sweeps Mask Size X slider from 0 to 1000; output is [controlValue, 413] (Mask Size Y held at default 413). Curve shows linear width scaling of the PiP mask rectangle."
+      }
+    },
+    {
+      "target": "S- PiP Mask / ADBE Root Vectors Group/Rectangle 1/2/Rectangle Path 1/ADBE Vector Rect Size",
+      "controlBinding": {
+        "control": "Mask Size X",
+        "param": "Slider",
+        "range": [0, 1000]
+      },
+      "expression": "x = thisComp.layer(\"S- PiP MASK PSR\").effect(\"Mask Size X\")(\"Slider\");\ry = thisComp.layer(\"S- PiP MASK PSR\").effect(\"Mask Size Y\")(\"Slider\");\r[x,y]",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 1000],
+        "steps": 41,
+        "note": "Same rect-size expression applied to the non-shadow PiP mask layer. Sweeps Mask Size X; output is [controlValue, 413]."
+      }
+    },
+    {
+      "target": "S- PiP Mask Shadow / ADBE Effect Parade/Drop Shadow/ADBE Drop Shadow-0001",
+      "controlBinding": null,
+      "expression": "thisComp.layer(\"S- PiP MASK PSR\").effect(\"PiP Shadow Color\")(\"Color\")",
+      "sim": {
+        "variable": "time",
+        "range": [0, 10],
+        "steps": 40,
+        "note": "Color pass-through from PiP Shadow Color control — value is constant over time unless animated upstream; sweep over time documents that the output is static."
+      }
+    },
+    {
+      "target": "S- PiP Mask Shadow / ADBE Effect Parade/Drop Shadow/ADBE Drop Shadow-0002",
+      "controlBinding": {
+        "control": "PiP Shadow Opacity",
+        "param": "Slider",
+        "range": [0, 100]
+      },
+      "expression": "thisComp.layer(\"S- PiP MASK PSR\").effect(\"PiP Shadow Opacity\")(\"Slider\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps PiP Shadow Opacity slider 0–100; output equals the slider value (1:1 linear)."
+      }
+    },
+    {
+      "target": "S- PiP Mask Shadow / ADBE Effect Parade/Drop Shadow/ADBE Drop Shadow-0003",
+      "controlBinding": {
+        "control": "Pip Shadow Angle",
+        "param": "Angle",
+        "range": [0, 360]
+      },
+      "expression": "thisComp.layer(\"S- PiP MASK PSR\").effect(\"Pip Shadow Angle\")(\"Angle\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 360],
+        "steps": 41,
+        "note": "Sweeps Pip Shadow Angle 0–360 degrees; output equals the angle value (1:1 pass-through)."
+      }
+    },
+    {
+      "target": "S- PiP Mask Shadow / ADBE Effect Parade/Drop Shadow/ADBE Drop Shadow-0004",
+      "controlBinding": {
+        "control": "PiP Shadow Distance",
+        "param": "Slider",
+        "range": [0, 200]
+      },
+      "expression": "thisComp.layer(\"S- PiP MASK PSR\").effect(\"PiP Shadow Distance\")(\"Slider\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 200],
+        "steps": 41,
+        "note": "Sweeps PiP Shadow Distance slider 0–200; output equals slider value (1:1 linear)."
+      }
+    },
+    {
+      "target": "S- PiP Mask Shadow / ADBE Effect Parade/Drop Shadow/ADBE Drop Shadow-0005",
+      "controlBinding": {
+        "control": "PiP Shadow Softness",
+        "param": "Slider",
+        "range": [0, 100]
+      },
+      "expression": "thisComp.layer(\"S- PiP MASK PSR\").effect(\"PiP Shadow Softness\")(\"Slider\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps PiP Shadow Softness slider 0–100; output equals slider value (1:1 linear)."
+      }
+    }
+  ],
+
+  "notes": [
+    "HEADLESS script — no ScriptUI dialog; runs entirely via app.beginUndoGroup/endUndoGroup.",
+    "prompt() is called exactly once (via getPrefix()) to collect a layer-name prefix; if cancelled or left empty the prefix is an empty string and layer names use their default 'S- …' identifiers.",
+    "Layer-name renaming is deferred: layers are first created with 'name:…' prefixes, then batch-renamed at the end via app.project.autoFixExpressions to keep expression references consistent.",
+    "All expression references use the literal layer name 'name:S- PiP MASK PSR'; after autoFixExpressions runs these are updated to the final prefixed name.",
+    "S- PiP Mask Shadow and S- PiP Mask are initially created then locked after expressions are applied.",
+    "Several layers (S- Mask Bottom, S- Mask Top, S- PiP Mask Shadow, S- Z < …>) are created in disabled state (enabled = false) as template infrastructure.",
+    "The script depends on AE-runtime-only constructors: MarkerValue, Shape, CompItem, FolderItem — cannot be replicated in a pure-JS harness without mocks.",
+    "Effect controls (Mask Size X/Y, PiP Shadow Opacity/Distance/Softness/Color, Pip Shadow Angle) live on the S- PiP MASK PSR shape layer as AE effect instances, not ScriptUI widgets.",
+    "setParentWithJump is used (preserves world position) rather than plain setParent."
+  ]
+}

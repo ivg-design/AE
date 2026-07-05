@@ -1,0 +1,168 @@
+{
+  "name": "Sync-o-tron",
+  "category": "effects",
+  "ui": "PALETTE",
+
+  "consumes": {
+    "selection": ["layers", "properties", "comp"],
+    "minimum": "1 active comp + 1 selected layer + 1 selected property + 1 comp whose name contains 'AUDIO REACTOR' in the project",
+    "description": "Reads app.project.activeItem (must be a CompItem), comp.selectedLayers[0], layer.selectedProperties to identify the property type and address, and iterates app.project items to find any CompItem whose name contains 'AUDIO REACTOR' for the dropdown."
+  },
+
+  "controls": [
+    {
+      "name": "Pick Reactor",
+      "type": "static",
+      "role": "labels the Audio Reactor dropdown",
+      "default": "Pick Reactor:"
+    },
+    {
+      "name": "dropdown",
+      "type": "dropdown",
+      "role": "selects the target AUDIO REACTOR composition from the project",
+      "default": null,
+      "options": ["AUDIO REACTOR - Kick", "AUDIO REACTOR - Bass", "AUDIO REACTOR - Snare"]
+    },
+    {
+      "name": "tuneSyncButton",
+      "type": "button",
+      "role": "triggers the TuneSync operation — adds effect controls and writes expression to the selected property",
+      "default": null
+    },
+    {
+      "name": "refreshButton",
+      "type": "button",
+      "role": "repopulates the dropdown with current AUDIO REACTOR compositions from the project",
+      "default": null
+    },
+    {
+      "name": "X checkbox (XY dialog)",
+      "type": "checkbox",
+      "role": "enables audio-reactive mapping on the X axis for 2D properties",
+      "default": false
+    },
+    {
+      "name": "Y checkbox (XY dialog)",
+      "type": "checkbox",
+      "role": "enables audio-reactive mapping on the Y axis for 2D properties",
+      "default": false
+    },
+    {
+      "name": "Unify Properties checkbox (XY dialog)",
+      "type": "checkbox",
+      "role": "when checked, applies a single Min/Max Output slider pair to both X and Y axes",
+      "default": false
+    },
+    {
+      "name": "X checkbox (XYZ dialog)",
+      "type": "checkbox",
+      "role": "enables audio-reactive mapping on the X axis for 3D properties",
+      "default": false
+    },
+    {
+      "name": "Y checkbox (XYZ dialog)",
+      "type": "checkbox",
+      "role": "enables audio-reactive mapping on the Y axis for 3D properties",
+      "default": false
+    },
+    {
+      "name": "Z checkbox (XYZ dialog)",
+      "type": "checkbox",
+      "role": "enables audio-reactive mapping on the Z axis for 3D properties",
+      "default": false
+    },
+    {
+      "name": "Unify Properties checkbox (XYZ dialog)",
+      "type": "checkbox",
+      "role": "when checked, applies a single Min/Max Output slider pair to all three axes",
+      "default": false
+    }
+  ],
+
+  "functions": [
+    "populate dropdown with all AUDIO REACTOR compositions found in the project",
+    "refresh the dropdown on demand",
+    "detect whether the selected AE property is 1D, 2D, 3D, or Color (4D)",
+    "add an ADBE Dropdown Control effect (renamed '<propName>_Easing Type') to the selected layer",
+    "add ADBE Slider Control effects for Min Output / Max Output (per-axis or unified) to the selected layer",
+    "add ADBE Color Control effects for Start Color and End Color when syncing a Color property",
+    "build and apply an AE expression that maps Audio Reactor output power to the target property value using linear, easeIn, easeOut, or ease interpolation",
+    "wrap all mutations in a single undo group named 'Create Controls'",
+    "guard against missing active composition, missing selected layer, and missing selected property"
+  ],
+
+  "scriptSim": {
+    "scenario": "success — sync 1D property (Opacity) to audio reactor",
+    "inputs": "Active comp 'Main Comp' with 'Shape Layer 1' selected; Opacity property selected; project contains 'AUDIO REACTOR - Kick' comp; dropdown shows 'AUDIO REACTOR - Kick'",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "app", "value": "Create Controls" },
+      { "kind": "setValue",       "target": "Shape Layer 1/Effects/Opacity_Easing Type" },
+      { "kind": "setValue",       "target": "Shape Layer 1/Effects/Opacity_Min Output" },
+      { "kind": "setValue",       "target": "Shape Layer 1/Effects/Opacity_Max Output" },
+      { "kind": "setExpression",  "target": "Shape Layer 1/Transform/Opacity" },
+      { "kind": "endUndoGroup",   "target": "app" }
+    ]
+  },
+
+  "expressions": [
+    {
+      "target": "Shape Layer 1/Transform/Opacity",
+      "controlBinding": {
+        "control": "dropdown",
+        "param": "Slider",
+        "range": [0, 100]
+      },
+      "expression": "d = comp(\"AUDIO REACTOR - Kick\").layer(\"Select Frequency\").effect(\"Audio Reactor\")(\"Output Power\");\niMin = 0;\niMax = 100;\nctrlLayer = thisLayer;\neaseType = ctrlLayer.effect(\"Opacity_Easing Type\")(\"Menu\").value;\noutMin = ctrlLayer.effect(\"Opacity_Min Output\")(\"Slider\");\noutMax = ctrlLayer.effect(\"Opacity_Max Output\")(\"Slider\");\nif (easeType == 1) linear(d, iMin, iMax, outMin, outMax);\nelse if (easeType == 2) easeIn(d, iMin, iMax, outMin, outMax);\nelse if (easeType == 3) easeOut(d, iMin, iMax, outMin, outMax);\nelse ease(d, iMin, iMax, outMin, outMax);",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps the Audio Reactor Output Power (d) from 0 to 100; with outMin=0 and outMax=100 and easeType=1 (linear), the result maps directly to the Opacity value in the same range."
+      }
+    },
+    {
+      "target": "<layer>/Effects/<propName>_Easing Type (2D unified — Position)",
+      "controlBinding": null,
+      "expression": "d = comp(\"AUDIO REACTOR - Kick\").layer(\"Select Frequency\").effect(\"Audio Reactor\")(\"Output Power\");\niMin = 0;\niMax = 100;\noriginalValue = value;\nctrlLayer = thisLayer;\neaseType = ctrlLayer.effect(\"Position_Easing Type\")(\"Menu\").value;\noutMin = ctrlLayer.effect(\"Position_Min Output\")(\"Slider\");\noutMax = ctrlLayer.effect(\"Position_Max Output\")(\"Slider\");\nxResult = yResult = (easeType == 1 ? linear(d, iMin, iMax, outMin, outMax) : (easeType == 2 ? easeIn(d, iMin, iMax, outMin, outMax) : (easeType == 3 ? easeOut(d, iMin, iMax, outMin, outMax) : ease(d, iMin, iMax, outMin, outMax))));\n[xResult, yResult];",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps Audio Reactor Output Power (d) from 0 to 100 with the unified 2D path (isUnified=true); both xResult and yResult follow the same eased curve. outMin=0, outMax=500 represents a representative position range."
+      }
+    },
+    {
+      "target": "<layer>/<3D property> (3D unified — 3D Position)",
+      "controlBinding": null,
+      "expression": "var d = comp(\"AUDIO REACTOR - Kick\").layer(\"Select Frequency\").effect(\"Audio Reactor\")(\"Output Power\");\nvar iMin = 0;\nvar iMax = 100;\nvar ctrlLayer = thisLayer;\nvar easeType = ctrlLayer.effect(\"Position_Easing Type\")(\"Menu\").value;\nvar outMin = ctrlLayer.effect(\"Position_Min Output\")(\"Slider\");\nvar outMax = ctrlLayer.effect(\"Position_Max Output\")(\"Slider\");\nvar x = value[0];\nvar y = value[1];\nvar z = value[2];\nif (easeType == 1) x = ease(d, iMin, iMax, outMin, outMax);\nelse if (easeType == 2) x = easeIn(d, iMin, iMax, outMin, outMax);\nelse if (easeType == 3) x = easeOut(d, iMin, iMax, outMin, outMax);\nelse x = easeInOut(d, iMin, iMax, outMin, outMax);\nif (easeType == 1) y = ease(d, iMin, iMax, outMin, outMax);\nelse if (easeType == 2) y = easeIn(d, iMin, iMax, outMin, outMax);\nelse if (easeType == 3) y = easeOut(d, iMin, iMax, outMin, outMax);\nelse y = easeInOut(d, iMin, iMax, outMin, outMax);\n[x, y, z];",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps Audio Reactor Output Power (d) from 0 to 100 with the unified 3D path (xSelected=true, ySelected=true, zSelected=false, isUnified=true); x and y follow the eased curve while z holds its original value."
+      }
+    },
+    {
+      "target": "<layer>/<Color property>",
+      "controlBinding": null,
+      "expression": "d = comp(\"AUDIO REACTOR - Kick\").layer(\"Select Frequency\").effect(\"Audio Reactor\")(\"Output Power\");\niMin = 0;\niMax = 100;\nctrlLayer = thisLayer;\neaseType = ctrlLayer.effect(\"Fill_Color_Easing Type\")(\"Menu\").value;\nstartColor = ctrlLayer.effect(\"Fill_Color_Start\")(\"Color\");\nendColor = ctrlLayer.effect(\"Fill_Color_End\")(\"Color\");\nif (easeType == 1) linear(d, iMin, iMax, startColor, endColor);\nelse if (easeType == 2) easeIn(d, iMin, iMax, startColor, endColor);\nelse if (easeType == 3) easeOut(d, iMin, iMax, startColor, endColor);\nelse ease(d, iMin, iMax, startColor, endColor);",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps Audio Reactor Output Power (d) from 0 to 100; with easeType=1 (linear), interpolates between startColor [0,1,0,1] (green) and endColor [0,0,1,1] (blue) — propName resolved from a Fill effect's Color property (parentName='Fill', propName='Color')."
+      }
+    }
+  ],
+
+  "notes": [
+    "The script runs as a dockable palette (thisObj pattern); it can be run as a floating window or docked into the AE UI.",
+    "The Audio Reactor template composition must already exist in the project and contain a layer named exactly 'Select Frequency' that has an effect named 'Audio Reactor' with an 'Output Power' output.",
+    "For 1D properties the script uses findPropertyByAddress() (regex-based address string parsing) to locate the target property; for 2D Color and 3D properties it uses findPropertyByMatchName().",
+    "PropQuery detects the property type by temporarily setting test expressions on the property and checking expressionError; it restores the original expression afterward.",
+    "Names containing 'Vertex' are automatically renamed to 'Property-Vert' in the generated effect control names to avoid AE pseudo-effect conflicts.",
+    "The 2D dialog (XYUnifyDialog) exposes X / Y / Unify checkboxes; without any check the script still creates per-axis X and Y sliders (both unselected = treat as independent).",
+    "The 3D expression uses easeInOut as the fallback (easeType else branch) while the 1D and 2D expressions use ease — these are different AE functions.",
+    "All three slider/dropdown effects are added to layer.Effects (the effect-parade), not to the actual target property."
+  ]
+}

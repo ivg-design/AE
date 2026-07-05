@@ -1,0 +1,55 @@
+{
+  "name": "Onionizer",
+  "category": "utilities",
+  "ui": "HEADLESS",
+
+  "consumes": {
+    "selection": ["layers", "properties", "comp"],
+    "minimum": "1 active composition + 1 selected shape layer",
+    "description": "Reads app.project.activeItem (must be a CompItem), comp.selectedLayers (at least one layer required), and each layer's selectedProperties. Uses PropQuery.main() to extract property paths and property objects for selected non-group properties. The active comp is also duplicated to form the CelSkin comp."
+  },
+
+  "controls": [],
+
+  "functions": [
+    "guard: alert and return when no active composition is present",
+    "guard: alert and return when no layers are selected",
+    "analyse selected layers and their selected properties via PropQuery to build a property-info array",
+    "duplicate the active composition and rename the duplicate to 'CelSkin'",
+    "navigate parentProperty chain on each selected property to retarget the CelSkin duplicate",
+    "add a controller null layer named 'Onionizer' to the original composition",
+    "add seven pre-comp instances of CelSkin to the original composition, named CelSkin_1 through CelSkin_7",
+    "enable time remapping on each of the seven CelSkin layers",
+    "apply ADBE Stroke effect to each CelSkin layer",
+    "apply ADBE Fill effect to each CelSkin layer",
+    "wrap all mutations in a named undo group"
+  ],
+
+  "scriptSim": {
+    "scenario": "success – single shape layer creates CelSkin + 7 instances + controller null",
+    "inputs": "Active comp 'Walk Cycle' (1920×1080, 24 fps, 2 s) containing one selected Shape layer 'Body Shape' with its Transform/Position property selected.",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Onionizer: The Onionizer for Shape Layers" },
+      { "kind": "createLayer",    "target": "Onionizer",  "value": "null layer (controller)" },
+      { "kind": "createLayer",    "target": "CelSkin_1",  "value": "precomp from CelSkin duplicate" },
+      { "kind": "createLayer",    "target": "CelSkin_2",  "value": "precomp from CelSkin duplicate" },
+      { "kind": "createLayer",    "target": "CelSkin_3",  "value": "precomp from CelSkin duplicate" },
+      { "kind": "createLayer",    "target": "CelSkin_4",  "value": "precomp from CelSkin duplicate" },
+      { "kind": "createLayer",    "target": "CelSkin_5",  "value": "precomp from CelSkin duplicate" },
+      { "kind": "createLayer",    "target": "CelSkin_6",  "value": "precomp from CelSkin duplicate" },
+      { "kind": "createLayer",    "target": "CelSkin_7",  "value": "precomp from CelSkin duplicate" },
+      { "kind": "endUndoGroup",   "target": "Onionizer: The Onionizer for Shape Layers" }
+    ]
+  },
+
+  "expressions": [],
+
+  "notes": [
+    "Script is marked KNOWN-BLOCKED in the test harness because it //@include's 'modules/PropQuery.js' — the static include-scanner flags this and functional execution is skipped.",
+    "v2.0.1 removed the destructive placeholder expression 'expression goes here' that v2.0.0 wrote to selected properties; no expressions are written at all in the current build.",
+    "The controller null 'Onionizer' is created but no pseudo-effect parameters are added yet — this is an acknowledged prototype limitation documented in the frontmatter.",
+    "Time remapping is enabled on each CelSkin layer but time offsets are not assigned; all seven layers share the same default remap curve.",
+    "comp.duplicate() is not modelled as a harness OPERATION_KIND; the fixture documents it as context setup rather than as a captured operation.",
+    "PropQuery.main() is called with the flags ['useMatchNames'] to obtain property paths; the module must be available on the include path for real-AE execution."
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "name": "Originator",
+  "category": "paths",
+  "ui": "DIALOG",
+  "consumes": {
+    "selection": ["layers", "comp"],
+    "minimum": "1 active comp + 1 selected ShapeLayer containing at least 1 shape path with vertices",
+    "description": "Reads app.project.activeItem (CompItem), activeItem.selectedLayers[0] (ShapeLayer), then recursively traverses the layer's Contents property to extract all ADBE Vector Group and ADBE Vector Shape - Group properties and their Path sub-properties (including keyframed Shape values)."
+  },
+  "controls": [
+    {
+      "name": "Shape Path Tree",
+      "type": "listbox",
+      "role": "displays hierarchical shape path tree; user selects one or more paths or groups to center",
+      "default": null
+    },
+    {
+      "name": "Center Selected",
+      "type": "button",
+      "role": "confirms selection and triggers centering of all selected shape paths",
+      "default": null
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "closes the dialog without centering any paths",
+      "default": null
+    }
+  ],
+  "functions": [
+    "recursively traverses Shape Layer Contents to extract vector groups and shape paths",
+    "computes bounding-box centroid of each shape path from its vertex array",
+    "offsets all vertices (and preserves in/out tangents) to recenter the path to (0,0)",
+    "processes all keyframes when a path property is animated, using the first keyframe's centroid as the shared offset",
+    "auto-centers immediately when exactly one shape path is found (headless, no dialog)",
+    "displays a multi-select tree-view dialog for layers with two or more shape paths",
+    "wraps all mutations in a single undo group named 'Center Shape Path Origin'"
+  ],
+  "scriptSim": {
+    "scenario": "success – single shape path auto-centered",
+    "inputs": "Active comp 'Origin Comp' (1920×1080, 24fps); selected ShapeLayer 'Star Shape' containing Contents > Group 1 > Path 1 > Path with a square at vertices [[100,100],[200,100],[200,200],[100,200]], closed, no keyframes.",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Center Shape Path Origin" },
+      { "kind": "setValue", "target": "Star Shape/Contents/Group 1/Path 1/Path", "value": { "vertices": [[-50,-50],[50,-50],[50,50],[-50,50]], "inTangents": [[0,0],[0,0],[0,0],[0,0]], "outTangents": [[0,0],[0,0],[0,0],[0,0]], "closed": true } },
+      { "kind": "alert", "target": "The shape path has been centered." },
+      { "kind": "endUndoGroup", "target": "" }
+    ]
+  },
+  "expressions": [],
+  "notes": [
+    "The DIALOG is only shown when the selected layer contains 2 or more shape paths; single-path layers are processed headlessly.",
+    "Centroid is computed as the midpoint of the bounding box (min/max of vertices), not the geometric centroid of the polygon area.",
+    "For animated paths, all keyframes are shifted by the same offset derived from the first keyframe's bounding-box center, so relative animation is preserved.",
+    "The tree-view dialog supports multiselect; selecting a group node recursively centers all child shape paths.",
+    "Tangent handles (inTangents, outTangents) are copied unchanged — only vertex positions are shifted.",
+    "Requires Adobe After Effects CS6 or later for Shape Layer (ShapeLayer instanceof) support.",
+    "The script uses getPathFromChain() which navigates via property('Contents').property(name) at each chain level — this approach fails if a group or path name contains special characters that AE property lookup cannot resolve by name."
+  ]
+}

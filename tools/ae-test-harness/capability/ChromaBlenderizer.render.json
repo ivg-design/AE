@@ -1,0 +1,13 @@
+{
+  "name": "ChromaBlenderizer",
+  "screenshot": "dashboard/assets/ui/ChromaBlenderizer.png",
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "UI mode is PALETTE; uiTree captured from the success scenario (Apply Colors clicked with default white-to-white color gamut settings).",
+    "PNG rendered via SDB service: 412x464 px (CSS), 824x928 px at device scale factor 2, 39 SDB items.",
+    "PNG size: 47446 bytes — well above 1 KB threshold; dimensions sane.",
+    "expressions[] is empty — ChromaBlenderizer applies static setValue() calls only and writes no AE expressions; expressionCurves is therefore [].",
+    "Operations log had 7 entries: beginUndoGroup, 2x alert (property-count display on launch), setValue x2, endUndoGroup — consistent with success scenario expectations."
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "name": "Trace-o-matic",
+  "category": "paths",
+  "ui": "HEADLESS",
+  "consumes": {
+    "selection": ["layers", "masks", "comp"],
+    "minimum": "1 active comp + exactly 1 selected layer with ≥1 mask",
+    "description": "Reads the active CompItem; reads the first selected layer; reads its ADBE Mask Parade group (all masks); for each mask reads ADBE Mask Shape keyframes (path + time) and ADBE Mask Opacity keyframes (opacity value + time)."
+  },
+  "controls": [],
+  "functions": [
+    "guard: alerts and exits when no project is open",
+    "guard: alerts and exits when no active composition is present",
+    "guard: alerts and exits when the number of selected layers is not exactly 1",
+    "guard: alerts and exits when the selected layer has no masks",
+    "create a new shape layer named 'Shapes from <source layer name>' in the active comp",
+    "add an ADBE Slider Control effect named 'Fill Opacity' with default value 100",
+    "add an ADBE Color Control effect named 'Fill Color' with default RGBA [1, 0, 0, 1]",
+    "add an ADBE Slider Control effect named 'Stroke Opacity' with default value 100",
+    "add an ADBE Color Control effect named 'Stroke Color' with default RGBA [0, 0, 1, 1]",
+    "add an ADBE Slider Control effect named 'Stroke Width' with default value 5",
+    "for each mask: add a shape group named after the mask inside ADBE Root Vectors Group",
+    "for each mask: add an ADBE Vector Shape - Group (path) inside the shape group Contents",
+    "for each mask: add an ADBE Vector Graphic - Fill and wire its Color and Opacity via AE expressions to the Fill Color and Fill Opacity effect controls on the shape layer",
+    "for each mask: add an ADBE Vector Graphic - Stroke and wire its Color, Opacity, and Stroke Width via AE expressions to the corresponding stroke effect controls on the shape layer",
+    "for each mask: copy all ADBE Mask Shape keyframes (path values + times) to the shape path as HOLD keyframes",
+    "for each mask: copy all ADBE Mask Opacity keyframes (opacity values + times) to the shape group Transform Opacity as HOLD keyframes",
+    "remove consecutive shape group opacity keyframes with identical values to reduce redundancy",
+    "remove shape path keyframes at times where the group opacity is zero (invisible frames pruned)",
+    "wrap all mutations in a single undo group named 'Trace-o-matic'"
+  ],
+  "scriptSim": {
+    "scenario": "success — two masked AV layer → shape layer with effect controls and expressions",
+    "inputs": "Active comp 'Main Comp' (1920×1080, 24fps, 5s); one AV layer 'Animated Footage' selected; layer has two masks — 'Mask 1' (2 path keyframes at t=0,1; 2 opacity keyframes at t=0,1 both value 100) and 'Mask 2' (2 path keyframes at t=0,2; 2 opacity keyframes at t=0→80, t=2→0); script runs headless with no UI actions",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Trace-o-matic", "value": "Trace-o-matic" },
+      { "kind": "createLayer", "target": "Shapes from Animated Footage" },
+      { "kind": "setValue", "target": "Shapes from Animated Footage/Effects/Fill Opacity/Slider", "value": 100 },
+      { "kind": "setValue", "target": "Shapes from Animated Footage/Effects/Fill Color/Color", "value": [1, 0, 0, 1] },
+      { "kind": "setValue", "target": "Shapes from Animated Footage/Effects/Stroke Opacity/Slider", "value": 100 },
+      { "kind": "setValue", "target": "Shapes from Animated Footage/Effects/Stroke Color/Color", "value": [0, 0, 1, 1] },
+      { "kind": "setValue", "target": "Shapes from Animated Footage/Effects/Stroke Width/Slider", "value": 5 },
+      { "kind": "setExpression", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Graphic - Fill/Color" },
+      { "kind": "setExpression", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Graphic - Fill/Opacity" },
+      { "kind": "setExpression", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Graphic - Stroke/Color" },
+      { "kind": "setExpression", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Graphic - Stroke/Opacity" },
+      { "kind": "setExpression", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Graphic - Stroke/Stroke Width" },
+      { "kind": "setValueAtTime", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Shape - Group/ADBE Vector Shape" },
+      { "kind": "setValueAtTime", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Shape - Group/ADBE Vector Shape" },
+      { "kind": "setValueAtTime", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Transform/Opacity" },
+      { "kind": "setValueAtTime", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Transform/Opacity" },
+      { "kind": "setExpression", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 2/Contents/ADBE Vector Graphic - Fill/Color" },
+      { "kind": "setExpression", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 2/Contents/ADBE Vector Graphic - Fill/Opacity" },
+      { "kind": "setExpression", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 2/Contents/ADBE Vector Graphic - Stroke/Color" },
+      { "kind": "setExpression", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 2/Contents/ADBE Vector Graphic - Stroke/Opacity" },
+      { "kind": "setExpression", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 2/Contents/ADBE Vector Graphic - Stroke/Stroke Width" },
+      { "kind": "setValueAtTime", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 2/Contents/ADBE Vector Shape - Group/ADBE Vector Shape" },
+      { "kind": "setValueAtTime", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 2/Contents/ADBE Vector Shape - Group/ADBE Vector Shape" },
+      { "kind": "setValueAtTime", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 2/Transform/Opacity" },
+      { "kind": "setValueAtTime", "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 2/Transform/Opacity" },
+      { "kind": "endUndoGroup", "target": "Trace-o-matic" }
+    ]
+  },
+  "expressions": [
+    {
+      "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Graphic - Fill/Color",
+      "controlBinding": {
+        "control": "Fill Color",
+        "param": "Color",
+        "range": [0, 1]
+      },
+      "expression": "thisComp.layer(\"Shapes from Animated Footage\").effect(\"Fill Color\")(\"Color\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 1],
+        "steps": 40,
+        "note": "The expression is a direct effect lookup — it returns the color value set on the Fill Color control; sweeping controlValue over [0,1] represents one channel component changing from black to full."
+      }
+    },
+    {
+      "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Graphic - Fill/Opacity",
+      "controlBinding": {
+        "control": "Fill Opacity",
+        "param": "Slider",
+        "range": [0, 100]
+      },
+      "expression": "thisComp.layer(\"Shapes from Animated Footage\").effect(\"Fill Opacity\")(\"Slider\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps the Fill Opacity slider from 0 to 100; output is the opacity value passed directly to the fill (0% fully transparent → 100% fully opaque)."
+      }
+    },
+    {
+      "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Graphic - Stroke/Color",
+      "controlBinding": {
+        "control": "Stroke Color",
+        "param": "Color",
+        "range": [0, 1]
+      },
+      "expression": "thisComp.layer(\"Shapes from Animated Footage\").effect(\"Stroke Color\")(\"Color\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 1],
+        "steps": 40,
+        "note": "The expression returns the stroke color value from the Stroke Color effect control; sweeping controlValue represents one color channel from 0 to 1."
+      }
+    },
+    {
+      "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Graphic - Stroke/Opacity",
+      "controlBinding": {
+        "control": "Stroke Opacity",
+        "param": "Slider",
+        "range": [0, 100]
+      },
+      "expression": "thisComp.layer(\"Shapes from Animated Footage\").effect(\"Stroke Opacity\")(\"Slider\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps the Stroke Opacity slider from 0 to 100; output is the stroke opacity (0% invisible → 100% fully opaque)."
+      }
+    },
+    {
+      "target": "Shapes from Animated Footage/ADBE Root Vectors Group/Mask 1/Contents/ADBE Vector Graphic - Stroke/Stroke Width",
+      "controlBinding": {
+        "control": "Stroke Width",
+        "param": "Slider",
+        "range": [0, 50]
+      },
+      "expression": "thisComp.layer(\"Shapes from Animated Footage\").effect(\"Stroke Width\")(\"Slider\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 50],
+        "steps": 41,
+        "note": "Sweeps the Stroke Width slider from 0 to 50 pixels; output is the stroke width value (default 5px, range 0–50px covers practical usage)."
+      }
+    }
+  ],
+  "notes": [
+    "UI mode is HEADLESS — the script has no ScriptUI dialog and runs immediately on execution.",
+    "The five expressions (fill color, fill opacity, stroke color, stroke opacity, stroke width) are written identically onto every mask's shape group; the expressions shown above use 'Mask 1' as the representative target — the same five templates are applied to all mask groups with the same shape layer name.",
+    "The shape layer name is dynamically built as 'Shapes from <source layer name>'; if that name changes the expression references break.",
+    "Hold interpolation (KeyframeInterpolationType.HOLD) is applied to every copied path and opacity keyframe, producing frame-by-frame animation style.",
+    "Keyframe cleanup removes consecutive opacity keyframes with identical values and removes path keyframes at times where opacity is zero; this post-processing is performed in a single pass after all masks are converted.",
+    "Original masks on the source layer are not modified (non-destructive operation).",
+    "Fill Color is added as an ADBE Color Control (not a slider); its expression references the 'Color' sub-property, not 'Slider'.",
+    "The script requires exactly 1 selected layer (not 0, not 2+); selecting multiple layers triggers the 'Please select one layer' guard."
+  ]
+}

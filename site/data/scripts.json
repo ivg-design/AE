@@ -1,0 +1,1388 @@
+[
+  {
+    "id": "limb-a-tron",
+    "name": "Limb-a-tron",
+    "displayName": "Limb-a-tron",
+    "category": "animation",
+    "version": "2.7.0",
+    "ui": "DIALOG",
+    "tagline": "Rig a two-segment IK/FK limb in seconds — drag one null to bend it, tune everything from one Limb Control effect, and bake it when done.",
+    "description": "Creates a shape-layer limb plus a \"<name> CTRL\" null carrying a \"<name> Limb Control\" pseudo-effect with every rig parameter — segment lengths, widths, curvature, Noodle Mode, FK/IK angles, pop prevention. Drag the null for IK, or check Disable IK for manual FK sliders. Run it again on an existing rig to bake the animation into simplified keyframes, strip the unused render mode, and remove the controller.",
+    "functionality": [
+      "Creates a named limb shape layer plus a controller null with the LimbControlsV3 pseudo effect.",
+      "Supports IK, FK/manual angles, dynamic IK direction, adjusted lengths, and pop prevention.",
+      "Builds both regular and noodle limb bodies, with regular/noodle stroke render passes.",
+      "Adds noodle curvature, tension, side-curvature, inverse-curvature, and center-point controls.",
+      "Uses linked shoulder/wrist stroke trim ranges for regular and noodle modes.",
+      "Includes radial/closest safe noodle outline logic for tight bends and folded poses.",
+      "Detects selected Limb-a-tron rigs and can bake paths, trim values, and visibility state.",
+      "Simplifies baked keys, freezes static appearances, removes inactive render groups, and can remove the controller."
+    ],
+    "usage": [
+      "Select a composition in Adobe After Effects.",
+      "Run the script with no existing Limb-a-tron rig selected to create a new rig.",
+      "Enter the limb name when prompted.",
+      "Select an existing Limb-a-tron shape layer or controller and run the script to bake it.",
+      "Confirm the bake prompt to sample animated expressions, simplify keys, and optionally remove the controller."
+    ],
+    "requirements": [
+      "Active composition.",
+      "Adobe After Effects shape layers, pseudo effects, and expression support.",
+      "Modern expression engine support for shape path APIs such as createPath(), points(), inTangents(), and outTangents()."
+    ],
+    "notes": [
+      "The catalog filename remains Limb-a-tron.jsx even when imported from a KBar-exported filename.",
+      "ExtendScript wrapper code is ECMA-3 compatible; property expressions use the After Effects expression engine.",
+      "Bake mode preserves animated appearances while pruning inactive regular/noodle groups where possible."
+    ],
+    "icon": "assets/icons/limb-a-tron.png",
+    "lucide": "square-code",
+    "docPath": "docs/Limb-a-tron.md",
+    "srcPath": "scripts/animation/Limb-a-tron.jsx"
+  },
+  {
+    "id": "linearizer",
+    "name": "Linearizer",
+    "displayName": "Linearizer",
+    "category": "animation",
+    "version": "1.5.8",
+    "ui": "DIALOG",
+    "tagline": "Drive existing keyframed animation from any slider, position, or rotation — scrubbing the driver scrubs the animation.",
+    "description": "Rewires a keyframed property with an expression so a driver property's Min–Max sweep plays back the original keyframe segments. Handles 1D/2D/3D properties and shape paths, batches multiple targets on one shared timing scale, and adds a \"Uniform Interpolation\" checkbox to the driver layer to switch between relative and even segment spacing live in Effect Controls.",
+    "functionality": [
+      "Links any property to a driver property with linear interpolation",
+      "Supports 1D, 2D, and 3D properties including shape paths",
+      "Multiple property selection for batch expression application",
+      "Min/max value range controls for precise mapping",
+      "Even vs relative interpolation modes",
+      "Shape path vertex interpolation support",
+      "Dimension-specific control for multi-dimensional properties",
+      "Automatic keyframe value capturing and preservation",
+      "Expression generation optimized for ECMA 3 compatibility"
+    ],
+    "usage": [
+      "Select a composition in Adobe After Effects",
+      "Run the script to open the dialog",
+      "Click \"Select Target Property\" and choose properties with at least 2 keyframes",
+      "Click \"Select Driver Property\" to choose the controlling property",
+      "For multi-dimensional drivers, select which dimension to use",
+      "Enter minimum and maximum values for the driver range",
+      "Toggle \"Even Interpolation\" for uniform distribution (vs keyframe-relative)",
+      "Click \"Apply Linear Expression\" to link the properties"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Target properties must have at least 2 keyframes",
+      "Properties must be numerical (no color or dropdown properties)",
+      "Hold keyframes are preserved as held segments while their mapped driver positions are adjusted"
+    ],
+    "notes": [
+      "Expressions are optimized for ECMA 3 environment",
+      "Shape path interpolation preserves vertex, tangent, and closed state",
+      "Multiple properties can be processed in a single operation",
+      "Driver property dimensions are handled automatically",
+      "All operations wrapped in undo groups for safety"
+    ],
+    "icon": "assets/icons/linearizer.png",
+    "lucide": "trending-up",
+    "docPath": "docs/Linearizer.md",
+    "srcPath": "scripts/animation/Linearizer.jsx"
+  },
+  {
+    "id": "pathmaster",
+    "name": "PathMaster",
+    "displayName": "PathMaster",
+    "category": "animation",
+    "version": "2.0.2",
+    "ui": "DIALOG",
+    "tagline": "Animate a layer's Position along any shape-layer path — retime, re-ease, trim, loop or ping-pong it afterwards from a single layer marker.",
+    "description": "Select a Position property, pick a path from any shape layer, and PathMaster writes a self-contained expression that moves the layer along it. All timing lives on a layer marker: slide it to change the start, stretch its duration to retime, and edit its comment — Easing: x1,y1,x2,y2 || Segment 20 - 75% || Loop or Ping-Pong — to reshape the ride without re-running the script. A Reverse Direction checkbox on the layer flips travel at any time.",
+    "functionality": [
+      "Displays a dialog to select any shape layer in the composition.",
+      "Recursively collects groups and paths, presenting them in a fully expanded tree view so the user can choose a path.",
+      "Offers an extended easing dropdown with many cubic-bezier presets (and possibly other advanced easings).",
+      "Lets the user specify a duration in frames, automatically converted to seconds in the expression.",
+      "Creates a marker on the same layer that holds the Position property, labeling the chosen easing, duration, partial segment, and loop/ping-pong modes.",
+      "Generates a complete expression that interpolates the Position over time and eases along the specified path using pointOnPath() for true curve-following.",
+      "Syntax for the marker comment uses double pipes (`||`) to separate Easing, Segment, and Loop/Ping-Pong declarations.",
+      "If the marker is absent or its data is invalid, the expression defaults to linear (0,0,1,1), animating along 0–100% of the path with no loop."
+    ],
+    "usage": [
+      "Open a composition and select (or highlight) the Position property on any layer.",
+      "Run the script.",
+      "A dialog appears for shape-layer selection. Choose the desired shape layer and click OK.",
+      "A second dialog shows a tree of all shape groups/paths. Pick the path to animate along and click OK.",
+      "The final dialog lets you pick an easing function from the extended list and enter your desired animation duration in frames, as well as toggle Reverse Direction if needed.",
+      "Once confirmed, the script checks for any existing \"Animation Easing\" marker on the layer and removes it before creating a fresh one that indicates your chosen easing and other parameters, while also updating the expression on the selected Position property.",
+      "Preview or play back the composition to see the animation."
+    ],
+    "requirements": [],
+    "notes": [],
+    "icon": "assets/icons/pathmaster.png",
+    "lucide": "square-code",
+    "docPath": "docs/PathMaster.md",
+    "srcPath": "scripts/animation/PathMaster.jsx"
+  },
+  {
+    "id": "guiderator",
+    "name": "Guiderator",
+    "displayName": "Guiderator",
+    "category": "composition",
+    "version": "2.0.0",
+    "ui": "PANEL",
+    "tagline": "Drop exact ruler guides by typing a number — or a formula like 1920/2 — into a dockable panel, then click H or V.",
+    "description": "A dockable panel with a calculator field: type 540 or 1920/2 and it evaluates in place. Click H for a horizontal guide or V for a vertical guide at the result, and toggle guide locking with the padlock button without touching the View menu.",
+    "functionality": [
+      "Displays a compact, dockable panel with an input field and buttons",
+      "Supports basic mathematical calculations in the input field (e.g., \"540/2\", \"1920*0.25\")",
+      "Adds horizontal or vertical guides at specified positions",
+      "Includes a lock/unlock toggle for guides",
+      "Automatically evaluates calculations when input changes"
+    ],
+    "usage": [
+      "Open a composition in After Effects",
+      "Run the script to display the panel",
+      "Enter a value or calculation in the input field",
+      "Click \"H\" to add a horizontal guide or \"V\" to add a vertical guide",
+      "Use the lock button (🔐/🔓) to toggle guide locking"
+    ],
+    "requirements": [],
+    "notes": [],
+    "icon": "assets/icons/guiderator.png",
+    "lucide": "ruler",
+    "docPath": "docs/Guiderator.md",
+    "srcPath": "scripts/composition/Guiderator.jsx"
+  },
+  {
+    "id": "slidotron-16x9",
+    "name": "Slidotron_16x9",
+    "displayName": "Slidotron_16x9",
+    "category": "composition",
+    "version": "2.0.1",
+    "ui": "HEADLESS",
+    "tagline": "Build a horizontal slide-reveal rig in one click — two nested 4K comps, mirrored alpha mattes, and one 0–100 \"CTRL\" slider plays the transition.",
+    "description": "Select a comp and run: it creates \"Sliders 16x9\" and \"Slide 16x9\" (3840×2160, 60 fps), wires mirrored mask panels as alpha mattes, and drops a layer carrying a Slider Control named \"CTRL\" into your comp. Keyframe CTRL from 0 to 100 to reveal whatever you place in \"Slide 16x9\". Expressions bind the \"Sliders 16x9\" layer and \"CTRL\" effect by name — don't rename them. Requires AE 23.0+ (uses setTrackMatte).",
+    "functionality": [
+      "Creates two nested compositions: \"Sliders 16x9\" and \"Slide 16x9\"",
+      "Generates animated mask layers for left and right slide transitions",
+      "Adds expression-driven slider control for seamless animation",
+      "Sets up track matte relationships for proper masking",
+      "Configures parent-child relationships for coordinated movement",
+      "Optimizes composition settings for 4K output (3840x2160)"
+    ],
+    "usage": [
+      "Select an existing composition in your project",
+      "Run the script - no user interface required",
+      "The script creates \"Sliders 16x9\" and \"Slide 16x9\" compositions",
+      "Use the CTRL slider effect on the main layer to animate transitions",
+      "Add content to the \"Slide 16x9\" composition for your slides",
+      "Adjust slider values from 0-100 to control transition position"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "An existing composition must be selected in the project panel",
+      "Sufficient memory for 4K composition handling"
+    ],
+    "notes": [
+      "Output resolution is 3840x2160 at 60fps for smooth playback",
+      "Slider control uses linear interpolation for smooth transitions",
+      "Mask layers are disabled by default to prevent visual interference",
+      "Expression references specific composition names - avoid renaming",
+      "Background color is set to dark gray (38, 38, 38) for professional look"
+    ],
+    "icon": "assets/icons/slidotron-16x9.png",
+    "lucide": "gallery-horizontal",
+    "docPath": "docs/Slidotron_16x9.md",
+    "srcPath": "scripts/composition/Slidotron_16x9.jsx"
+  },
+  {
+    "id": "slidotron-9x16",
+    "name": "Slidotron_9x16",
+    "displayName": "Slidotron_9x16",
+    "category": "composition",
+    "version": "2.0.2",
+    "ui": "HEADLESS",
+    "tagline": "Build a vertical 9:16 slide-reveal rig in one click — two nested 1080×1920 comps, mirrored mattes, and one 0–100 \"CTRL\" slider plays the transition.",
+    "description": "Sized for Stories, TikTok, and Shorts: select a comp and run to create \"Sliders 9x16\" and \"Slide 9x16\" (1080×1920, 60 fps) with mirrored alpha-matte panels and a Slider Control named \"CTRL\" in your comp. Keyframe CTRL from 0 to 100 to reveal your artwork in \"Slide 9x16\". Names are expression-bound — don't rename the layer or effect. Requires AE 23.0+ and exits cleanly on older versions.",
+    "functionality": [
+      "Creates two nested compositions: \"Sliders 9x16\" and \"Slide 9x16\"",
+      "Generates animated mask layers for left and right slide transitions",
+      "Adds expression-driven slider control for seamless horizontal animation",
+      "Sets up track matte relationships for proper content masking",
+      "Configures parent-child relationships for coordinated movement",
+      "Optimizes composition settings for vertical mobile output (1080x1920)"
+    ],
+    "usage": [
+      "Select an existing composition in your project",
+      "Run the script - no user interface required",
+      "The script creates \"Sliders 9x16\" and \"Slide 9x16\" compositions",
+      "Use the CTRL slider effect on the main layer to animate transitions",
+      "Add content to the \"Slide 9x16\" composition for your slides",
+      "Adjust slider values from 0-100 to control transition position"
+    ],
+    "requirements": [
+      "Adobe After Effects 23.0 (2023) or later — the rig is wired with the AVLayer.setTrackMatte() scripting API, which was introduced in AE 23.0. On earlier versions (CS6 through 22.6) that method does not exist; the script now detects this and exits cleanly with an explanatory message.",
+      "An existing composition must be selected in the project panel",
+      "Sufficient memory for vertical HD composition handling"
+    ],
+    "notes": [
+      "Output resolution is 1080x1920 at 60fps for smooth mobile playback",
+      "Slider control uses linear interpolation for smooth transitions",
+      "Mask layers are disabled by default to prevent visual interference",
+      "Expression references specific composition names - avoid renaming",
+      "Optimized for vertical viewing on mobile devices and social platforms",
+      "Background color is set to dark gray (38, 38, 38) for professional look"
+    ],
+    "icon": "assets/icons/slidotron-9x16.png",
+    "lucide": "gallery-vertical",
+    "docPath": "docs/Slidotron_9x16.md",
+    "srcPath": "scripts/composition/Slidotron_9x16.jsx"
+  },
+  {
+    "id": "burstmate",
+    "name": "BurstMate",
+    "displayName": "BurstMate",
+    "category": "effects",
+    "version": "2.0.1",
+    "ui": "HEADLESS",
+    "tagline": "Drop a fully rigged radial stroke burst into your comp — every color, length, density, and dash tuned from one StrokeBurst control panel.",
+    "description": "Creates a hidden \"BURST CTRL\" guide layer plus two repeater-driven stroke layers whose every visual property is expression-linked to a \"StrokeBurst\" pseudo-effect. Adjust or keyframe colors, widths, spoke lengths, density, dash patterns, and the rotation offset between the two stroke sets from Effect Controls. The burst-out reveal comes pre-animated with eased Trim Paths keyframes, and the whole rig moves with the control layer.",
+    "functionality": [
+      "Applies pre-built \"StrokeBurst\" animation preset to selected layer",
+      "Configures dual-stroke system with independent color controls",
+      "Sets up customizable width, length, and density parameters",
+      "Implements advanced dash pattern controls for both stroke layers",
+      "Provides rotation offset controls for dynamic burst animations",
+      "Includes comprehensive parameter groups for organized control"
+    ],
+    "usage": [
+      "Select a layer in your composition that will receive the burst effect",
+      "Run the script - no user interface required",
+      "The script applies the \"StrokeBurst\" effect with default parameters",
+      "Customize burst appearance using the effect controls panel: - Adjust Stroke 1 & 2 colors for visual variety - Modify width and length for stroke dimensions - Control density for burst complexity - Fine-tune dash patterns for stroke styling"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "A layer must be selected in the active composition",
+      "Uses embedded StrokeBurst and Void FFX binary data"
+    ],
+    "notes": [
+      "Effect uses embedded FFX preset data for consistent results",
+      "Dual-stroke system allows for complex layered burst effects",
+      "Parameters are organized into logical groups for efficient workflow",
+      "Rotation offset enables dynamic animated burst patterns",
+      "Dash controls provide fine detail customization options",
+      "All parameters support keyframe animation for motion graphics"
+    ],
+    "icon": "assets/icons/burstmate.png",
+    "lucide": "asterisk",
+    "docPath": "docs/BurstMate.md",
+    "srcPath": "scripts/effects/BurstMate.jsx"
+  },
+  {
+    "id": "chromablenderizer",
+    "name": "ChromaBlenderizer",
+    "displayName": "ChromaBlenderizer",
+    "category": "effects",
+    "version": "2.3.1",
+    "ui": "PALETTE",
+    "tagline": "Ramp a color range across selected fills, strokes, and effect colors — pick Start/End, then apply a linear blend or random scatter in one click.",
+    "description": "A modeless palette: set Start and End colors with the bundled color-wheel picker or HSB sliders, select two or more color properties in AE, and click Apply Colors. Color Gamut mode walks hue the shortest way around the wheel with shared saturation; Grayscale interpolates brightness only; Randomize scatters each target within the range. Refresh Count confirms what's targeted before you commit.",
+    "functionality": [
+      "Modeless ScriptUI palette so AE color target properties can be selected while the panel is open",
+      "Self-contained AdobeColorPicker v2.0 integration for start/end swatches",
+      "Linear color interpolation across selected properties",
+      "Random color distribution within the selected range",
+      "Full HSB control with shared saturation and separate start/end hue and brightness",
+      "Grayscale and color gamut modes",
+      "Shortest-path hue interpolation on the color wheel",
+      "Live color previews for start and end colors",
+      "Target color-property counter and clearer selection guidance",
+      "Robust error handling and validation",
+      "Support for any number of color properties (minimum 2)"
+    ],
+    "usage": [
+      "Run the script with an active composition open.",
+      "Choose Start and End colors by clicking the swatches or moving the HSB sliders.",
+      "Select two or more target color properties in the Timeline or Effect Controls panel.",
+      "Click Refresh Count to confirm the target color-property count.",
+      "Choose Linear or Randomize, then choose Grayscale or Color Gamut.",
+      "Click Apply Colors. The palette remains open so you can change selections and apply again."
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition"
+    ],
+    "notes": [
+      "Valid targets are properties whose value type is PropertyValueType.COLOR.",
+      "Common targets include shape Fill Color, shape Stroke Color, effect Color controls, and text animator color properties.",
+      "Layer selection alone is not enough; select the actual color property rows before applying.",
+      "Start/End swatches set the generated range directly with the bundled picker."
+    ],
+    "icon": "assets/icons/chromablenderizer.png",
+    "lucide": "square-code",
+    "docPath": "docs/ChromaBlenderizer.md",
+    "srcPath": "scripts/effects/ChromaBlenderizer.jsx"
+  },
+  {
+    "id": "sfxmaster",
+    "name": "sfxMaster",
+    "displayName": "sfxMaster",
+    "category": "effects",
+    "version": "2.0.1",
+    "ui": "HEADLESS",
+    "tagline": "Mix Voice Over, Sound Effects, and Music from three master sliders — audio layers auto-categorized by marker comments and wired in one pass.",
+    "description": "Builds an \"SFX CTRL\" null with Voice Over / Sound Effects / Music sliders and expression-links every audio layer's Stereo Mixer levels to the matching one. Routing reads each layer's first marker comment: \"voice over\" or \"music\" (case-insensitive substring) picks the bucket; everything else lands in Sound Effects. Recurses into precomps so one console controls the whole nested structure.",
+    "functionality": [
+      "Creates an \"SFX CTRL\" null layer with three slider controls (Voice Over, Sound Effects, Music)",
+      "Automatically identifies audio layers in selected compositions",
+      "Categorizes audio based on layer markers (voice over, music, or defaults to sound effects)",
+      "Applies Stereo Mixer effect to all audio layers",
+      "Links audio levels to appropriate control sliders via expressions",
+      "Supports nested compositions with recursive processing",
+      "Handles existing Stereo Mixer effects with overwrite options",
+      "Processes multiple selected compositions simultaneously"
+    ],
+    "usage": [
+      "Select one or more compositions in the Project panel",
+      "Run the script via File > Scripts > sfxMaster.jsx",
+      "Script will automatically: - Create SFX CTRL null with three audio category sliders - Find all audio layers in compositions - Apply Stereo Mixer effects - Link levels to appropriate sliders based on markers",
+      "Adjust master sliders to control audio mix levels"
+    ],
+    "requirements": [
+      "Adobe After Effects CC 2019 or later",
+      "At least one composition selected in Project panel",
+      "Audio layers in the composition(s)"
+    ],
+    "notes": [
+      "Audio categorization is based on first marker's comment text",
+      "Markers should contain \"voice over\" or \"music\" for categorization",
+      "Layers without markers default to \"Sound Effects\" category",
+      "Nested compositions are processed recursively",
+      "All operations wrapped in undo group named \"SFX Master\""
+    ],
+    "icon": "assets/icons/sfxmaster.png",
+    "lucide": "square-code",
+    "docPath": "docs/sfxMaster.md",
+    "srcPath": "scripts/effects/sfxMaster.jsx"
+  },
+  {
+    "id": "sync-o-tron",
+    "name": "Sync-o-tron",
+    "displayName": "Sync-o-tron",
+    "category": "effects",
+    "version": "2.1.4",
+    "ui": "DIALOG",
+    "tagline": "Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio Reactor template.",
+    "description": "Select a property, hit TuneSync, and Sync-o-tron generates the easing dropdown and per-axis Min/Max sliders, wired to the Output Power of an AUDIO REACTOR comp. The Audio Reactor template project ships in the bundle and is imported automatically the first time you launch in a project without one — drop your track in and everything from Opacity to 3D Position can dance to it.",
+    "functionality": [],
+    "usage": [],
+    "requirements": [],
+    "notes": [],
+    "icon": "assets/icons/sync-o-tron.png",
+    "lucide": "audio-lines",
+    "docPath": "docs/Sync-o-tron.md",
+    "srcPath": "scripts/effects/Sync-o-tron.jsx"
+  },
+  {
+    "id": "elast-o-matic",
+    "name": "Elast-o-matic",
+    "displayName": "Elast-o-matic",
+    "category": "keyframes",
+    "version": "1.0.0",
+    "ui": "HEADLESS",
+    "tagline": "Add elastic overshoot or gravity bounce after any keyframe — hold Cmd/Ctrl at launch to switch variants, tune everything in Effect Controls.",
+    "description": "Select keyframed properties and run it: each gets a controller effect plus an expression that overshoots after every keyframe. Default is a decaying elastic spring (Amplitude/Frequency/Decay); hold Cmd or Ctrl while launching for gravity bounces (Elasticity/Gravity/Number of bounces) — the command-bar icon swaps while the key is down. The inertial variant can even follow another layer's motion via its External Driver controls.",
+    "functionality": [
+      "Applies a per-property pseudo-effect controller named \"<Property> Inertial Bounce\" or \"<Property> Bounce\"",
+      "Inertial variant controls: Amplitude, Frequency, Decay, Duration, Delay (in frames), External Driver (+ Layer / Animated Property)",
+      "Bounce variant controls: Elasticity, Gravity, Number of bounces",
+      "Inertial variant can follow ANOTHER layer's motion via the External Driver checkbox + layer picker",
+      "Works on any keyframeable property; multiple selected properties are rigged in one run",
+      "Hold Cmd/Ctrl at launch to switch from Inertial Bounce to Bounce"
+    ],
+    "usage": [
+      "Select a layer and the keyframed property/properties you want to rig",
+      "Run Elast-o-matic (from the IVGD Command Bar, hold Cmd/Ctrl for the Bounce variant)",
+      "Tune the motion from the generated effect(s) in the Effect Controls panel"
+    ],
+    "requirements": [
+      "Adobe After Effects CC or later",
+      "Active composition, a selected layer, and at least one selected property",
+      "\"Allow Scripts to Write Files and Access Network\" enabled (first run per project may need to register the pseudo effect from a temporary .ffx file)"
+    ],
+    "notes": [
+      "The FFX-registration snippet inside ensurePseudoRegistered() (writing the controller binary to a temp .ffx and applying it on a throwaway comp) is based on \"Apply Pseudo Effect as Animation Preset\" (c) 2017 Tomas Šinkūnas, www.rendertom.com. The script itself is IVG Design's.",
+      "The Inertial expression reads the last keyframe before the current time, so it activates after every keyframe, not just the final one.",
+      "Deleting the generated effect disables the expression (it will error politely); remove the expression from the property to fully undo by hand."
+    ],
+    "icon": "assets/icons/elast-o-matic.png",
+    "lucide": "activity",
+    "docPath": "docs/Elast-o-matic.md",
+    "srcPath": "scripts/keyframes/Elast-o-matic.jsx"
+  },
+  {
+    "id": "keybot",
+    "name": "KeyBot",
+    "displayName": "KeyBot",
+    "category": "keyframes",
+    "version": "2.0.1",
+    "ui": "PANEL",
+    "tagline": "Batch-edit selected keyframe values with =, +, −, ×, ÷ per axis — timing, easing, and interpolation stay untouched.",
+    "description": "A dockable panel: check X/Y/Z, type an operand, click an operator, and every selected keyframe on every selected property and layer updates in one undo step. Handles 1D, 2D, and 3D numeric properties (1D values ride the X field), preserves keyframe times and ease exactly, and treats division by zero as a safe no-op.",
+    "functionality": [
+      "Interactive dockable panel with real-time input validation",
+      "Per-dimension control with individual X, Y, Z input fields and toggles",
+      "Five mathematical operations: Set (=), Add (+), Subtract (-), Multiply (×), Divide (÷)",
+      "Multi-layer and multi-property support for batch operations",
+      "Automatic property type detection and validation",
+      "Safe division with zero-division protection",
+      "Preserves keyframe timing, interpolation, and ease settings",
+      "Comprehensive undo group support for all operations",
+      "Real-time UI feedback and input enabling/disabling"
+    ],
+    "usage": [
+      "Open the script to dock the KeyBot panel in your workspace",
+      "Select one or more layers in your composition",
+      "Select specific properties with keyframes (Position, Scale, Rotation, etc.)",
+      "Select the keyframes you want to modify in the timeline",
+      "Check the dimension checkboxes (X, Y, Z) for the axes you want to modify",
+      "Enter the desired values in the corresponding input fields",
+      "Click the appropriate mathematical operation button (=, +, -, ×, ÷)",
+      "The selected keyframes will be updated with the calculated values"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "At least one composition with layers containing animatable properties",
+      "Selected layers with keyframed properties",
+      "Selected keyframes in the timeline for the target properties"
+    ],
+    "notes": [
+      "Only works with numerical properties (Position, Scale, Rotation, etc.)",
+      "Supports 2D and 3D spatial properties as well as single-value properties",
+      "Input fields are automatically enabled/disabled based on checkbox selection",
+      "Division by zero returns the original value to prevent errors",
+      "Works with multiple selected keyframes across multiple layers simultaneously",
+      "All operations are wrapped in undo groups for easy reversal",
+      "The panel remains docked and available for repeated use across compositions"
+    ],
+    "icon": "assets/icons/keybot.png",
+    "lucide": "calculator",
+    "docPath": "docs/KeyBot.md",
+    "srcPath": "scripts/keyframes/KeyBot.jsx"
+  },
+  {
+    "id": "keyclonematic",
+    "name": "KeyCloneMatic",
+    "displayName": "KeyCloneMatic",
+    "category": "keyframes",
+    "version": "2.0.1",
+    "ui": "DIALOG",
+    "tagline": "Repeat a hand-tuned keyframe set down the timeline at a fixed or decaying interval — values, easing, and spatial tangents cloned faithfully.",
+    "description": "Clones your selected keyframes a set number of times — or fills the rest of the comp — spaced by an interval in frames. Optional Temporal Decay shrinks the gap per repetition on a Linear, Ease In, or Ease Out curve so cycles accelerate over time. Every clone keeps its value, interpolation types, temporal ease, spatial tangents, roving, and label color.",
+    "functionality": [
+      "Intelligent keyframe selection and duplication across multiple layers",
+      "Customizable interval timing with frame-based precision control",
+      "Flexible repetition system with composition duration auto-calculation",
+      "Advanced temporal decay system with multiple easing curve options",
+      "Complete keyframe property preservation (values, interpolation, spatial tangents)",
+      "Support for all keyframe types (spatial, temporal, color, custom properties)",
+      "Automatic global time range detection from selected keyframes",
+      "Mathematical decay calculations with Linear, Ease In, and Ease Out curves",
+      "Comprehensive error handling and user input validation",
+      "Full undo group support for safe operation reversal"
+    ],
+    "usage": [
+      "Select one or more layers in your composition timeline",
+      "Select specific properties and keyframes you want to duplicate",
+      "Run the script to open the KeyCloneMatic dialog",
+      "Configure the interval duration (in frames) between duplications",
+      "Set the number of repetitions or enable \"Comp Duration\" for auto-calculation",
+      "Optionally enable \"Temporal Decay\" for progressive timing variations",
+      "If using decay, set the decay duration and choose the decay type (Linear/Ease In/Ease Out)",
+      "Click \"Proceed\" to execute the duplication with your specified settings",
+      "The script will create multiple copies of your keyframes with calculated timing"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with selected layers containing keyframed properties",
+      "At least one selected keyframe in the timeline",
+      "Sufficient composition duration for the planned duplications"
+    ],
+    "notes": [
+      "The script automatically calculates global in/out points from selected keyframes",
+      "Temporal decay progressively reduces intervals over time for organic timing variation",
+      "All keyframe properties are preserved including spatial tangents and interpolation types",
+      "Supports complex property types including paths, masks, and custom effect parameters",
+      "Composition duration mode automatically calculates maximum possible repetitions",
+      "The decay system uses mathematical easing functions for smooth temporal transitions",
+      "Memory-efficient processing handles large keyframe selections without performance impact"
+    ],
+    "icon": "assets/icons/keyclonematic.png",
+    "lucide": "copy",
+    "docPath": "docs/KeyCloneMatic.md",
+    "srcPath": "scripts/keyframes/KeyCloneMatic.jsx"
+  },
+  {
+    "id": "valuatron",
+    "name": "Valuatron",
+    "displayName": "Valuatron",
+    "category": "keyframes",
+    "version": "2.0.1",
+    "ui": "HEADLESS",
+    "tagline": "Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo.",
+    "description": "A headless one-shot: select layers and property rows, run, and each keyframeable property gets a keyframe at the current time holding its current evaluated value. Expression-driven properties capture the expression's output at that instant. No dialog, no options — one undo reverses the whole batch.",
+    "functionality": [
+      "Instant keyframe creation with zero user interaction required",
+      "Multi-layer and multi-property support for batch keyframe creation",
+      "Automatic property validation to ensure compatibility with keyframe animation",
+      "Current time detection from active composition timeline position",
+      "Current value sampling from property evaluation at timeline position",
+      "Comprehensive error handling with detailed user feedback",
+      "Safe execution with validation checks for composition and layer selection",
+      "Full undo group support for easy operation reversal",
+      "Efficient processing optimized for large property selections"
+    ],
+    "usage": [
+      "Open a composition and position the timeline playhead at desired time",
+      "Select one or more layers in the composition timeline",
+      "In the Timeline panel, select specific properties you want to keyframe",
+      "Run the Valuatron script (no dialog will appear - it executes immediately)",
+      "The script will create keyframes for all selected properties at current time",
+      "Each keyframe will capture the property's current evaluated value",
+      "Use Undo (Ctrl+Z / Cmd+Z) if you need to reverse the operation"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with playhead positioned at desired keyframe time",
+      "At least one selected layer in the composition",
+      "Selected properties that support keyframe animation (canVaryOverTime = true)"
+    ],
+    "notes": [
+      "This is a headless script - it executes immediately without showing a dialog",
+      "Only works with properties that can be keyframed (canVaryOverTime property)",
+      "The script captures the exact evaluated value at the current time, including expressions",
+      "Particularly useful for creating hold keyframes or establishing timing markers",
+      "Works efficiently with large selections of layers and properties",
+      "All operations are wrapped in a single undo group for clean workflow integration",
+      "If properties have expressions, it keyframes the expression result, not the underlying value"
+    ],
+    "icon": "assets/icons/valuatron.png",
+    "lucide": "sliders-horizontal",
+    "docPath": "docs/Valuatron.md",
+    "srcPath": "scripts/keyframes/Valuatron.jsx"
+  },
+  {
+    "id": "controllerizer",
+    "name": "Controllerizer",
+    "displayName": "Controllerizer",
+    "category": "layers",
+    "version": "1.0.0",
+    "ui": "HEADLESS",
+    "tagline": "Gather any selected properties from any layers onto one Controller Null as matching expression controls, pre-set to current values.",
+    "description": "Select properties across your comp and run it: a comp-long \"Controller Null\" gains one control per property — Slider, Angle, Point, 3D Point or Color, matched to the value type and named \"<Layer> || <Property>\" — each seeded with the current value and wired back by expression. Re-runs append to the same null, so the whole scene animates from one Effect Controls panel.",
+    "functionality": [
+      "Creates (or reuses) a comp-long null named \"Controller Null\"",
+      "Adds one expression control per selected property, matched by value type: 1D → Slider (Rotation flavors → Angle), 2D / 2D-spatial → Point, 3D / 3D-spatial → 3D Point (Point when the layer is 2D), Color → Color",
+      "Controls are seeded with the property's current value, so nothing jumps",
+      "Writes the linking expression onto every selected property",
+      "Works across multiple layers in one run; re-runs append to the same null"
+    ],
+    "usage": [
+      "Select the properties you want centralized (across any number of layers)",
+      "Run Controllerizer",
+      "Animate everything from the \"Controller Null\" layer's Effect Controls"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with at least one selected property"
+    ],
+    "notes": [
+      "Expressions reference \"Controller Null\" and the control BY NAME - renaming the null or a control breaks its links. Duplicate layer names can misdirect Slider/Angle links only if their generated control names collide.",
+      "Property groups and unsupported value types (e.g. Shape paths, text) are skipped and reported at the end of the run."
+    ],
+    "icon": "assets/icons/controllerizer.png",
+    "lucide": "settings-2",
+    "docPath": "docs/Controllerizer.md",
+    "srcPath": "scripts/layers/Controllerizer.jsx"
+  },
+  {
+    "id": "nullbot",
+    "name": "NullBot",
+    "displayName": "NullBot",
+    "category": "layers",
+    "version": "2.0.0",
+    "ui": "HEADLESS",
+    "tagline": "Parent a group of layers to one master null at their average position — move, scale, or rotate the whole group from a single handle.",
+    "description": "NullBot creates a single null named \"NullBot\" at the averaged position of the selected layers and parents them all to it, so the group moves, scales, and rotates from one control. The null's in/out points span the whole selection, and it becomes 3D if any selected layer is 3D. It is headless — no dialog, nothing to configure.",
+    "functionality": [
+      "Calculates the average position of all selected layers",
+      "Creates a null object at the calculated center point",
+      "Automatically parents all selected layers to the new null",
+      "Adjusts null timing to encompass all selected layers' duration",
+      "Preserves 3D layer properties when any selected layer is 3D",
+      "Positions null at the topmost layer index for easy access"
+    ],
+    "usage": [
+      "Select one or more layers in your composition",
+      "Run the script via File > Scripts > NullBot.jsx",
+      "A null object named \"Null Control\" will be created at the average position",
+      "All selected layers will be automatically parented to this null"
+    ],
+    "requirements": [
+      "Active composition must be selected",
+      "At least one layer must be selected"
+    ],
+    "notes": [
+      "The null's in/out points match the combined duration of selected layers",
+      "If any selected layer is 3D, the null will also be 3D",
+      "The null is placed at the top of the layer stack",
+      "All operations are wrapped in an undo group named \"NullBot\""
+    ],
+    "icon": "assets/icons/nullbot.png",
+    "lucide": "box-select",
+    "docPath": "docs/NullBot.md",
+    "srcPath": "scripts/layers/NullBot.jsx"
+  },
+  {
+    "id": "opac-o-bot",
+    "name": "Opac-o-bot",
+    "displayName": "Opac-o-bot",
+    "category": "layers",
+    "version": "1.0.0",
+    "ui": "HEADLESS",
+    "tagline": "Parenting for Opacity — selected layers' Opacity follows their parent via expression, the one property AE parenting ignores.",
+    "description": "Parent layers as usual, select the children, run Opac-o-bot: each child's Opacity gets thisComp.layer(\"<parent>\").transform.opacity, so fading the parent fades the whole rig. Links are by parent name; unparented layers are skipped with an alert.",
+    "functionality": [
+      "Writes `thisComp.layer(\"<parent>\").transform.opacity` onto every selected layer's Opacity",
+      "Processes all selected layers in one undo step",
+      "Alerts per layer when a selected layer has no parent (and leaves it untouched)"
+    ],
+    "usage": [
+      "Parent your layers as usual (Position/Scale/Rotation already follow)",
+      "Select the child layers and run Opac-o-bot",
+      "Animate the parent's Opacity - the children now follow it"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with at least one selected, parented layer"
+    ],
+    "notes": [
+      "The expression references the parent BY NAME - renaming the parent (or having duplicate layer names in the comp) breaks or misdirects the link. Re-run after renames.",
+      "To make a child fade independently again, just delete the expression from its Opacity."
+    ],
+    "icon": "assets/icons/opac-o-bot.png",
+    "lucide": "blend",
+    "docPath": "docs/Opac-o-bot.md",
+    "srcPath": "scripts/layers/Opac-o-bot.jsx"
+  },
+  {
+    "id": "ordermaster",
+    "name": "OrderMaster",
+    "displayName": "OrderMaster",
+    "category": "layers",
+    "version": "2.0.1",
+    "ui": "DIALOG",
+    "tagline": "Reverse or shuffle the stacking order of a contiguous run of selected layers, or the contiguous shape groups inside one shape layer.",
+    "description": "OrderMaster flips or randomizes the order of a contiguous run of selected layers — or of the contiguous shape groups inside a single shape layer — in place, without dragging each item in the Timeline. A one-checkbox dialog picks Reverse (the default) or Randomize. Both keep every property and animation intact and run as a single undo step.",
+    "functionality": [
+      "Intelligent contiguity detection for safe layer and shape group reordering",
+      "Dual operation modes: systematic reversal and randomized arrangement",
+      "Multi-target support: composition layers and shape layer contents",
+      "Advanced validation system ensuring only contiguous selections are processed",
+      "Precise index tracking and mathematical reordering algorithms",
+      "Shape group hierarchy preservation during reordering operations",
+      "Comprehensive error handling with detailed user feedback",
+      "Memory-efficient processing for large layer and group selections",
+      "Full undo group support for safe operation reversal",
+      "Real-time validation with immediate user feedback"
+    ],
+    "usage": [
+      "Select multiple contiguous layers in a composition timeline OR",
+      "Select multiple contiguous shape groups within a single shape layer",
+      "Run the script to open the OrderMaster dialog",
+      "Choose your reordering option: - Leave \"Randomize\" unchecked for systematic reversal (reverse order) - Check \"Randomize\" for random arrangement of selected items",
+      "Click \"Proceed\" to execute the reordering operation",
+      "The script will rearrange your selection according to the chosen method",
+      "Use Undo (Ctrl+Z / Cmd+Z) if you need to reverse the operation"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with multiple layers OR single shape layer with multiple shape groups",
+      "Contiguous selection of layers or shape groups (no gaps in indices)",
+      "At least 2 items selected for reordering to be meaningful"
+    ],
+    "notes": [
+      "Contiguous selection means no gaps in layer indices or shape group order",
+      "For layers: indices must be consecutive (e.g., layers 3, 4, 5, 6)",
+      "For shape groups: groups must be adjacent in the shape layer hierarchy",
+      "Randomization uses mathematical shuffling algorithms for true randomness",
+      "The script preserves all layer and group properties during reordering",
+      "Shape group reordering maintains all internal properties and animations",
+      "Large selections are handled efficiently without performance degradation",
+      "All reordering operations are atomic - either all succeed or none are applied"
+    ],
+    "icon": "assets/icons/ordermaster.png",
+    "lucide": "square-code",
+    "docPath": "docs/OrderMaster.md",
+    "srcPath": "scripts/layers/OrderMaster.jsx"
+  },
+  {
+    "id": "parent-o-bot",
+    "name": "Parent-o-bot",
+    "displayName": "Parent-o-bot",
+    "category": "layers",
+    "version": "2.0.2",
+    "ui": "DIALOG",
+    "tagline": "Blend a layer's Position, Scale, Rotation, and Opacity toward up to two parent layers, each with its own 0–100% influence slider.",
+    "description": "Parent-o-bot rigs each selected layer with a \"Multi_Parent\" effect that blends its Position, Rotation, Scale, and Opacity toward one or two chosen parents, without native parenting. Parent 1 / Parent 2 pickers set the parents, per-property checkboxes enable blending, and Position/Scale/Rotation/Opacity Influence sliders (0–100%) set the weights — all animatable in Effect Controls after the fact.",
+    "functionality": [
+      "Multi-parent constraint system supporting up to two simultaneous parent influences",
+      "Individual property control for Position, Scale, Rotation, and Opacity transformations",
+      "Advanced influence weighting system with 0-100% control over each property",
+      "Custom pseudo-effect controller with embedded binary data for persistent settings",
+      "Mathematical expression generation for complex parent blending calculations",
+      "Automatic layer selection interface with real-time validation",
+      "Scale inheritance system with proportional adjustment algorithms",
+      "Multi-layer batch processing for efficient rigging workflows",
+      "Comprehensive error handling and user feedback systems",
+      "Full undo group support for safe operation reversal"
+    ],
+    "usage": [
+      "Select the target layers you want to apply multi-parent constraints to",
+      "Run the script to open the Parent-o-bot layer selection dialog",
+      "From the layer list, select one or two layers to act as parent controllers",
+      "Click \"OK\" to apply the multi-parent system to your selected layers",
+      "The script will add \"Multi_Parent\" effects to each target layer",
+      "Use the effect controls to set parent layers and adjust influence percentages",
+      "Toggle individual properties (Position, Rotation, Scale, Opacity) as needed",
+      "Adjust influence sliders to blend between parent influences (0-100%)"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with at least one selected layer for constraint application",
+      "Additional layers in composition to serve as parent controllers",
+      "Sufficient system memory for expression processing and effect management"
+    ],
+    "notes": [
+      "The system uses pseudo-effects with binary data for persistent, project-portable controls",
+      "Scale calculations include proportional adjustment to maintain visual consistency",
+      "Expression-based system provides real-time performance without keyframe dependencies",
+      "Parent influences can be animated over time using the effect control keyframes",
+      "The multi-parent system works with 2D and 3D layers seamlessly",
+      "All transform properties can be independently controlled and weighted",
+      "System is compatible with existing parenting hierarchies and constraints",
+      "Binary effect data is embedded for cross-project compatibility and portability"
+    ],
+    "icon": "assets/icons/parent-o-bot.png",
+    "lucide": "square-code",
+    "docPath": "docs/Parent-o-bot.md",
+    "srcPath": "scripts/layers/Parent-o-bot.jsx"
+  },
+  {
+    "id": "rectangulator",
+    "name": "Rectangulator",
+    "displayName": "Rectangulator",
+    "category": "layers",
+    "version": "2.1.5",
+    "ui": "HEADLESS",
+    "tagline": "Convert a parametric rectangle into a bezier shape with independent per-corner rounding and a 9-point anchor grid, driven by one effect.",
+    "description": "Rectangulator rebuilds a parametric (Rectangle tool) rectangle as a custom bezier shape with independently roundable corners and a nine-point anchor grid, preserving the original fills, strokes, and transform. A \"Rectangulator Controls\" effect drives it entirely by expression: Rectangle Width/Height sliders, four per-corner rounding sliders, and a nine-item Anchor Point popup, all keyframeable.",
+    "functionality": [
+      "Intelligent parametric rectangle detection and selection from shape layers",
+      "Advanced bezier path generation with mathematical precision",
+      "Individual corner rounding control for each rectangle corner (Top Left, Top Right, Bottom Right, Bottom Left)",
+      "Dynamic anchor point positioning with 9-point grid system (Top Left, Top Center, Top Right, etc.)",
+      "Expression-based animation system for real-time parameter control",
+      "Custom pseudo-effect controller with embedded binary data for persistent settings",
+      "Automatic shape property preservation (fills, strokes, transform properties)",
+      "Composite position calculation including parent transform inheritance",
+      "Reference management system for safe property linking and cleanup",
+      "Memory-efficient processing with comprehensive error handling"
+    ],
+    "usage": [
+      "Create a shape layer with a parametric rectangle (Rectangle Path tool)",
+      "Select the shape layer in your composition timeline",
+      "Run the Rectangulator script (executes automatically without dialog)",
+      "The script will detect the rectangle and convert it to a controllable bezier path",
+      "A new \"Parametric Rectangle\" group will be created with custom controls",
+      "Use the \"Rectangulator Controls\" effect to adjust: - Rectangle Width and Height (in pixels) - Individual corner rounding for each corner (0-100%) - Anchor Point position (9-point grid system)",
+      "The original parametric rectangle will be automatically removed/hidden",
+      "Animate the effect controls to create dynamic rectangular animations"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with at least one shape layer containing a parametric rectangle",
+      "Selected shape layer with detectable rectangle shape (Rectangle Path tool)",
+      "Sufficient system memory for expression processing and effect management"
+    ],
+    "notes": [
+      "Only works with parametric rectangles created using After Effects' Rectangle Path tool",
+      "The script automatically detects rectangles in shape groups and nested hierarchies",
+      "All original shape properties (fills, strokes, transforms) are preserved during conversion",
+      "The expression system provides real-time updates without keyframe dependencies",
+      "Anchor point positioning affects both visual centering and animation pivot points",
+      "Individual corner rounding allows for sophisticated organic shape transitions",
+      "The system is intended to support shape layer parenting and pre-compositions",
+      "Binary effect data ensures cross-project compatibility and settings persistence"
+    ],
+    "icon": "assets/icons/rectangulator.png",
+    "lucide": "vector-square",
+    "docPath": "docs/Rectangulator.md",
+    "srcPath": "scripts/layers/Rectangulator.jsx"
+  },
+  {
+    "id": "reseterator",
+    "name": "Reseterator",
+    "displayName": "Reseterator",
+    "category": "layers",
+    "version": "1.0.0",
+    "ui": "HEADLESS",
+    "tagline": "Zero the transform origin of selected layers — layer anchor to [0,0,0], every nested shape-group anchor and position to [0,0].",
+    "description": "One click cleans layers whose anchors and shape groups carry stray offsets after imports or restructuring. Each selected layer's Anchor Point resets to [0,0,0] and a recursive pass zeroes every shape group's internal Transform anchor/position, however deep. Position, Scale and Rotation are left alone.",
+    "functionality": [
+      "Resets the layer Anchor Point to [0,0,0] for every selected layer",
+      "Recursively walks each layer's property groups and resets every ADBE Vector Transform Group's Anchor Point and Position to [0,0]",
+      "Processes any number of selected layers in a single undo step"
+    ],
+    "usage": [
+      "Select one or more layers in the active composition",
+      "Run Reseterator - anchors and shape-group offsets snap to zero immediately"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with at least one selected layer"
+    ],
+    "notes": [
+      "Layer Position, Scale and Rotation are left untouched - only anchors and shape-group internal transforms are reset, so layers may shift visually if their anchor carried an offset.",
+      "Works on any layer type; the recursive shape-group reset only affects shape layers (others simply get their anchor reset)."
+    ],
+    "icon": "assets/icons/reseterator.png",
+    "lucide": "rotate-ccw",
+    "docPath": "docs/Reseterator.md",
+    "srcPath": "scripts/layers/Reseterator.jsx"
+  },
+  {
+    "id": "subtitleforge",
+    "name": "SubtitleForge",
+    "displayName": "SubtitleForge",
+    "category": "layers",
+    "version": "2.0.1",
+    "ui": "HEADLESS",
+    "tagline": "Build a full caption rig in one run — text plus a self-sizing box with stroke and drop shadow, all driven from one Subtitle Setup effect.",
+    "description": "SubtitleForge builds a complete subtitle rig in a single headless run: a SUBTITLE text layer plus an auto-sizing TXTBox background box wired together with expressions. Each caption line is authored by editing layer markers on SUBTITLE (the marker's comment becomes the on-screen text, its time+duration the visibility window), while all styling comes from one Subtitle Setup pseudo-effect grouped into Font (Font Color/Size/Opacity), Box (Offset X/Y, Box Roundness/Box Color/Opacity), Stroke (Stroke/Stroke Width/Stroke Color), and Shadow (Shadow/Shadow Color/Shadow Opacity, Distance, Spread, Size, Angle). A separate Enable Type On checkbox adds an optional per-character typewriter reveal.",
+    "functionality": [
+      "Applies comprehensive \"Subtitle Setup\" effect preset with extensive parameters",
+      "Configures font properties including size, color, and opacity controls",
+      "Sets up customizable background box with color, roundness, and opacity options",
+      "Implements stroke effects with width and color customization",
+      "Adds professional drop shadow with color, opacity, distance, spread, size, and angle controls",
+      "Provides position offset controls for precise subtitle placement",
+      "Organizes all parameters into logical groups for efficient workflow"
+    ],
+    "usage": [
+      "Select a text layer or create a new composition for subtitle work",
+      "Run the script - no user interface required",
+      "The script applies the \"Subtitle Setup\" effect with default parameters",
+      "Customize subtitle appearance using the effect controls panel: - Font: Adjust size, color, and opacity - Box: Configure background color, roundness, and opacity - Position: Set X and Y offsets for precise placement - Stroke: Control width and color for text outlines - Shadow: Fine-tune color, opacity, distance, spread, size, and angle"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "A text layer or composition must be selected",
+      "Uses embedded Subtitle Setup FFX binary data"
+    ],
+    "notes": [
+      "Effect uses embedded FFX preset data for consistent subtitle styling",
+      "All parameters support keyframe animation for dynamic subtitle effects",
+      "Organized parameter groups enable efficient subtitle template creation",
+      "Background box system ideal for improving text readability over video",
+      "Stroke and shadow effects enhance text visibility across various backgrounds",
+      "Position offsets allow for precise subtitle placement within composition bounds"
+    ],
+    "icon": "assets/icons/subtitleforge.png",
+    "lucide": "captions",
+    "docPath": "docs/SubtitleForge.md",
+    "srcPath": "scripts/layers/SubtitleForge.jsx"
+  },
+  {
+    "id": "textmate",
+    "name": "TextMate",
+    "displayName": "TextMate",
+    "category": "layers",
+    "version": "2.0.0",
+    "ui": "DIALOG",
+    "tagline": "Type a word and highlight every case-sensitive occurrence of it in a text layer, each with its own Range Selector on a new animator.",
+    "description": "TextMate scans a selected text layer's Source Text for every case-sensitive occurrence of a typed string and builds one character-index Range Selector per match inside a single new animator named \"Highlight Animator (<term>)\", with a shared random Fill Color from a 12-color palette. Each occurrence gets its own selector, so you can animate highlights independently. The run is additive and never alters the layer's text or existing animators.",
+    "functionality": [
+      "Intelligent text search with case-sensitive pattern matching",
+      "Advanced text animator creation with range selector precision",
+      "Dynamic color assignment system with predefined contrasting color palette",
+      "Character-level index calculation with carriage return compensation",
+      "Multiple instance highlighting with individual animator controls",
+      "Smart color rotation system preventing consecutive identical colors",
+      "Comprehensive error handling with detailed user feedback",
+      "Batch processing support for multiple text occurrences",
+      "Real-time text analysis and position calculation",
+      "Full undo group support for safe operation reversal"
+    ],
+    "usage": [
+      "Select a single text layer in your composition timeline",
+      "Run the TextMate script to open the highlighting dialog",
+      "Enter the specific text string you want to highlight in the input field",
+      "Click \"OK\" to process the text layer and create highlighting animations",
+      "The script will automatically: - Search for all instances of your specified text - Create a \"Highlight Animator\" with range selectors for each instance - Apply a randomly selected bright color to each highlighted section - Set precise character ranges using index-based positioning",
+      "Each highlighted instance gets its own range selector for independent control",
+      "Use the created animators to add additional text animation properties"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with at least one text layer",
+      "Single text layer selected (exactly one layer must be selected)",
+      "Text layer must contain searchable text content"
+    ],
+    "notes": [
+      "Text search is case-sensitive for precise matching control",
+      "The script automatically handles carriage returns in text calculations",
+      "Color selection uses a curated palette of 12 high-contrast colors",
+      "Each search creates a new animator group with the search term in the name",
+      "Range selectors use character index units for precise text targeting",
+      "The color rotation system ensures visual variety across multiple highlights",
+      "All text formatting and existing animations are preserved during processing",
+      "Multiple instances of the same text get individual range selectors within one animator"
+    ],
+    "icon": "assets/icons/textmate.png",
+    "lucide": "type",
+    "docPath": "docs/TextMate.md",
+    "srcPath": "scripts/layers/TextMate.jsx"
+  },
+  {
+    "id": "timewarp-a-tron",
+    "name": "TimeWarp-a-tron",
+    "displayName": "TimeWarp-a-tron",
+    "category": "layers",
+    "version": "2.0.1",
+    "ui": "DIALOG",
+    "tagline": "Drive a layer's Time Remap from a 0–100 slider that scrubs a user-defined in/out frame range, framerate-correct and keyframe-free.",
+    "description": "TimeWarp-a-tron links a time-remapped layer to a controller slider through a two-button red-to-green pick flow. It adds an In/Out Range point control (X=in frame, Y=out frame, default [0,60]) to the source layer and a Slider Control named \"<Source Layer> || Time Control\" (0–100) to the controller, joined by a generated expression that maps the slider into seconds using the comp's frame rate. Drive the slider to scrub the range; one controller can drive multiple layers.",
+    "functionality": [
+      "Interactive layer selection system with visual feedback indicators",
+      "Automatic time remapping detection and validation for selected layers",
+      "Dynamic controller creation with intelligent naming conventions",
+      "Advanced mathematical expression generation for linear time remapping",
+      "In/Out range point control system for precise timing boundaries",
+      "Frame rate compensation and automatic time conversion calculations",
+      "Dual-control system supporting existing and new slider controllers",
+      "Real-time validation with immediate user feedback",
+      "Comprehensive error handling and user guidance",
+      "Full undo group support for safe operation reversal"
+    ],
+    "usage": [
+      "Select layers with time remapping enabled in your composition timeline",
+      "Run the TimeWarp-a-tron script to open the control selection dialog",
+      "Click the first red button to select a layer with time remapping enabled - The button turns green when a valid time-remapped layer is selected",
+      "Click the second red button to select or create a controller layer - Choose an existing slider control or allow the script to create a new one - The button turns green when a valid controller is established",
+      "Click \"OK\" to generate the time remapping system: - An \"In/Out Range\" point control is added to the time-remapped layer - A slider control is created/configured on the controller layer - Mathematical expressions link the controls for real-time time manipulation",
+      "Use the slider control (0-100) to scrub through the specified time range",
+      "Adjust the \"In/Out Range\" point control to define the timing boundaries"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with layers that support time remapping",
+      "At least one layer with time remapping enabled (canSetTimeRemapEnabled = true)",
+      "Valid controller layers for hosting slider controls"
+    ],
+    "notes": [
+      "The script requires time remapping to be manually enabled before use",
+      "Expression system provides real-time feedback without keyframe dependencies",
+      "Frame rate calculations ensure accurate time conversion across different compositions",
+      "The In/Out Range system defines the temporal boundaries for the remapping control",
+      "Controller naming includes the source layer name for easy identification",
+      "The system supports both pre-existing and newly created slider controls",
+      "All time calculations are automatically compensated for composition frame rate",
+      "Multiple layers can share the same controller for synchronized time control"
+    ],
+    "icon": "assets/icons/timewarp-a-tron.png",
+    "lucide": "square-code",
+    "docPath": "docs/TimeWarp-a-tron.md",
+    "srcPath": "scripts/layers/TimeWarp-a-tron.jsx"
+  },
+  {
+    "id": "centralizer",
+    "name": "Centralizer",
+    "displayName": "Centralizer",
+    "category": "paths",
+    "version": "2.1.0",
+    "ui": "DIALOG",
+    "tagline": "Drop center and bounding-box guides around anything — one shape, a multiselected group of shapes, text, footage or a precomp.",
+    "description": "Pick one or MORE shapes from the layer's list (bezier paths and parametric Rectangles/Ellipses/Polystars alike) and Centralizer adds comp-space guides for their combined bounding box, its center, and/or the layer anchor. Text, footage, precomp and solid layers get the same options measured from their rendered bounds. Parenting and layer transforms are respected.",
+    "functionality": [
+      "Extracts and analyzes shape groups and paths from selected shape layers",
+      "Displays interactive tree view interface for intuitive path selection",
+      "Generates precise center point guides based on path geometry calculations",
+      "Creates bounding box guides for comprehensive path boundary visualization",
+      "Supports multiple guide type selection through checkbox interface",
+      "Implements comprehensive undo functionality for all guide operations",
+      "Maintains shape layer integrity while adding composition-level guides"
+    ],
+    "usage": [
+      "Select a shape layer containing paths in your active composition",
+      "Run the script to analyze the layer and open the selection dialog",
+      "Browse the hierarchical tree view to locate your desired path",
+      "Select the path and choose guide options (center and/or bounding box)",
+      "Click \"Proceed\" to generate guides at calculated positions",
+      "Review the added guides in your composition for alignment reference",
+      "Use generated guides for precise positioning and layout operations"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later with shape layer and guide support",
+      "Active composition must be selected with at least one shape layer",
+      "Shape layer must contain path data for meaningful guide generation",
+      "Sufficient system memory for tree view dialog rendering"
+    ],
+    "notes": [
+      "Tree view provides clear hierarchical visualization of shape layer contents",
+      "Guide calculations account for complex path geometries and transformations",
+      "All operations support full undo functionality for non-destructive workflow",
+      "Center guides are positioned at calculated path centroids for accuracy",
+      "Bounding box guides create comprehensive rectangular boundary references",
+      "Tool maintains composition guide organization and naming conventions"
+    ],
+    "icon": "assets/icons/centralizer.png",
+    "lucide": "crosshair",
+    "docPath": "docs/Centralizer.md",
+    "srcPath": "scripts/paths/Centralizer.jsx"
+  },
+  {
+    "id": "distributron",
+    "name": "Distributron",
+    "displayName": "Distributron",
+    "category": "paths",
+    "version": "1.1.2",
+    "ui": "HEADLESS",
+    "tagline": "Spread a comp's layers evenly along a shape path, each auto-rotating to follow the curve, all steered live from one CTRL null.",
+    "description": "Distributron distributes every other layer in a composition along one shape layer's path, evenly spaced and each auto-rotated to follow the curve, all parented to a CTRL null so the whole spread animates from one controller and re-flows live as the path is reshaped. Ongoing control lives on the Distribute Along the Path pseudo-effect on CTRL: Randomize Rotation, Rotation Offset, Start Distribution Offset, End Distribution Offset, and First/Last Layer Index, plus a Distribution Path Layer picker the script sets automatically.",
+    "functionality": [
+      "Distributes multiple layers evenly along a selected shape path",
+      "Creates control null with pseudo effects for animation control",
+      "Randomization options for rotation variations",
+      "Start and end distribution offset controls",
+      "First and last layer index selection for partial distribution",
+      "Automatic path-following expressions with position and rotation",
+      "Includes bundled ApplyFFX module for pseudo effect application",
+      "Creates mask linked to shape path for reference",
+      "Parents control layer to shape for coordinated movement"
+    ],
+    "usage": [
+      "Select a shape layer with a path in your composition",
+      "Run the script via File > Scripts > PathDistributor.jsx",
+      "Script creates \"CTRL\" null with distribution controls: - Randomize Rotation: Adds variation to each layer's rotation - Rotation Offset: Global rotation adjustment - Start/End Distribution Offset: Path segment control - First/Last Layer Index: Range of layers to distribute",
+      "Layers between specified indices are distributed along path",
+      "Adjust controls in Effects panel for animation"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Shape layer with at least one path selected",
+      "Multiple layers in composition for distribution",
+      "Shape layer must be at top of layer stack or will be moved"
+    ],
+    "notes": [
+      "Bundled version includes ApplyFFX module inline",
+      "Creates complex expressions for path-following behavior",
+      "All distributed layers parent to CTRL null for group control",
+      "Shape layer moves to top if not already there",
+      "Pseudo effect binary data embedded for compatibility",
+      "All operations wrapped in undo group \"Distributron\""
+    ],
+    "icon": "assets/icons/distributron.png",
+    "lucide": "waypoints",
+    "docPath": "docs/Distributron.md",
+    "srcPath": "scripts/paths/Distributron.jsx"
+  },
+  {
+    "id": "originator",
+    "name": "Originator",
+    "displayName": "Originator",
+    "category": "paths",
+    "version": "2.0.0",
+    "ui": "DIALOG",
+    "tagline": "Recenter a shape layer's bezier path origin on (0,0) so it scales and rotates predictably — instantly for one path, via a picker for several.",
+    "description": "Originator computes the bounding-box center of a bezier path's vertices and shifts every vertex (and every keyframe) by that offset, recentering the path on (0,0) without moving the shape on screen — so scaling and rotating it behaves predictably. A single path is centered headlessly; when several exist, a resizable multiselect tree view lets you pick which paths or groups to center. Tangents and existing path animation are preserved.",
+    "functionality": [
+      "Recursively traverses Shape Layer \"Contents\" to extract vector groups and shape paths",
+      "Computes accurate centroids of shape paths using vertex analysis",
+      "Automatically offsets vertices to recenter paths to (0,0) origin",
+      "Provides intelligent ScriptUI tree view for complex shape hierarchies",
+      "Mimics After Effects' property path construction for reliable access",
+      "Handles nested vector groups and maintains shape integrity",
+      "Offers both headless automation and interactive user selection"
+    ],
+    "usage": [
+      "Open a composition and select a Shape Layer containing shape paths",
+      "Run the script to analyze the layer structure",
+      "For single shape path: Automatic centering occurs immediately",
+      "For multiple shape paths: Tree view dialog appears for selection",
+      "In the dialog, browse the hierarchical structure and select desired shape path",
+      "Click \"Center Selected\" to center the origin of the chosen shape path",
+      "Verify the path has been recentered to the coordinate system origin"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later with Shape Layer support",
+      "A Shape Layer must be selected in the active composition",
+      "Shape Layer must contain at least one shape path with vertices",
+      "Sufficient system memory for UI dialog rendering (when applicable)"
+    ],
+    "notes": [
+      "Script automatically detects single vs. multiple path scenarios",
+      "Tree view provides clear hierarchy visualization for complex shapes",
+      "Centroid calculation accounts for all vertex positions and bezier handles",
+      "Original shape data is preserved while adjusting only position offsets",
+      "Compatible with various shape types: rectangles, ellipses, custom paths",
+      "UI dialog is resizable and provides intuitive selection workflow"
+    ],
+    "icon": "assets/icons/originator.png",
+    "lucide": "crosshair",
+    "docPath": "docs/Originator.md",
+    "srcPath": "scripts/paths/Originator.jsx"
+  },
+  {
+    "id": "trace-o-matic",
+    "name": "Trace-o-matic",
+    "displayName": "Trace-o-matic",
+    "category": "paths",
+    "version": "2.0.1",
+    "ui": "HEADLESS",
+    "tagline": "Convert a layer's masks into a new shape layer with hold-keyframed paths and opacity, all styled at once by five master fill/stroke controls.",
+    "description": "Trace-o-matic rebuilds each mask on the selected layer as a shape group on a new shape layer, copying path and opacity animation as HOLD keyframes for a frame-by-frame look. Five master controls on the new layer — Fill Color, Fill Opacity, Stroke Color, Stroke Opacity, Stroke Width — are expression-linked to every traced shape, so one adjustment restyles them all. The source layer and its masks are left untouched.",
+    "functionality": [
+      "Converts all masks from selected layer to shape layer paths",
+      "Preserves mask path keyframes and opacity animations",
+      "Applies hold interpolation for frame-by-frame animation",
+      "Adds centralized fill and stroke controls via effect sliders",
+      "Links shape properties to master controls via expressions",
+      "Cleans up redundant keyframes automatically",
+      "Removes path keyframes where opacity is zero",
+      "Removes consecutive opacity keyframes with same value",
+      "Maintains mask naming in shape groups"
+    ],
+    "usage": [
+      "Select a layer with animated masks in your composition",
+      "Run the script via File > Scripts > MaskShapeMorph.jsx",
+      "Script creates new shape layer \"Shapes from [layer name]\"",
+      "Adjust master controls in Effects panel: - Fill Color & Opacity - Stroke Color, Opacity & Width",
+      "All mask animations are preserved as hold keyframes"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with selected layer",
+      "Selected layer must have at least one mask",
+      "Masks can have path and/or opacity keyframes"
+    ],
+    "notes": [
+      "Hold interpolation creates frame-by-frame animation style",
+      "Keyframe cleanup reduces file size and improves performance",
+      "Zero-opacity path keyframes are removed as invisible",
+      "Master controls allow global appearance changes",
+      "Original masks remain on source layer (non-destructive)",
+      "All operations wrapped in undo group \"Trace-o-matic\""
+    ],
+    "icon": "assets/icons/trace-o-matic.png",
+    "lucide": "pen-tool",
+    "docPath": "docs/Trace-o-matic.md",
+    "srcPath": "scripts/paths/Trace-o-matic.jsx"
+  },
+  {
+    "id": "vertexmaster",
+    "name": "VertexMaster",
+    "displayName": "VertexMaster",
+    "category": "paths",
+    "version": "2.0.2",
+    "ui": "DIALOG",
+    "tagline": "Turn a bezier path's vertices and tangents into null-object handles you can keyframe and parent, or flip to Follow mode to track an animated path.",
+    "description": "VertexMaster rigs a shape layer's bezier path from a tree-view path picker plus Vertex / InTangent / OutTangent checkboxes, generating null objects that drive each vertex and its tangents through a createPath() expression on the Path property. Each vertex null carries a Vertex Control slider (1-based index), a Control/Follow checkbox, and an Open/Closed Path checkbox. In Control mode the null pushes its position into the path; in Follow mode it reads out an already-animated path's vertex instead. Built for organic and character path work where dragging nulls beats hand-editing the Path property.",
+    "functionality": [
+      "Interactive tree-view interface for hierarchical shape layer exploration",
+      "Intelligent path detection across nested shape groups and complex hierarchies",
+      "Individual vertex control system using null objects as animation handles",
+      "Advanced tangent control with independent inTangent and outTangent manipulation",
+      "Dual operation modes: Control (manipulate paths) and Follow (track existing animation)",
+      "Dynamic path topology control with Open/Closed path switching capabilities",
+      "Expression-based automation system for real-time path updates and vertex tracking",
+      "Multi-vertex control with automatic null object generation and naming",
+      "Coordinate space conversion with proper layer-to-comp transformations",
+      "Comprehensive shape group property analysis and path extraction"
+    ],
+    "usage": [
+      "Select a single shape layer containing bezier paths in your composition",
+      "Run the VertexMaster script to open the path selection dialog",
+      "Browse the tree view to locate and select the specific path you want to control",
+      "Configure control options using the checkboxes: - \"Vertex\": Creates null objects to control vertex positions - \"InTangent\": Adds control for incoming tangent handles (parented to vertex nulls) - \"OutTangent\": Adds control for outgoing tangent handles (parented to vertex nulls)",
+      "Click \"Create\" to generate the control system: - Vertex control nulls are created and positioned at existing vertex locations - Tangent nulls are parented to their corresponding vertex nulls - Advanced expressions are applied to link the nulls to the original path",
+      "Use the control nulls to manipulate path vertices in real-time",
+      "Enable \"Control/Follow\" on nulls to switch between control and tracking modes",
+      "Use \"Open/Closed Path\" to dynamically change path topology"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with at least one shape layer containing bezier paths",
+      "Selected shape layer with accessible path properties",
+      "Sufficient composition space for null object placement and manipulation"
+    ],
+    "notes": [
+      "The system works with any bezier path including masks, shape paths, and custom paths",
+      "Control nulls can be duplicated to create additional vertex controls automatically",
+      "The Follow mode allows nulls to track animated paths without controlling them",
+      "All coordinate transformations account for shape group transforms and layer positioning",
+      "The expression system uses the createPath() function for optimal performance",
+      "Tangent controls are parented to vertex controls for intuitive manipulation",
+      "The system preserves existing path animation while adding controllable vertices",
+      "Open/Closed path switching affects the connection between first and last vertices"
+    ],
+    "icon": "assets/icons/vertexmaster.png",
+    "lucide": "square-code",
+    "docPath": "docs/VertexMaster.md",
+    "srcPath": "scripts/paths/VertexMaster.jsx"
+  },
+  {
+    "id": "iteratron",
+    "name": "Iteratron",
+    "displayName": "Iteratron",
+    "category": "utilities",
+    "version": "2.0.1",
+    "ui": "DIALOG",
+    "tagline": "Spread a property evenly across a layer stack — link a start value and an end value, and every layer in between gets its interpolated step.",
+    "description": "Highlight a property on a start layer and click Link Start Property; do the same on an end layer, then OK — evenly interpolated values are written to every unlocked, visible layer between them. Property-agnostic (Position, Scale, Rotation, colors, effect sliders) and keyframe-aware: properties that already have keys get a value at the playhead instead of being overwritten.",
+    "functionality": [
+      "Interactive property selection system with visual feedback indicators",
+      "Advanced mathematical interpolation between start and end property values",
+      "Multi-dimensional property support (1D, 2D, 3D, and color properties)",
+      "Intelligent layer validation system excluding locked and hidden layers",
+      "Bidirectional processing supporting both ascending and descending layer orders",
+      "Smart keyframe detection with automatic setValue vs setValueAtTime selection",
+      "Real-time property path construction and validation",
+      "Comprehensive error handling with detailed user feedback",
+      "Current timeline time integration for keyframe-based properties",
+      "Full undo group support for safe operation reversal"
+    ],
+    "usage": [
+      "Prepare your composition with multiple layers containing the same property type",
+      "Run the Iteratron script to open the property linking dialog",
+      "Select the start layer and click \"Link Start Property\" (red circle button) - Select the specific property you want to use as the starting value - The button turns green when a valid property is selected",
+      "Select the end layer and click \"Link End Property\" (red circle button) - Select the same property type on a different layer - The button turns green when a valid property is selected",
+      "Click \"OK\" to execute the property distribution: - The script calculates incremental steps between start and end values - All valid layers between start and end get interpolated values - Locked and hidden layers are automatically skipped",
+      "The property values will be smoothly distributed across the selected layer range",
+      "Use Undo (Ctrl+Z / Cmd+Z) if you need to reverse the operation"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later",
+      "Active composition with at least 3 layers (start, middle, and end layers)",
+      "Layers containing compatible properties (Position, Scale, Rotation, Color, etc.)",
+      "Valid layer selection with accessible and unlocked intermediate layers"
+    ],
+    "notes": [
+      "The system works with any animatable property that returns numerical values",
+      "Layer processing automatically excludes locked, hidden, or invalid layers from calculations",
+      "The script supports both forward (1→10) and reverse (10→1) layer index processing",
+      "Keyframe detection automatically determines the appropriate value-setting method",
+      "Property path construction uses both matchName and name for maximum compatibility",
+      "Mathematical interpolation ensures smooth value distribution regardless of layer count",
+      "The system preserves existing keyframe timing while updating values at current time",
+      "Multi-dimensional properties (Position, Scale) are processed component-wise for accuracy"
+    ],
+    "icon": "assets/icons/iteratron.png",
+    "lucide": "square-code",
+    "docPath": "docs/Iteratron.md",
+    "srcPath": "scripts/utilities/Iteratron.jsx"
+  },
+  {
+    "id": "randomatic",
+    "name": "RandoMatic",
+    "displayName": "RandoMatic",
+    "category": "utilities",
+    "version": "2.0.0",
+    "ui": "DIALOG",
+    "tagline": "Replace every selected keyframe's value with a fresh uniform-random number inside a per-axis range you type in — timing and easing untouched.",
+    "description": "RandoMatic rewrites the values of already-selected keyframes with independent uniform-random numbers, leaving their time, interpolation, and easing untouched. A dimensionality-aware dialog shows one Start Range / End Range row per axis needed (X, X+Y, or X+Y+Z) across the selection. Every selected keyframe on every selected property is drawn independently, in one undo step.",
+    "functionality": [
+      "Creates interactive dialog with input fields for X, Y, Z dimension ranges",
+      "Validates numeric input data and provides clear error messaging for invalid entries",
+      "Computes mathematically distributed random values within specified ranges",
+      "Applies randomization to multiple selected keyframes simultaneously",
+      "Preserves original keyframe timing relationships and interpolation settings",
+      "Supports multi-dimensional properties including position, scale, and rotation",
+      "Includes comprehensive NaN detection and input validation systems"
+    ],
+    "usage": [
+      "Open your After Effects composition and select properties with keyframes",
+      "Select the specific keyframes you want to randomize in the timeline",
+      "Run the script to open the RandoMatic dialog interface",
+      "Enter start and end range values for each dimension (X, Y, Z) as needed",
+      "Review your range inputs to ensure they match your creative intent",
+      "Click \"OK\" to apply randomization to all selected keyframes",
+      "Use \"Cancel\" to exit without making changes if needed"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later with keyframe animation support",
+      "Active composition must be selected with keyframeable properties",
+      "Selected keyframes must exist on properties that support the specified dimensions",
+      "Sufficient system memory for dialog rendering and keyframe processing"
+    ],
+    "notes": [
+      "Dialog validates all inputs to prevent non-numeric values and calculation errors",
+      "Randomization uses uniform distribution within specified ranges for predictable results",
+      "Tool preserves keyframe interpolation methods and temporal properties",
+      "Multiple properties can be randomized simultaneously for efficient workflow",
+      "Range inputs support both positive and negative values for complete flexibility",
+      "Script includes built-in NaN detection array utility for robust error handling"
+    ],
+    "icon": "assets/icons/randomatic.png",
+    "lucide": "shuffle",
+    "docPath": "docs/RandoMatic.md",
+    "srcPath": "scripts/utilities/RandoMatic.jsx"
+  },
+  {
+    "id": "triminator",
+    "name": "Triminator",
+    "displayName": "Triminator",
+    "category": "utilities",
+    "version": "2.0.0",
+    "ui": "HEADLESS",
+    "tagline": "Add a Trim Paths effect — pre-keyframed 0→100% for an instant reveal — to a shape layer's contents or to the specific shape groups you select.",
+    "description": "Triminator adds a Trim Paths effect to each selected shape layer's root contents, or, when you have drilled in and selected specific shape Groups, inside each group's own contents. By default it writes a 0%→100% keyframe pair on Start and End (from the layer's in-point to one second later) for an instant grow-in; hold Shift while launching to add the effect only. Non-shape layers in a mixed selection are skipped.",
+    "functionality": [
+      "Automatically adds Trim Paths effects to root vector groups or selected shape groups",
+      "Creates optional keyframes for animated trim effects (0 to 100% progression)",
+      "Supports multiple selected layers and groups for batch processing",
+      "Intelligently detects and processes only vector layers, skipping incompatible types",
+      "Provides Shift key modifier support to skip keyframe generation when desired",
+      "Handles complex shape layer hierarchies and nested group structures",
+      "Maintains proper effect placement within shape layer contents structure"
+    ],
+    "usage": [
+      "Select one or more shape layers in your active composition",
+      "Optionally select specific shape groups within layers for targeted application",
+      "Run the script to automatically add Trim Paths effects to selected elements",
+      "Hold Shift key while running to skip adding keyframes (effects only)",
+      "Review the added Trim Paths effects in the timeline",
+      "Customize trim animation timing and values as needed for your project",
+      "Use generated keyframes as starting point for custom trim animations"
+    ],
+    "requirements": [
+      "Adobe After Effects CS6 or later with shape layer and Trim Paths support",
+      "Active composition must be selected with at least one shape layer",
+      "Selected layers must be vector/shape layers for trim effects to be applicable",
+      "Shape layers should contain path data for meaningful trim effects"
+    ],
+    "notes": [
+      "Script intelligently skips non-vector layers to prevent errors and warnings",
+      "Shift key modifier allows for effect-only application without automatic keyframes",
+      "Trim Paths effects are added to appropriate vector groups within shape layer hierarchy",
+      "Generated keyframes animate from 0% to 100% trim over composition duration",
+      "Tool maintains shape layer integrity while adding effects to contents structure",
+      "Compatible with both simple and complex nested shape layer configurations"
+    ],
+    "icon": "assets/icons/triminator.png",
+    "lucide": "scissors",
+    "docPath": "docs/Triminator.md",
+    "srcPath": "scripts/utilities/Triminator.jsx"
+  }
+]

@@ -84,6 +84,14 @@ describe('buildProperties — tree + traversal', () => {
     expect(opacity.canSetExpression).toBe(true);
     expect(opacity.numKeys).toBe(1);
   });
+
+  it('reflects keyframe interpolation metadata from fixtures', () => {
+    const opacity = root.property('Transform').property('Opacity');
+    opacity.setInterpolationTypeAtKey(1, 'LINEAR', 'HOLD');
+
+    expect(opacity.keyInInterpolationType(1)).toBe(6612);
+    expect(opacity.keyOutInterpolationType(1)).toBe(6614);
+  });
 });
 
 describe('setValue logging', () => {

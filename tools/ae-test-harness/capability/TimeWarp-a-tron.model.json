@@ -1,0 +1,88 @@
+{
+  "name": "TimeWarp-a-tron",
+  "category": "layers",
+  "ui": "DIALOG",
+  "consumes": {
+    "selection": ["layers", "comp"],
+    "minimum": "1 active comp + 1 layer with time remapping enabled (canSetTimeRemapEnabled = true) + 1 controller layer (any layer that can host effects)",
+    "description": "Reads the active CompItem. The 'pick time-remap' button reads selectedLayers[0] and checks canSetTimeRemapEnabled, then stores the layer's 'ADBE Time Remapping' property. The 'pick controller' button reads selectedLayers[0] and selectedProperties[0]; it searches the controller layer's effect parade for an existing named slider or a selected ADBE Slider Control. Reads the composition frameRate at OK-click time to embed in the generated expression."
+  },
+  "controls": [
+    {
+      "name": "pickTimeRemapButton",
+      "type": "button",
+      "role": "captures the currently selected layer as the time-remapped source; turns green (🟢) on success, alerts on invalid selection",
+      "default": null
+    },
+    {
+      "name": "pickControllerButton",
+      "type": "button",
+      "role": "captures the currently selected layer/effect as the slider controller; creates a new Slider Control effect if none exists (after confirm prompt); turns green (🟢) on success",
+      "default": null
+    },
+    {
+      "name": "OK",
+      "type": "button",
+      "role": "validates both picks, adds 'In/Out Range' Point Control to the time-remap layer, ensures slider on controller layer, builds and writes the linear time-remap expression, then closes the dialog",
+      "default": null
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "closes the dialog without applying any changes",
+      "default": null
+    }
+  ],
+  "functions": [
+    "wrap all mutations in a single undo group named 'TimeWarp-a-tron'",
+    "guard: alert if pickTimeRemapButton is clicked without a layer selected that supports time remapping",
+    "guard: alert if pickControllerButton is clicked before a time-remap layer has been picked",
+    "guard: alert if OK is clicked before both a time-remap layer and a controller layer have been picked",
+    "detect and store the 'ADBE Time Remapping' property from the selected time-remap layer",
+    "search the controller layer's effect parade by name for an existing named slider control",
+    "accept a pre-selected ADBE Slider Control effect on the controller layer without prompting",
+    "confirm-prompt the user to add a new Slider Control when no matching effect exists on the controller layer",
+    "add an ADBE Slider Control effect to the controller layer and name it '<layerName> || Time Control'",
+    "add an ADBE Point Control effect named 'In/Out Range' to the time-remap layer (if not already present)",
+    "set the 'In/Out Range' Point Control default value to [0, 60] (frame numbers for In/Out boundaries)",
+    "build a linear-interpolation expression string that maps a 0–100 slider value to a time range defined by the 'In/Out Range' point control divided by the composition frame rate",
+    "write the generated expression onto the layer's 'ADBE Time Remapping' property"
+  ],
+  "scriptSim": {
+    "scenario": "link time-remap layer to new slider controller",
+    "inputs": "Active comp 'VFX Comp' (1920×1080, 24fps, 10s); layer 'Footage Layer' (index 1, AV, has ADBE Time Remapping); layer 'Controller NULL' (index 2, Null, no effects); remap layer initially selected; user clicks pickTimeRemapButton, switches selection to 'Controller NULL', clicks pickControllerButton (no existing slider → confirm 'yes'), clicks OK",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "TimeWarp-a-tron" },
+      { "kind": "confirm", "target": "No slider controller found. Would you like to add a Control Slider?" },
+      { "kind": "setValue", "target": "Footage Layer/Effects/In/Out Range/Point", "value": [0, 60] },
+      { "kind": "setExpression", "target": "Footage Layer/Time Remap" },
+      { "kind": "endUndoGroup", "target": "TimeWarp-a-tron" }
+    ]
+  },
+  "expressions": [
+    {
+      "target": "Footage Layer/Time Remap",
+      "controlBinding": {
+        "control": "pickControllerButton",
+        "param": "Slider",
+        "range": [0, 100]
+      },
+      "expression": "function linearExpression(value, inputMin, inputMax, outputMin, outputMax) {\n    var normalizedValue = (value - inputMin) / (inputMax - inputMin);\n    var outputValue = outputMin + normalizedValue * (outputMax - outputMin);\n    return outputValue;\n}\nvar inOutRange = thisComp.layer(\"Footage Layer\").effect(\"In/Out Range\")(\"Point\");\nvar controllingValue = thisComp.layer(\"Controller NULL\").effect(\"Footage Layer || Time Control\")(\"Slider\");\nvar inputMin = 0;\nvar inputMax = 100;\nvar outputMin = inOutRange[0] / 24;\nvar outputMax = inOutRange[1] / 24;\nlinearExpression(controllingValue, inputMin, inputMax, outputMin, outputMax);",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps the Slider Control value from 0 (→ outputMin = inOutRange[0]/24 = 0s) to 100 (→ outputMax = inOutRange[1]/24 = 2.5s at 24fps with default [0,60]). Output is the linearly remapped time in seconds fed to the ADBE Time Remapping property, controlling playback position across the in/out frame range."
+      }
+    }
+  ],
+  "notes": [
+    "Time remapping must be manually enabled on the source layer before running the script (canSetTimeRemapEnabled check is passive — the script does not enable it automatically).",
+    "The expression embeds the controller layer name and effect name as literal strings at generation time; renaming either layer or effect after application will break the expression.",
+    "The 'In/Out Range' Point Control stores frame numbers (not seconds); the expression divides by the composition frameRate (embedded as a literal at generation time) for AE time-in-seconds output.",
+    "The slider operates on a fixed 0–100 input domain regardless of the actual In/Out frame range; the range is entirely governed by the Point Control values.",
+    "If a slider effect whose matchName is 'ADBE Slider Control-0001' OR 'ADBE Slider Control' is pre-selected on the controller layer, it is used directly without renaming or confirmation.",
+    "The script searches for an existing controller by the name pattern '<layerName> || Time Control' before prompting to create a new one.",
+    "The endUndoGroup() call is placed after win.show() returns (modal dialog), so it fires after all user interactions including the OK click."
+  ]
+}

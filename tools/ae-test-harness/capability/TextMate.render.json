@@ -1,0 +1,12 @@
+{
+  "name": "TextMate",
+  "screenshot": "dashboard/assets/ui/TextMate.png",
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "UI is DIALOG mode; UITree was captured from the success scenario ('highlight two occurrences of search term') with search term 'Hello' pre-seeded into the edittext field.",
+    "PNG rendered via SDB at 2x device scale factor; dimensions 173x153 CSS px (346x306 px physical). File size 19358 bytes.",
+    "expressions[] is empty — TextMate writes no AE expressions; no curves to plot.",
+    "The dialog shows: static label 'Enter text to highlight:', an edittext (200 px wide, prefilled 'Hello'), and an OK/Cancel button row."
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "name": "Linearizer",
+  "screenshot": "/Users/ivg/github/ae-script-catalog/ae/tools/ae-test-harness/dashboard/assets/ui/Linearizer.png",
+  "uiTreePath": null,
+  "expressionCurves": [
+    {
+      "target": "Target Shape/Transform/Opacity",
+      "xLabel": "Slider Control value (0–100)",
+      "yLabel": "Opacity (%)",
+      "samples": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 2.5,
+          "y": 2.5
+        },
+        {
+          "x": 5,
+          "y": 5
+        },
+        {
+          "x": 7.5,
+          "y": 7.5
+        },
+        {
+          "x": 10,
+          "y": 10
+        },
+        {
+          "x": 12.5,
+          "y": 12.5
+        },
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 17.5,
+          "y": 17.5
+        },
+        {
+          "x": 20,
+          "y": 20
+        },
+        {
+          "x": 22.5,
+          "y": 22.5
+        },
+        {
+          "x": 25,
+          "y": 25
+        },
+        {
+          "x": 27.5,
+          "y": 27.500000000000004
+        },
+        {
+          "x": 30,
+          "y": 30
+        },
+        {
+          "x": 32.5,
+          "y": 32.5
+        },
+        {
+          "x": 35,
+          "y": 35
+        },
+        {
+          "x": 37.5,
+          "y": 37.5
+        },
+        {
+          "x": 40,
+          "y": 40
+        },
+        {
+          "x": 42.5,
+          "y": 42.5
+        },
+        {
+          "x": 45,
+          "y": 45
+        },
+        {
+          "x": 47.5,
+          "y": 47.5
+        },
+        {
+          "x": 50,
+          "y": 50
+        },
+        {
+          "x": 52.5,
+          "y": 52.5
+        },
+        {
+          "x": 55,
+          "y": 55
+        },
+        {
+          "x": 57.5,
+          "y": 57.5
+        },
+        {
+          "x": 60,
+          "y": 60
+        },
+        {
+          "x": 62.5,
+          "y": 62.5
+        },
+        {
+          "x": 65,
+          "y": 65
+        },
+        {
+          "x": 67.5,
+          "y": 67.5
+        },
+        {
+          "x": 70,
+          "y": 70
+        },
+        {
+          "x": 72.5,
+          "y": 72.5
+        },
+        {
+          "x": 75,
+          "y": 75
+        },
+        {
+          "x": 77.5,
+          "y": 77.5
+        },
+        {
+          "x": 80,
+          "y": 80
+        },
+        {
+          "x": 82.5,
+          "y": 82.5
+        },
+        {
+          "x": 85,
+          "y": 85
+        },
+        {
+          "x": 87.5,
+          "y": 87.5
+        },
+        {
+          "x": 90,
+          "y": 90
+        },
+        {
+          "x": 92.5,
+          "y": 92.5
+        },
+        {
+          "x": 95,
+          "y": 95
+        },
+        {
+          "x": 97.5,
+          "y": 97.5
+        },
+        {
+          "x": 100,
+          "y": 100
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "PNG rendered: 349x188px (10 items)",
+    "Expression curve sweeps Slider Control value 0→100 with evenInterpolation=false (checkbox=0), using the 3-keyframe piecewise mapping: [0,50] → opacity 0→50%, [50,100] → opacity 50→100%.",
+    "Operations logged during success scenario: alert, setExpression, setExpression, setExpression, setExpression, setExpression, beginUndoGroup, executeCommand, setValue, setExpression, setExpression, setExpression, setExpression, setExpression, setExpression, endUndoGroup, setValue, executeCommand, setValue, executeCommand, executeCommand, executeCommand, executeCommand"
+  ]
+}

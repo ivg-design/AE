@@ -1,0 +1,12 @@
+{
+  "name": "OrderMaster",
+  "screenshot": "dashboard/assets/ui/OrderMaster.png",
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "UI mode is DIALOG; UITree captured from the success scenario 'reverse two contiguous layers'.",
+    "Dialog contains: Randomize checkbox + Group with Proceed and Cancel buttons.",
+    "PNG rendered via SDB service: 187×82 px (device scale 2×), 12 424 bytes.",
+    "No AE expressions defined in this script; expressionCurves is empty."
+  ]
+}

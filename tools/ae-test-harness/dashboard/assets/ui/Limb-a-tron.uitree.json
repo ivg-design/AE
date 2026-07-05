@@ -1,0 +1,56 @@
+{
+  "type": "Dialog",
+  "children": [
+    {
+      "type": "edittext",
+      "text": "Arm",
+      "value": "Arm",
+      "properties": {
+        "size": {},
+        "preferredSize": {},
+        "enabled": true,
+        "visible": true
+      }
+    },
+    {
+      "type": "group",
+      "properties": {
+        "size": {},
+        "preferredSize": {},
+        "orientation": "column",
+        "enabled": true,
+        "visible": true
+      },
+      "children": [
+        {
+          "type": "button",
+          "text": "OK",
+          "properties": {
+            "size": {},
+            "preferredSize": {},
+            "enabled": true,
+            "visible": true
+          },
+          "handlers": [
+            "onClick"
+          ]
+        },
+        {
+          "type": "button",
+          "text": "Arm",
+          "value": "Arm",
+          "properties": {
+            "size": {},
+            "preferredSize": {},
+            "enabled": true,
+            "visible": true
+          },
+          "handlers": [
+            "onClick"
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "Name the Limb"
+}

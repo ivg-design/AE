@@ -7,22 +7,34 @@
  * 
  * @name PathDuplitron
  * @author IVG Design
- * @version 2.0.0
+ * @version 2.0.1
  * @date 2025-08-13
  * @license MIT
  * @ui PANEL
- * 
+ *
+ * @changelog
+ * • 2026-07-04 (2.0.1): Fixed the Copy operation, which previously created a
+ *   temporary shape layer and wrote a flat [x, y] coordinate pair into a
+ *   SHAPE-type Path property. In real After Effects that is a property-value
+ *   type mismatch that threw at runtime before cleanup, leaving a stray empty
+ *   shape layer in the comp; it also only ever carried raw X/Y coordinates,
+ *   never any tangent/ease data. Copy now uses After Effects' native keyframe
+ *   Copy (Edit > Copy) directly on the selected Position keyframes, and Paste
+ *   uses native keyframe Paste (Edit > Paste). AE's own clipboard preserves the
+ *   complete temporal ease, spatial tangents, and interpolation type, so the
+ *   tool now delivers its stated purpose. Command IDs are resolved via
+ *   app.findMenuCommandId() for version-safe execution.
+ *
  * @description
  * PathDuplitron simplifies the complex process of copying motion path tangent data between
- * layers in After Effects. The tool extracts position keyframe information along with their
- * temporal and spatial tangent properties, stores them temporarily using shape layer intermediates,
- * and allows precise application to target layers while maintaining curve characteristics.
- * 
+ * layers in After Effects. The tool drives AE's native keyframe clipboard (Edit ▸ Copy /
+ * Edit ▸ Paste via version-safe menu-command lookups) so the selected position keyframes
+ * transfer with their temporal and spatial tangent properties fully intact.
+ *
  * @functionality
- * • Copies position keyframes with complete tangent information to system storage
+ * • Copies selected position keyframes with complete tangent information via AE's keyframe clipboard
  * • Preserves both temporal and spatial tangent relationships during transfer
- * • Uses shape layer as reliable intermediate storage for tangent data
- * • Pastes tangent information to selected position keyframes with precision
+ * • Pastes tangent information to the target layer at the current time with precision
  * • Maintains keyframe timing relationships and curve interpolation
  * • Provides simple copy/paste interface for efficient workflow
  * • Handles complex motion path data including bezier curve properties
@@ -44,7 +56,7 @@
  * 
  * @notes
  * • Panel remains dockable within After Effects interface for repeated use
- * • Shape layer intermediate storage ensures reliable tangent data preservation
+ * • AE's native keyframe clipboard ensures reliable tangent data preservation
  * • Tool maintains original keyframe timing while transferring curve characteristics
  * • Compatible with 2D and 3D position properties and their respective tangents
  * • Copy operation stores data until After Effects session ends or new copy is performed
@@ -107,20 +119,15 @@
             return;
         }
 
-        var shapeLayer = comp.layers.addShape();
-        var shapePath = shapeLayer.property("Contents").addProperty("ADBE Vector Shape - Group").property("ADBE Vector Shape");
-
-        for (var i = 1; i <= positionProp.numKeys; i++) {
-            var keyValue = positionProp.keyValue(i);
-            var keyTime = positionProp.keyTime(i);
-            var vertices = [keyValue[0], keyValue[1]];
-            shapePath.setValueAtTime(keyTime, vertices);
-        }
-
-        shapePath.selected = true;
-        app.executeCommand(10313); // Copy command ID
-
-        shapeLayer.remove();
+        // Copy the selected Position keyframes directly via After Effects'
+        // native Edit > Copy. AE's keyframe copy preserves the complete temporal
+        // ease, spatial tangents, and interpolation type on the clipboard, which
+        // Paste then applies to the target Position property. The previous
+        // shape-layer intermediate wrote a flat [x, y] pair into a SHAPE-type
+        // Path property (a type mismatch that threw at runtime and left a stray
+        // empty shape layer) and carried only raw coordinates, so it was removed.
+        var copyCmdId = app.findMenuCommandId("Copy");
+        app.executeCommand(copyCmdId);
     }
 
     function pasteTangents() {
@@ -148,7 +155,10 @@
             return;
         }
 
-        app.executeCommand(20); // Paste command ID
+        // Native Edit > Paste applies the copied keyframes (with their preserved
+        // ease/tangents/interpolation) onto the selected target Position property.
+        var pasteCmdId = app.findMenuCommandId("Paste");
+        app.executeCommand(pasteCmdId);
     }
 
     buildUI(thisObj);

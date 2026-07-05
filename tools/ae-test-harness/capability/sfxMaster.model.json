@@ -1,0 +1,84 @@
+{
+  "name": "sfxMaster",
+  "category": "effects",
+  "ui": "HEADLESS",
+
+  "consumes": {
+    "selection": ["comp"],
+    "minimum": "1 or more compositions selected in the Project panel",
+    "description": "Reads app.project.selection — expects one or more CompItem entries. For each comp it iterates all layers, identifying audio-only FootageItem layers (hasVideo === false) and nested CompItem layers (processed recursively). Inspects each audio layer's Marker property to classify it as Voice Over, Music, or Sound Effects. Also checks whether any audio layer already has a Stereo Mixer effect with expressions so it can prompt before overwriting."
+  },
+
+  "controls": [],
+
+  "functions": [
+    "create 'SFX CTRL' null layer in each selected composition",
+    "add three Slider Control effects (Voice Over, Sound Effects, Music) to the SFX CTRL null",
+    "scan compositions recursively for audio-only layers",
+    "categorize each audio layer as Voice Over, Music, or Sound Effects via its first marker comment",
+    "apply Stereo Mixer effect to each audio layer",
+    "link Stereo Mixer Left Level and Right Level to the appropriate SFX CTRL slider via expressions",
+    "detect pre-existing Stereo Mixer expressions and optionally overwrite them after a confirm dialog",
+    "wrap all mutations in a single 'Apply Stereo Mixer' undo group"
+  ],
+
+  "scriptSim": {
+    "scenario": "success — SFX CTRL created, Stereo Mixer linked to Music slider",
+    "inputs": "Project with one selected comp ('Ad Sequence') containing one audio-only layer ('BGMusic.wav') whose first marker comment is 'music'; no pre-existing Stereo Mixer effects.",
+    "operations": [
+      { "kind": "beginUndoGroup",  "target": "app",                                          "value": "Apply Stereo Mixer" },
+      { "kind": "createLayer",     "target": "SFX CTRL" },
+      { "kind": "setValue",        "target": "SFX CTRL/Transform/Position",                  "value": [100, 100] },
+      { "kind": "setValue",        "target": "SFX CTRL/Effects/Voice Over" },
+      { "kind": "setValue",        "target": "SFX CTRL/Effects/Sound Effects" },
+      { "kind": "setValue",        "target": "SFX CTRL/Effects/Music" },
+      { "kind": "setValue",        "target": "BGMusic.wav/Effects/Stereo Mixer" },
+      { "kind": "setExpression",   "target": "BGMusic.wav/Effects/Stereo Mixer/Left Level",  "value": "comp('Ad Sequence').layer('SFX CTRL').effect('Music')('Slider')" },
+      { "kind": "setExpression",   "target": "BGMusic.wav/Effects/Stereo Mixer/Right Level", "value": "comp('Ad Sequence').layer('SFX CTRL').effect('Music')('Slider')" },
+      { "kind": "endUndoGroup",    "target": "app" }
+    ]
+  },
+
+  "expressions": [
+    {
+      "target": "BGMusic.wav/Effects/Stereo Mixer/Left Level",
+      "controlBinding": {
+        "control": "Music",
+        "param": "Slider",
+        "range": [-48, 6]
+      },
+      "expression": "comp('Ad Sequence').layer('SFX CTRL').effect('Music')('Slider')",
+      "sim": {
+        "variable": "controlValue",
+        "range": [-48, 6],
+        "steps": 40,
+        "note": "Sweeps the Music slider on SFX CTRL from -48 dB to +6 dB and plots the Left Level output, which equals the slider value 1-to-1."
+      }
+    },
+    {
+      "target": "BGMusic.wav/Effects/Stereo Mixer/Right Level",
+      "controlBinding": {
+        "control": "Music",
+        "param": "Slider",
+        "range": [-48, 6]
+      },
+      "expression": "comp('Ad Sequence').layer('SFX CTRL').effect('Music')('Slider')",
+      "sim": {
+        "variable": "controlValue",
+        "range": [-48, 6],
+        "steps": 40,
+        "note": "Sweeps the Music slider on SFX CTRL from -48 dB to +6 dB and plots the Right Level output, which mirrors Left Level exactly."
+      }
+    }
+  ],
+
+  "notes": [
+    "HEADLESS: no ScriptUI; runs as an IIFE with no dialog (except the optional confirm for overwrite).",
+    "Audio categorization is determined by the first marker comment only; 'voice over' → Voice Over slider, 'music' → Music slider, anything else (including no marker) → Sound Effects slider.",
+    "The script checks app.project.selection, not app.project.activeItem — compositions must be selected in the Project panel, not merely open in the timeline.",
+    "Nested compositions are recursively processed; the expression in each nested audio layer always references the top-level (main) comp's SFX CTRL by name.",
+    "If a Stereo Mixer effect already exists without expressions, the code path adds a second Stereo Mixer rather than reusing the existing one (the addProperty branch runs when stereoMixer is truthy and overwrite is false).",
+    "All mutations are wrapped in a single undo group named 'Apply Stereo Mixer' (not 'SFX Master' as the JSDoc states — the actual code uses 'Apply Stereo Mixer').",
+    "Expression slider dB range of [-48, 6] is a representative mix-engineering range; AE Slider Control allows any numeric value."
+  ]
+}

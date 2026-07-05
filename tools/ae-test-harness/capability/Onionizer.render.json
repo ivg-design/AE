@@ -1,0 +1,12 @@
+{
+  "name": "Onionizer",
+  "screenshot": null,
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "ui:HEADLESS — no ScriptUI dialog; screenshot and uiTree are not applicable.",
+    "expressions:[] — v2.0.1 writes no AE expressions; no expression curves to plot.",
+    "Script is KNOWN-BLOCKED due to //@include 'modules/PropQuery.js'; harness runner skipped functional execution.",
+    "PNG not generated (HEADLESS + no expressions)."
+  ]
+}

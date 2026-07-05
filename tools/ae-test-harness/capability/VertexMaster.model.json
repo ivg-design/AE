@@ -1,0 +1,112 @@
+{
+  "name": "VertexMaster",
+  "category": "paths",
+  "ui": "DIALOG",
+
+  "consumes": {
+    "selection": ["comp", "layers"],
+    "minimum": "1 active CompItem + exactly 1 selected shape layer (matchName ADBE Vector Layer) containing at least one bezier path in its Contents hierarchy",
+    "description": "Reads the active CompItem, validates that exactly one shape layer is selected, then recursively traverses the selected layer's Contents property group (via extractGroups) to enumerate vector groups and shape paths for display in the tree-view dialog."
+  },
+
+  "controls": [
+    {
+      "name": "treeView",
+      "type": "listbox",
+      "role": "selects the specific bezier path to control from the shape layer's Contents hierarchy",
+      "default": null
+    },
+    {
+      "name": "Vertex",
+      "type": "checkbox",
+      "role": "when checked, creates a null object positioned at vertex 1 of the selected path with Vertex Control, Control/Follow, and Open/Closed Path effects",
+      "default": true
+    },
+    {
+      "name": "InTangent",
+      "type": "checkbox",
+      "role": "when checked, creates an additional null object for the incoming tangent handle parented to the vertex null",
+      "default": false
+    },
+    {
+      "name": "OutTangent",
+      "type": "checkbox",
+      "role": "when checked, creates an additional null object for the outgoing tangent handle parented to the vertex null",
+      "default": false
+    },
+    {
+      "name": "Create",
+      "type": "button",
+      "role": "validates selection, creates control nulls with effects, applies position and path expressions, closes dialog",
+      "default": null
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "closes the dialog without making any changes",
+      "default": null
+    }
+  ],
+
+  "functions": [
+    "validate that an active composition is open and exactly one shape layer is selected",
+    "recursively traverse the selected shape layer's Contents hierarchy to extract vector groups and bezier paths",
+    "display a tree-view dialog listing the shape layer's path hierarchy for user selection",
+    "create a null object as a vertex control handle with ADBE Slider Control ('Vertex Control'), two ADBE Checkbox Control effects ('Control/Follow' and 'Open/Closed Path') applied",
+    "optionally create inTangent and outTangent null objects parented to the vertex control null",
+    "apply a position expression to the vertex (and optionally tangent) null objects that reads the path's vertex and tangent data and transforms coordinates from shape-group space to comp space via shapeLayer.toComp()",
+    "build and apply a path expression to the original bezier path property that reads all vertex control nulls, converts their world positions back to local shape-group space via shapeLayer.fromWorld(), updates pathPoints/inTangents/outTangents arrays, and reconstructs the path with createPath()",
+    "support a Control/Follow toggle on each null: when Follow mode is active the null tracks the animated path; when Control mode is active the null drives the path",
+    "support dynamic open/closed path switching via the Open/Closed Path checkbox effect on vertex nulls",
+    "wrap all mutations in a single undo group ('Create Shape Controls and Expression')"
+  ],
+
+  "scriptSim": {
+    "scenario": "success — select Path 1 from Ellipse 1 group, create vertex null with expression",
+    "inputs": "Composition 'Main Comp' (1920×1080, 24 fps, 5 s) containing one shape layer 'Shape Layer 1' with a flat Contents tree holding 'Path 1' (ADBE Vector Shape - Group) with a 4-vertex closed bezier ellipse; 'Vertex' checked, 'InTangent' and 'OutTangent' unchecked",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Create Shape Controls and Expression", "value": "Create Shape Controls and Expression" },
+      { "kind": "endUndoGroup", "target": "Create Shape Controls and Expression" }
+    ]
+  },
+
+  "expressions": [
+    {
+      "target": "Shape Layer 1 Vertex 1/Transform/Position",
+      "controlBinding": {
+        "control": "Vertex Control",
+        "param": "Slider",
+        "range": [1, 4]
+      },
+      "expression": "var shapeLayer = thisComp.layer(\"Shape Layer 1\");\nvar controlFollow = thisLayer.effect(\"Control/Follow\")(\"Checkbox\").value;\nif (controlFollow == 1) {\n    var vertexIndex = Math.floor(thisLayer.effect(\"Vertex Control\")(\"Slider\").value);\n    var pathProperty = thisComp.layer(\"Shape Layer 1\")(\"Contents\")(\"Path 1\")(\"Path 1\")(\"Path\");\n    var points = pathProperty.points();\n    if (points.length >= vertexIndex && vertexIndex > 0) {\n        var point = points[vertexIndex - 1];\n        var shapeGroupPosition = pathProperty.propertyGroup(3)(\"Transform\")(\"Position\").value;\n        var shapeGroupAnchor = pathProperty.propertyGroup(3)(\"Transform\")(\"Anchor Point\").value;\n        point[0] += (shapeGroupPosition[0] - shapeGroupAnchor[0]);\n        point[1] += (shapeGroupPosition[1] - shapeGroupAnchor[1]);\n        if (\"vertex\" === \"vertex\") {\n            shapeLayer.toComp(point);\n        } else if (\"vertex\" === \"inTangent\" || \"vertex\" === \"outTangent\") {\n            var tangents = \"vertex\" === \"inTangent\" ? pathProperty.inTangents() : pathProperty.outTangents();\n            var tangent = tangents[vertexIndex - 1];\n            shapeLayer.toComp([point[0] + tangent[0], point[1] + tangent[1]]);\n        }\n    } else {\n        value;\n    }\n} else {\n    value;\n}",
+      "sim": {
+        "variable": "controlValue",
+        "range": [1, 4],
+        "steps": 4,
+        "note": "Sweeps the 'Vertex Control' slider from vertex 1 to vertex 4 (the 4 vertices of the ellipse path) while Control/Follow is 1 (Follow mode), showing the null snapping to each vertex position in comp space"
+      }
+    },
+    {
+      "target": "Shape Layer 1/Contents/Path 1/Path 1/Path",
+      "controlBinding": null,
+      "expression": "var shapeLayer = thisComp.layer(\"Shape Layer 1\");\nvar shapeName = \"Path 1\";\nvar pathProperty = thisComp.layer(\"Shape Layer 1\")(\"Contents\")(\"Path 1\")(\"Path 1\")(\"Path\");\nif (pathProperty) {\n    var pathPoints = pathProperty.points();\n    var inTangents = pathProperty.inTangents();\n    var outTangents = pathProperty.outTangents();\n    var isOpenPath = false;\n    for (var i = 1; i <= thisComp.numLayers; i++) {\n        var layer = thisComp.layer(i);\n        if (layer && layer.name && layer.name.startsWith(shapeName + \" Vertex\")) {\n            if (layer.effect(\"Open/Closed Path\")) {\n                isOpenPath = layer.effect(\"Open/Closed Path\")(\"Checkbox\").value;\n            }\n            var controlFollow = layer.effect(\"Control/Follow\") ? layer.effect(\"Control/Follow\")(\"Checkbox\").value : 0;\n            if (controlFollow) {\n                // Do nothing, let it follow the original path\n            } else {\n                var vertexControl = layer.effect(\"Vertex Control\")(\"Slider\");\n                if (vertexControl && vertexControl.value > 0) {\n                    var vertexIndex = Math.floor(vertexControl.value) - 1;\n                    var worldVertexPosition = layer.toWorld([0,0]);\n                    var vertexPosition = shapeLayer.fromWorld(worldVertexPosition);\n                    var shapeGroupPosition = pathProperty.propertyGroup(3)(\"Transform\")(\"Position\").value;\n                    var shapeGroupAnchor = pathProperty.propertyGroup(3)(\"Transform\")(\"Anchor Point\").value;\n                    vertexPosition[0] -= (shapeGroupPosition[0] - shapeGroupAnchor[0]);\n                    vertexPosition[1] -= (shapeGroupPosition[1] - shapeGroupAnchor[1]);\n                    pathPoints[vertexIndex] = vertexPosition;\n                    var vertexNameParts = layer.name.split(\" \");\n                    var vertexSuffix = vertexNameParts[vertexNameParts.length - 1];\n                    for (var j = 1; j <= thisComp.numLayers; j++) {\n                        var tangentLayer = thisComp.layer(j);\n                        var tangentNameParts = tangentLayer.name.split(\" \");\n                        var tangentSuffix = tangentNameParts[tangentNameParts.length - 1];\n                        if ((tangentLayer.name.startsWith(shapeName + \" inTangent for Vertex\") || tangentLayer.name.startsWith(shapeName + \" outTangent for Vertex\")) && vertexSuffix === tangentSuffix) {\n                            var tangentType = tangentLayer.name.split(\" \")[shapeName.split(\" \").length];\n                            var worldTangent = tangentLayer.toWorld([0,0]);\n                            var localTangent = shapeLayer.fromWorld(worldTangent);\n                            var shapeGroupPosition = pathProperty.propertyGroup(3)(\"Transform\")(\"Position\").value;\n                            var shapeGroupAnchor = pathProperty.propertyGroup(3)(\"Transform\")(\"Anchor Point\").value;\n                            localTangent[0] -= (shapeGroupPosition[0] - shapeGroupAnchor[0]);\n                            localTangent[1] -= (shapeGroupPosition[1] - shapeGroupAnchor[1]);\n                            var tangentOffset = [localTangent[0] - pathPoints[vertexIndex][0], localTangent[1] - pathPoints[vertexIndex][1]];\n                            if (tangentType === \"inTangent\") {\n                                inTangents[vertexIndex] = tangentOffset;\n                            } else if (tangentType === \"outTangent\") {\n                                outTangents[vertexIndex] = tangentOffset;\n                            }\n                        }\n                    }\n                }\n            }\n        }\n    }\n    createPath(pathPoints, inTangents, outTangents, isOpenPath);\n}",
+      "sim": {
+        "variable": "time",
+        "range": [0, 5],
+        "steps": 41,
+        "note": "Sweeps time from 0 to 5 s (the full comp duration) to observe how the path expression reconstructs the bezier shape as vertex control nulls are moved at different times; with no null movement the output is a static ellipse"
+      }
+    }
+  ],
+
+  "notes": [
+    "The script requires the selected tree-view item to have a .parent node (the shape group name is read from selectedItem.parent.text). The harness ScriptUI runtime models treeview as a flat list with no .parent, so the Create handler always takes the 'Please select a shape from the tree view' alert branch and the null creation / expression writing code is never reached under the harness — only observable in a live AE session.",
+    "The position expression on vertex/tangent nulls uses 'value;' as a no-op fallback when Control/Follow is 0 (Control mode) or when the vertexIndex is out of range, preserving whatever position the null is manually set to.",
+    "Tangent null layers (inTangent, outTangent) are parented to the vertex null in createControls() but their position expressions are commented-out in the current source; they rely entirely on parent-child inheritance for positioning.",
+    "The path expression enumerates ALL layers in the comp on every frame (two nested loops), which can be slow in comps with many layers.",
+    "The shapeName embedded in the path expression is the shape group name (selectedItem.parent.text), not the path item name; naming collision is possible if multiple shape groups share the same prefix.",
+    "All coordinate transforms account for shapeGroup Transform Position minus Anchor Point offset to correctly map between shape-group local space, layer space, and comp space.",
+    "The Open/Closed Path toggle is implemented as an ADBE Checkbox Control effect on the vertex null; its value is passed directly as the fourth argument of createPath().",
+    "createPath() is an AE expression built-in that returns a new Shape value; it is not available in standard JavaScript — the expressions field captures the source as written for the AE ExtendScript / expression engine."
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "name": "Valuatron",
+  "category": "keyframes",
+  "ui": "HEADLESS",
+
+  "consumes": {
+    "selection": ["layers", "properties", "comp"],
+    "minimum": "1 active comp + 1 selected layer + 1 selected property that canVaryOverTime",
+    "description": "Reads the active CompItem for its current timeline time (comp.time), iterates comp.selectedLayers, and for each layer iterates layer.selectedProperties. Reads prop.canVaryOverTime and prop.value at the current time before writing the keyframe."
+  },
+
+  "controls": [],
+
+  "functions": [
+    "validate that an active composition is present",
+    "validate that at least one layer is selected",
+    "open a single undo group named 'Valuatron'",
+    "iterate every selected layer and every selected property on that layer",
+    "skip properties where canVaryOverTime is false",
+    "sample each keyframeable property's current evaluated value via prop.value",
+    "write a keyframe at comp.time with that value via prop.setValueAtTime",
+    "surface per-property errors via alert without aborting remaining properties",
+    "close the undo group"
+  ],
+
+  "scriptSim": {
+    "scenario": "success — create keyframes for two selected properties at current time",
+    "inputs": "Active comp 'Main Comp' (1920×1080, 10 s, 24 fps); 1 selected layer 'Shape Layer 1'; 2 selected properties: Transform/Position ([960,540]) and Transform/Opacity (75); playhead at t=2 s",
+    "operations": [
+      { "kind": "beginUndoGroup",   "target": "Valuatron" },
+      { "kind": "setValueAtTime",   "target": "Transform/Position", "value": [960, 540] },
+      { "kind": "addKeyframe",      "target": "Transform/Position" },
+      { "kind": "setValueAtTime",   "target": "Transform/Opacity",  "value": 75 },
+      { "kind": "addKeyframe",      "target": "Transform/Opacity" },
+      { "kind": "endUndoGroup",     "target": "Valuatron" }
+    ]
+  },
+
+  "expressions": [],
+
+  "notes": [
+    "HEADLESS — no dialog or panel; runs immediately when the script file is executed.",
+    "Only properties where canVaryOverTime === true receive a keyframe; group properties (e.g. Transform) are silently skipped.",
+    "The keyframe value is prop.value — the evaluated value at comp.time, which includes any expression result rather than the underlying static value.",
+    "Per-property errors are reported via alert() but do not abort processing of remaining properties.",
+    "All mutations are wrapped in a single undo group so Cmd+Z / Ctrl+Z reverses everything in one step.",
+    "writeLn() calls for layer progress are non-mutating and do not appear in the operation log."
+  ]
+}

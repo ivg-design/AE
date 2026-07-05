@@ -72,15 +72,19 @@ var ApplyFFX = (function () {
 			binary: binaryData,
 			matchName: 'Pseudo/' + matchName,
 			name: name,
-			version: version,
+			version: version
 		};
 
 		var tempFolder = Folder.temp;
 		var ffxFile = File(tempFolder.fsName + '/' + config.name + '_v' + config.version + '.ffx');
 		ffxFile.encoding = 'BINARY';
-		ffxFile.open('w');
-		ffxFile.write(config.binary);
+		var opened = ffxFile.open('w');
+		var wrote = (opened === false) ? false : ffxFile.write(config.binary);
 		ffxFile.close();
+		if (opened === false || wrote === false) {
+			throw new Error("Could not write the temporary .ffx preset (" + ffxFile.fsName + "). " +
+				"Enable 'Allow Scripts to Write Files and Access Network' in Preferences > Scripting & Expressions and try again.");
+		}
 
 		var myComp = app.project.activeItem;
 		module.deselectAll(myComp);
@@ -89,4 +93,3 @@ var ApplyFFX = (function () {
 	};
 	return module;
 })();
-

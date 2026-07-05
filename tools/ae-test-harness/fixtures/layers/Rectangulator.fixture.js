@@ -4,11 +4,11 @@
  * Rectangulator converts a selected parametric rectangle shape into a bezier-backed
  * shape group with preserved fills/strokes, applies a pseudo-effect controller via
  * embedded FFX binary (ApplyFFX), and attaches expressions for path, anchorPoint,
- * and position. It depends on //@include directives (RefManager, ApplyFFX,
- * rectangulator_expressions) so it is KNOWN-BLOCKED in standalone Node execution.
+ * and position. As of v2.1.0 RefManager, ApplyFFX, and the expression helpers are
+ * inlined, so the script runs standalone.
  *
  * Scenarios:
- *  1. known-blocked — confirms include-blocked status, zero mutating ops expected
+ *  1. success — converts a parametric rectangle: new group, pseudo effect, expressions
  *  2. guard/no-comp  — no active composition, expects guard alert
  *  3. guard/no-shape — non-shape layer selected, expects guard alert
  */
@@ -25,14 +25,15 @@ const fixture = {
   },
   scenarios: [
     // -------------------------------------------------------------------------
-    // Scenario 1: known-blocked
-    // The script contains //@include directives; it cannot execute in the Node
-    // sandbox because RefManager, ApplyFFX, and rectangulator_expressions are
-    // not bundled inline. scanIncludes returns blocked:true.
+    // Scenario 1: success
+    // A shape layer with a parametric rectangle is selected. The script creates
+    // a "Parametric Rectangle" group (addProperty → executeCommand ops), writes
+    // the pseudo-effect FFX to temp and applies it (fileWrite + applyPreset),
+    // then wires the path/anchorPoint/position expressions (setExpression).
     // -------------------------------------------------------------------------
     {
-      name: 'known-blocked — include dependencies prevent standalone execution',
-      kind: 'known-blocked',
+      name: 'success — converts parametric rectangle to controlled bezier group',
+      kind: 'success',
       host: {
         appVersion: '25.0',
         project: {
@@ -111,9 +112,15 @@ const fixture = {
       actions: [
         { type: 'run' }
       ],
-      // Known-blocked: no mutating operations expected at harness level
-      expectedOperations: [],
-      expectedConfidence: 'known-blocked'
+      expectedOperations: [
+        { kind: 'beginUndoGroup' },
+        { kind: 'fileWrite' },
+        { kind: 'applyPreset' },
+        { kind: 'setValue' },
+        { kind: 'setExpression' },
+        { kind: 'endUndoGroup' }
+      ],
+      expectedConfidence: 'medium'
     },
 
     // -------------------------------------------------------------------------
@@ -141,7 +148,7 @@ const fixture = {
         { kind: 'alert' }
       ],
       expectedAlerts: ['Please open a composition first.'],
-      expectedConfidence: 'known-blocked'
+      expectedConfidence: 'high'
     },
 
     // -------------------------------------------------------------------------
@@ -195,7 +202,7 @@ const fixture = {
         { kind: 'alert' }
       ],
       expectedAlerts: ['Please select a shape layer with a rectangle.'],
-      expectedConfidence: 'known-blocked'
+      expectedConfidence: 'high'
     }
   ]
 };

@@ -1,0 +1,42 @@
+{
+  "name": "NullBot",
+  "category": "layers",
+  "ui": "HEADLESS",
+  "consumes": {
+    "selection": ["comp", "layers"],
+    "minimum": "1 active CompItem + at least 1 selected layer",
+    "description": "Reads the active CompItem, iterates over comp.selectedLayers to gather each layer's position.value, threeDLayer flag, inPoint/outPoint, and index. Derives the union time span and topmost index for null placement."
+  },
+  "controls": [],
+  "functions": [
+    "calculate average [x, y] position of all selected layers",
+    "create a null layer named 'NullBot' at the calculated average position",
+    "inherit 3D mode from selected layers (sets threeDLayer if any selected layer is 3D)",
+    "parent every selected layer to the new null",
+    "move the null before the topmost selected layer (moveBefore)",
+    "set null inPoint/outPoint to the combined time span of all selected layers",
+    "wrap all operations in an undo group named 'NullBot'"
+  ],
+  "scriptSim": {
+    "scenario": "success — two selected AV layers, null created at average position",
+    "inputs": "Active comp 'Main Comp' (1920×1080, 5 s, 30 fps) with two AV layers selected: Layer A at [300, 200] (in 0 s – out 3 s) and Layer B at [500, 400] (in 1 s – out 5 s)",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "NullBot" },
+      { "kind": "createLayer", "target": "NullBot", "value": "NullBot" },
+      { "kind": "setValue", "target": "NullBot/Transform/Position", "value": [400, 300] },
+      { "kind": "setParent", "target": "layer-1", "value": "NullBot" },
+      { "kind": "setParent", "target": "layer-2", "value": "NullBot" },
+      { "kind": "reorder", "target": "NullBot" },
+      { "kind": "endUndoGroup", "target": "NullBot" }
+    ]
+  },
+  "expressions": [],
+  "notes": [
+    "Script is fully headless — no ScriptUI dialog or panel is displayed.",
+    "Position averaging is 2D only; Z position of 3D layers is not factored into the average.",
+    "Negative-stretch (reversed) layers have inPoint/outPoint swapped before the union span calculation.",
+    "The null is named 'NullBot' (not 'Null Control' as noted in the @usage JSDoc — the source code takes precedence).",
+    "Null timing is clamped to the union span of selected layers, not the full comp duration.",
+    "If only one layer is selected the null is positioned at that layer's position exactly."
+  ]
+}

@@ -2,15 +2,15 @@
  * tests/integration.test.js — MASTER integration suite for ae-test-harness.
  *
  * Asserts the whole pipeline holds together against the real subsystems and the
- * real AE-script catalog (31 scripts) + fixtures (one per script):
+ * real AE-script catalog (35 scripts) + fixtures (one per script):
  *
- *   1. discovery finds all 31 scripts
+ *   1. discovery finds all 35 scripts
  *   2. every .jsx parses as ECMA3 (or its exact failure is reported)
  *   3. every statically-extracted literal expression parses (ES2018)
  *   4. every fixture validates against the frozen contract
  *   5. every fixture's success scenario runs through createHost + sandbox and
  *      produces the expected operation KINDS
- *   6. Rectangulator & Onionizer are reported known-blocked
+ *   6. Onionizer is reported known-blocked
  *   7. every UI script (@ui != HEADLESS) yields a captured UITree
  *
  * Uses the real host runner from src/host/index.js (createHost + runFixtureScenario),
@@ -36,8 +36,8 @@ import { runActions } from '../src/scriptui/actions/index.js';
 import { validateFixture, validateUITree } from '../src/contracts/index.js';
 import * as hostMod from '../src/host/index.js';
 
-const EXPECTED_SCRIPT_COUNT = 31;
-const KNOWN_BLOCKED = ['Rectangulator', 'Onionizer'];
+const EXPECTED_SCRIPT_COUNT = 35;
+const KNOWN_BLOCKED = ['Onionizer'];
 
 /** Shared discovery + fixtures, loaded once. */
 let scripts = [];
@@ -308,7 +308,7 @@ describe('functional — success scenarios', () => {
 // 6. Known-blocked scripts
 // ---------------------------------------------------------------------------
 describe('known-blocked scripts', () => {
-  it('Rectangulator & Onionizer are flagged known-blocked', () => {
+  it('Onionizer is flagged known-blocked', () => {
     for (const blockedName of KNOWN_BLOCKED) {
       const fixture = fixtureResult.byName[blockedName];
       expect(fixture, `fixture for ${blockedName} should be loaded`).toBeTruthy();

@@ -1,0 +1,81 @@
+{
+  "name": "Iteratron",
+  "category": "utilities",
+  "ui": "DIALOG",
+
+  "consumes": {
+    "selection": ["layers", "properties", "comp"],
+    "minimum": "1 active comp + at least 3 unlocked/visible layers, with the same animatable property type present on all of them; user must select a property on the start layer and a property on the end layer via the palette buttons before clicking OK",
+    "description": "Reads app.project.activeItem (active composition), curComp.selectedLayers[0].index and curComp.selectedProperties to capture start and end layer indices and property paths. On OK, resolves those property paths on every valid (unlocked + enabled) layer between the two indices and reads their current values plus numKeys to determine the write method."
+  },
+
+  "controls": [
+    {
+      "name": "Link Start Property",
+      "type": "button",
+      "role": "captures the currently selected layer index and property path as the interpolation start point; button label changes from ⚪️ to 🟢 on success",
+      "default": null
+    },
+    {
+      "name": "Link End Property",
+      "type": "button",
+      "role": "captures the currently selected layer index and property path as the interpolation end point; button label changes from ⚪️ to 🟢 on success",
+      "default": null
+    },
+    {
+      "name": "OK",
+      "type": "button",
+      "role": "executes interpolation — distributes property values linearly across all valid intermediate layers and closes the palette",
+      "default": null
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "dismisses the palette without making any changes",
+      "default": null
+    }
+  ],
+
+  "functions": [
+    "open a non-modal palette for linking start and end layer properties",
+    "capture layer index and property path from the current host selection",
+    "validate that start and end layers are unlocked and visible",
+    "count valid (unlocked + enabled) intermediate layers between the two linked indices",
+    "compute a linear step value for each dimension of the selected property",
+    "distribute interpolated property values across all valid intermediate layers",
+    "write values via setValue for static properties or setValueAtTime(currentTime) for keyframed properties",
+    "wrap all writes in a single undo group named 'Link Properties'",
+    "alert the user on invalid property selection, locked/hidden boundary layers, or zero valid intermediate layers"
+  ],
+
+  "scriptSim": {
+    "scenario": "success – 2D Position distributed setValue across 2 intermediate layers",
+    "inputs": "Active comp 'Motion Comp' (1920×1080, 24 fps, 5 s) with 4 AV layers: Ball A (index 1, Position [0,540]), Ball B (index 2, Position [960,540]), Ball C (index 3, Position [960,540]), Ball D (index 4, Position [1920,540]). Start linked to Ball A / Transform / Position; end re-linked to Ball D / Transform / Position. No keyframes on any layer.",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Link Properties" },
+      {
+        "kind": "setValue",
+        "target": "Ball B/Transform/Position",
+        "value": [640, 540]
+      },
+      {
+        "kind": "setValue",
+        "target": "Ball C/Transform/Position",
+        "value": [1280, 540]
+      },
+      { "kind": "endUndoGroup", "target": "Link Properties" }
+    ]
+  },
+
+  "expressions": [],
+
+  "notes": [
+    "The @ui frontmatter declares DIALOG but the script creates Window('palette', ...) — it behaves as a floating, non-modal palette that stays open until OK or Cancel is clicked.",
+    "Property paths are constructed using matchName when available, falling back to name; they are joined by commas (e.g. 'ADBE Transform Group,ADBE Position').",
+    "Multi-dimensional properties (2D Position, 3D Position, Color) are processed component-wise; each dimension gets its own step value.",
+    "Layer ordering is direction-agnostic: the script uses Math.min/Math.max of the two linked indices, so start can be above or below end in the layer stack.",
+    "Locked or hidden (enabled=false) layers between start and end are silently skipped and not counted in the interpolation step calculation.",
+    "If the target property has numKeys > 0, the script calls setValueAtTime(curComp.time, newValue) instead of setValue(newValue).",
+    "The script does not write any AE expressions; all values are baked at run time."
+  ]
+}

@@ -1,0 +1,156 @@
+{
+  "name": "Rectangulator",
+  "category": "layers",
+  "ui": "HEADLESS",
+  "consumes": {
+    "selection": ["layers", "comp"],
+    "minimum": "1 active comp + 1 selected ShapeLayer containing a parametric rectangle (ADBE Vector Shape - Rect)",
+    "description": "Reads the active CompItem; reads selectedLayers[0] and confirms it is a ShapeLayer; traverses ADBE Root Vectors Group recursively to locate the first ADBE Vector Shape - Rect; reads its size, position, and roundness values; reads fill (color, opacity, blendMode, enabled) and stroke (color, opacity, width, lineCap, lineJoin, miterLimit, enabled) from the containing group; reads the group transform (position, anchorPoint, scale, rotation, opacity, skew, skewAxis)."
+  },
+  "controls": [
+    {
+      "name": "Rectangle Width (px)",
+      "type": "slider",
+      "role": "sets the width of the bezier rectangle path in pixels; drives the path expression and position compensation expression",
+      "default": 100,
+      "range": [0, 1000000]
+    },
+    {
+      "name": "Rectangle Height (px)",
+      "type": "slider",
+      "role": "sets the height of the bezier rectangle path in pixels; drives the path expression and position compensation expression",
+      "default": 100,
+      "range": [0, 1000000]
+    },
+    {
+      "name": "Top Left Corner Rounding",
+      "type": "slider",
+      "role": "sets the top-left corner rounding as a percentage (0–100%) of the shortest dimension; drives the path expression",
+      "default": 0,
+      "range": [0, 100]
+    },
+    {
+      "name": "Top Right Corner Rounding",
+      "type": "slider",
+      "role": "sets the top-right corner rounding as a percentage (0–100%) of the shortest dimension; drives the path expression",
+      "default": 0,
+      "range": [0, 100]
+    },
+    {
+      "name": "Bottom Right Left Corner Rounding",
+      "type": "slider",
+      "role": "sets the bottom-right corner rounding as a percentage (0–100%) of the shortest dimension; drives the path expression",
+      "default": 0,
+      "range": [0, 100]
+    },
+    {
+      "name": "Bottom Left Corner Rounding",
+      "type": "slider",
+      "role": "sets the bottom-left corner rounding as a percentage (0–100%) of the shortest dimension; drives the path expression",
+      "default": 0,
+      "range": [0, 100]
+    },
+    {
+      "name": "Anchor Point",
+      "type": "dropdown",
+      "role": "selects the 9-point anchor grid position (1=Top Left … 9=Bottom Right); drives the path, anchorPoint, and position expressions",
+      "default": 5,
+      "options": [
+        "Top Left",
+        "Top Center",
+        "Top Right",
+        "Center Left",
+        "Center",
+        "Center Right",
+        "Bottom Left",
+        "Bottom Center",
+        "Bottom Right"
+      ]
+    }
+  ],
+  "functions": [
+    "detect and locate parametric rectangle inside the selected shape layer hierarchy",
+    "read fills, strokes, and transform properties from the source rectangle group",
+    "create a new 'Parametric Rectangle' shape group with a bezier path (ADBE Vector Shape - Group) on the layer",
+    "copy fill and stroke properties from the original rectangle to the new group",
+    "copy transform properties from the original group to the new bezier group",
+    "apply 'Rectangulator Controls' pseudo-effect via embedded FFX binary (ApplyFFX)",
+    "write a path expression on ADBE Vector Shape that constructs an 8-vertex rounded-rectangle bezier from effect sliders",
+    "write an anchorPoint expression on ADBE Vector Anchor Point that maps the Anchor Point dropdown to a 2D offset",
+    "write a position expression on ADBE Vector Position that compensates position when width, height, or anchor point changes",
+    "remove or hide the original parametric rectangle group",
+    "wrap all mutations in an undo group named 'Rectangulator'"
+  ],
+  "scriptSim": {
+    "scenario": "known-blocked — include dependencies prevent standalone execution",
+    "inputs": "Active comp 'Main Comp' (1920×1080, 10 s, 24 fps); one ShapeLayer 'Rectangle Shape' selected, containing ADBE Vector Shape - Rect inside ADBE Vector Group > ADBE Vectors Group",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Rectangulator" },
+      { "kind": "createLayer", "target": "Contents/Parametric Rectangle (ADBE Vector Group)" },
+      { "kind": "setValue", "target": "Contents/Parametric Rectangle/ADBE Vector Shape - Group" },
+      { "kind": "setValue", "target": "Contents/Parametric Rectangle/ADBE Vector Graphic - Fill" },
+      { "kind": "setValue", "target": "Contents/Parametric Rectangle/ADBE Vector Transform Group" },
+      { "kind": "applyPreset", "target": "layer.ADBE Effect Parade/Rectangulator Controls (pseudo-effect via ApplyFFX)" },
+      { "kind": "setExpression", "target": "Contents/Parametric Rectangle/ADBE Vector Shape - Group/ADBE Vector Shape", "value": "path expression (rounded bezier)" },
+      { "kind": "setExpression", "target": "Contents/Parametric Rectangle/ADBE Vector Transform Group/ADBE Vector Anchor Point", "value": "anchorPoint expression (9-point grid)" },
+      { "kind": "setExpression", "target": "Contents/Parametric Rectangle/ADBE Vector Transform Group/ADBE Vector Position", "value": "position compensation expression" },
+      { "kind": "deleteLayer", "target": "Contents/Rectangle 1 (original parametric rect group removed or disabled)" },
+      { "kind": "endUndoGroup", "target": "Rectangulator" }
+    ]
+  },
+  "expressions": [
+    {
+      "target": "Contents/Parametric Rectangle/ADBE Vector Shape - Group/ADBE Vector Shape",
+      "controlBinding": {
+        "control": "Rectangle Width (px)",
+        "param": "Slider",
+        "range": [0, 1000]
+      },
+      "expression": "// Custom rounded rectangle with individual corner control\ntry {\n    // Get effect values\n    width = effect(\"Width\")(\"Slider\");\n    height = effect(\"Height\")(\"Slider\");\n    tlPercent = effect(\"Top Left Roundness %\")(\"Slider\");\n    trPercent = effect(\"Top Right Roundness %\")(\"Slider\");\n    brPercent = effect(\"Bottom Right Roundness %\")(\"Slider\");\n    blPercent = effect(\"Bottom Left Roundness %\")(\"Slider\");\n    posOffset = effect(\"Position Offset\")(\"Point\");\n    anchorType = effect(\"Anchor Point\")(\"Menu\");\n\n    // Calculate the maximum roundness based on the smallest dimension\n    maxRound = Math.min(width, height);\n\n    // First, clamp individual percentages to 0-100%\n    tlPercent = Math.max(0, Math.min(100, tlPercent));\n    trPercent = Math.max(0, Math.min(100, trPercent));\n    brPercent = Math.max(0, Math.min(100, brPercent));\n    blPercent = Math.max(0, Math.min(100, blPercent));\n\n    // Convert percentages to actual roundness values (0-100% -> 0-maxRound)\n    tl = (tlPercent / 100) * maxRound;\n    tr = (trPercent / 100) * maxRound;\n    br = (brPercent / 100) * maxRound;\n    bl = (blPercent / 100) * maxRound;\n\n    // Ensure all roundness values are non-negative\n    tl = Math.max(0, tl);\n    tr = Math.max(0, tr);\n    br = Math.max(0, br);\n    bl = Math.max(0, bl);\n\n    // Apply constraints to prevent distortion\n    maxTopRoundness = width / 2;\n    maxBottomRoundness = width / 2;\n    maxLeftRoundness = height / 2;\n    maxRightRoundness = height / 2;\n\n    if (tlPercent + blPercent > 100) {\n        blPercent = Math.min(blPercent, 100 - tlPercent);\n        bl = (blPercent / 100) * maxRound;\n    }\n\n    if (trPercent + brPercent > 100) {\n        brPercent = Math.min(brPercent, 100 - trPercent);\n        br = (brPercent / 100) * maxRound;\n    }\n\n    if (tlPercent + trPercent > 100 && width <= height) {\n        trPercent = Math.min(trPercent, 100 - tlPercent);\n        tr = (trPercent / 100) * maxRound;\n    }\n\n    if (blPercent + brPercent > 100 && width <= height) {\n        brPercent = Math.min(brPercent, 100 - blPercent);\n        br = (brPercent / 100) * maxRound;\n    }\n\n    if (tl + tr > width) { var scale = width / (tl + tr); tl *= scale; tr *= scale; }\n    if (bl + br > width) { var scale = width / (bl + br); bl *= scale; br *= scale; }\n    if (tl + bl > height) { var scale = height / (tl + bl); tl *= scale; bl *= scale; }\n    if (tr + br > height) { var scale = height / (tr + br); tr *= scale; br *= scale; }\n\n    w = width / 2;\n    h = height / 2;\n\n    anchorX = 0;\n    anchorY = 0;\n\n    if (anchorType == 1) { anchorX = -w; anchorY = -h; }\n    else if (anchorType == 2) { anchorX = 0; anchorY = -h; }\n    else if (anchorType == 3) { anchorX = w; anchorY = -h; }\n    else if (anchorType == 4) { anchorX = -w; anchorY = 0; }\n    else if (anchorType == 5) { anchorX = 0; anchorY = 0; }\n    else if (anchorType == 6) { anchorX = w; anchorY = 0; }\n    else if (anchorType == 7) { anchorX = -w; anchorY = h; }\n    else if (anchorType == 8) { anchorX = 0; anchorY = h; }\n    else if (anchorType == 9) { anchorX = w; anchorY = h; }\n\n    vertices = [];\n    inTangents = [];\n    outTangents = [];\n    cp = 0.552;\n\n    tlx1 = -w; tly1 = -h + tl; tlx2 = -w + tl; tly2 = -h;\n    trx1 = w - tr; try1 = -h; trx2 = w; try2 = -h + tr;\n    brx1 = w; bry1 = h - br; brx2 = w - br; bry2 = h;\n    blx1 = -w + bl; bly1 = h; blx2 = -w; bly2 = h - bl;\n\n    if (tl === 0) { tlx1 = tlx2 = -w; tly1 = tly2 = -h; }\n    if (tr === 0) { trx1 = trx2 = w; try1 = try2 = -h; }\n    if (br === 0) { brx1 = brx2 = w; bry1 = bry2 = h; }\n    if (bl === 0) { blx1 = blx2 = -w; bly1 = bly2 = h; }\n\n    vertices.push([tlx1, tly1]); vertices.push([tlx2, tly2]);\n    vertices.push([trx1, try1]); vertices.push([trx2, try2]);\n    vertices.push([brx1, bry1]); vertices.push([brx2, bry2]);\n    vertices.push([blx1, bly1]); vertices.push([blx2, bly2]);\n\n    for (i = 0; i < 8; i++) { inTangents.push([0, 0]); outTangents.push([0, 0]); }\n\n    if (tl > 0) { outTangents[0] = [0, -tl * cp]; inTangents[1] = [-tl * cp, 0]; }\n    if (tr > 0) { outTangents[2] = [tr * cp, 0]; inTangents[3] = [0, -tr * cp]; }\n    if (br > 0) { outTangents[4] = [0, br * cp]; inTangents[5] = [br * cp, 0]; }\n    if (bl > 0) { outTangents[6] = [-bl * cp, 0]; inTangents[7] = [0, bl * cp]; }\n\n    createPath(vertices, inTangents, outTangents, true);\n} catch (err) {\n    createPath([[0,0], [100,0], [100,100], [0,100]], [[0,0],[0,0],[0,0],[0,0]], [[0,0],[0,0],[0,0],[0,0]], true);\n}",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 1000],
+        "steps": 41,
+        "note": "Sweeps Rectangle Width (px) from 0 to 1000 px with height fixed at 200, all corners at 0%, anchor at Center (5); plots the resulting bezier vertex positions (w = width/2, 8-vertex closed path)."
+      }
+    },
+    {
+      "target": "Contents/Parametric Rectangle/ADBE Vector Transform Group/ADBE Vector Anchor Point",
+      "controlBinding": {
+        "control": "Anchor Point",
+        "param": "Menu",
+        "range": [1, 9]
+      },
+      "expression": "// Anchor point expression\ntry {\n    w = effect(\"Width\")(\"Slider\") / 2;\n    h = effect(\"Height\")(\"Slider\") / 2;\n    anchorType = effect(\"Anchor Point\")(\"Menu\");\n    result = [0, 0];\n\n    if (anchorType == 1) result = [-w, -h];      // Top Left\n    else if (anchorType == 2) result = [0, -h];   // Top Center\n    else if (anchorType == 3) result = [w, -h];   // Top Right\n    else if (anchorType == 4) result = [-w, 0];   // Middle Left\n    else if (anchorType == 5) result = [0, 0];    // Middle Center\n    else if (anchorType == 6) result = [w, 0];    // Middle Right\n    else if (anchorType == 7) result = [-w, h];   // Bottom Left\n    else if (anchorType == 8) result = [0, h];    // Bottom Center\n    else if (anchorType == 9) result = [w, h];    // Bottom Right\n    else result = [0, 0];                         // Default\n\n    result;\n} catch (err) {\n    [0, 0];\n}",
+      "sim": {
+        "variable": "controlValue",
+        "range": [1, 9],
+        "steps": 9,
+        "note": "Steps through all 9 anchor-point menu positions (1=Top Left … 9=Bottom Right) with width=200 and height=100 fixed; plots resulting [x, y] anchor offset."
+      }
+    },
+    {
+      "target": "Contents/Parametric Rectangle/ADBE Vector Transform Group/ADBE Vector Position",
+      "controlBinding": {
+        "control": "Rectangle Width (px)",
+        "param": "Slider",
+        "range": [0, 1000]
+      },
+      "expression": "try {\n    // Get current values\n    var width = effect(\"Width\")(\"Slider\");\n    var height = effect(\"Height\")(\"Slider\");\n    var posOffset = effect(\"Position Offset\")(\"Point\");\n    var anchorType = effect(\"Anchor Point\")(\"Menu\");\n    var w = width/2;\n    var h = height/2;\n    var result = value.slice(); // Default to current position\n    \n    // Initialize and track state\n    if (typeof __state === 'undefined') {\n        __state = {\n            lastWidth: width,\n            lastHeight: height,\n            lastAnchorType: anchorType,\n            lastPosOffset: [posOffset[0], posOffset[1]],\n            basePos: value.slice(),\n            visiblePos: value.slice()\n        };\n    }\n    \n    var widthDelta = width - __state.lastWidth;\n    var heightDelta = height - __state.lastHeight;\n    var anchorChanged = (anchorType != __state.lastAnchorType);\n    var offsetChanged = (posOffset[0] != __state.lastPosOffset[0] || posOffset[1] != __state.lastPosOffset[1]);\n    \n    var newPos = __state.visiblePos.slice();\n    \n    if (offsetChanged) {\n        var offsetDeltaX = posOffset[0] - __state.lastPosOffset[0];\n        var offsetDeltaY = posOffset[1] - __state.lastPosOffset[1];\n        newPos[0] += offsetDeltaX;\n        newPos[1] += offsetDeltaY;\n        __state.lastPosOffset = [posOffset[0], posOffset[1]];\n    }\n    \n    function getAnchorOffset(type) {\n        var offset = [0, 0];\n        if (type == 1) offset = [-w, -h];\n        else if (type == 2) offset = [0, -h];\n        else if (type == 3) offset = [w, -h];\n        else if (type == 4) offset = [-w, 0];\n        else if (type == 5) offset = [0, 0];\n        else if (type == 6) offset = [w, 0];\n        else if (type == 7) offset = [-w, h];\n        else if (type == 8) offset = [0, h];\n        else if (type == 9) offset = [w, h];\n        return offset;\n    }\n    \n    if (widthDelta !== 0 || heightDelta !== 0) {\n        if (anchorType == 1) {\n        } else if (anchorType == 2) {\n            newPos[0] -= widthDelta/2;\n        } else if (anchorType == 3) {\n            newPos[0] -= widthDelta;\n        } else if (anchorType == 4) {\n            newPos[1] -= heightDelta/2;\n        } else if (anchorType == 5) {\n            newPos[0] -= widthDelta/2;\n            newPos[1] -= heightDelta/2;\n        } else if (anchorType == 6) {\n            newPos[0] -= widthDelta;\n            newPos[1] -= heightDelta/2;\n        } else if (anchorType == 7) {\n            newPos[1] -= heightDelta;\n        } else if (anchorType == 8) {\n            newPos[0] -= widthDelta/2;\n            newPos[1] -= heightDelta;\n        } else if (anchorType == 9) {\n            newPos[0] -= widthDelta;\n            newPos[1] -= heightDelta;\n        }\n    }\n    \n    if (anchorChanged) {\n        var oldAnchorOffset = getAnchorOffset(__state.lastAnchorType);\n        var newAnchorOffset = getAnchorOffset(anchorType);\n        var anchorDiffX = newAnchorOffset[0] - oldAnchorOffset[0];\n        var anchorDiffY = newAnchorOffset[1] - oldAnchorOffset[1];\n        newPos[0] += anchorDiffX;\n        newPos[1] += anchorDiffY;\n    }\n    \n    __state.lastWidth = width;\n    __state.lastHeight = height;\n    __state.lastAnchorType = anchorType;\n    __state.visiblePos = newPos.slice();\n    \n    result = newPos;\n} catch (err) {\n    // Error fallback - just keep current position\n}\nresult;",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 1000],
+        "steps": 41,
+        "note": "Sweeps Rectangle Width (px) from 0 to 1000 with height=200 and anchorType=5 (Center); plots position X compensation (newPos[0] offset) showing how the position shifts to keep the rectangle visually anchored."
+      }
+    }
+  ],
+  "notes": [
+    "HEADLESS script — no ScriptUI dialog; all controls are pseudo-effect sliders applied to the target layer via embedded FFX binary (ApplyFFX).",
+    "Depends on three //@include directives (RefManager, ApplyFFX, rectangulator_expressions.js) that must be bundled or available at runtime; the script is KNOWN-BLOCKED in standalone Node execution.",
+    "The 'Rectangulator Controls' pseudo-effect parameter names in the binary use short aliases ('Width', 'Height', 'Top Left Roundness %', etc.) which differ from the UI label strings ('Rectangle Width (px)', etc.); expressions reference the short alias form.",
+    "The position expression uses a stateful __state object to track delta changes between evaluations; this pattern works in AE's expression engine but cannot be accurately swept in a stateless evaluator.",
+    "Corner rounding sliders are percentage-based (0–100%) and are internally converted to pixel values relative to Math.min(width, height); adjacent-corner over-sum constraints prevent intersecting bezier curves.",
+    "The original parametric rectangle group is removed (or disabled as a fallback) after conversion; the operation is wrapped in a single undo group named 'Rectangulator'."
+  ]
+}

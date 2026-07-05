@@ -1,0 +1,438 @@
+{
+  "name": "BurstMate",
+  "category": "effects",
+  "ui": "HEADLESS",
+  "consumes": {
+    "selection": ["comp"],
+    "minimum": "1 active CompItem (no layer selection required)",
+    "description": "Reads app.project.activeItem; requires it to be a CompItem. No layer selection is needed — the script creates all layers itself."
+  },
+  "controls": [],
+  "functions": [
+    "guard against missing active composition and alert user",
+    "create 'BURST CTRL' guide shape layer with rect and stroke geometry",
+    "write StrokeBurst FFX binary to a temp file and apply it as a pseudo-effect preset onto BURST CTRL",
+    "write Void FFX binary to a temp file and apply it as a pseudo-effect preset onto BURST CTRL",
+    "set StrokeBurst effect parameters (widths, lengths, density, dash values, rotation offset) on BURST CTRL",
+    "create 'Stroke 1' shape layer with animated trim-path arc, repeater, and eased keyframes",
+    "create 'Stroke 2' shape layer with animated trim-path arc, repeater, and eased keyframes",
+    "parent Stroke 1 and Stroke 2 to BURST CTRL",
+    "wire AE expressions on BURST CTRL rect size, position, and stroke width",
+    "wire AE expressions on Stroke 1 path shape, stroke color, stroke width, dash/gap values, repeater copies, and repeater rotation",
+    "wire AE expressions on Stroke 2 path shape, stroke color, stroke width, dash/gap values, repeater copies, repeater rotation, and layer rotation",
+    "wrap all mutations in a single undo group named 'BurstMate'"
+  ],
+  "scriptSim": {
+    "scenario": "success — burst layers created on active comp",
+    "inputs": "Active composition 'Main Comp' (1920×1080, 24fps, 5s) containing one AV layer 'Background'; no layer selection required",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "app", "value": "BurstMate" },
+      { "kind": "createLayer", "target": "BURST CTRL" },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Root Vectors Group/1/2/1/ADBE Vector Rect Size", "value": [100, 100] },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Root Vectors Group/1/2/1/ADBE Vector Rect Position", "value": [0, 0] },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Color", "value": [0.7647, 0.1412, 0.1412, 1] },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Width", "value": 1 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 1", "value": 2 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 1", "value": 2 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Offset", "value": 4 },
+      { "kind": "fileWrite", "target": "Folder.temp/StrokeBurst_v1.0.ffx" },
+      { "kind": "applyPreset", "target": "BURST CTRL" },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Effect Parade/1/Pseudo/stroke_burst-0008", "value": 5 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Effect Parade/1/Pseudo/stroke_burst-0009", "value": 5 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Effect Parade/1/Pseudo/stroke_burst-0012", "value": 231.9 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Effect Parade/1/Pseudo/stroke_burst-0013", "value": 151.7 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Effect Parade/1/Pseudo/stroke_burst-0016", "value": 14 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Effect Parade/1/Pseudo/stroke_burst-0017", "value": 7 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Effect Parade/1/Pseudo/stroke_burst-0019", "value": 10 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Effect Parade/1/Pseudo/stroke_burst-0020", "value": 30 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Effect Parade/1/Pseudo/stroke_burst-0027", "value": 20 },
+      { "kind": "setValue", "target": "BURST CTRL/ADBE Effect Parade/1/Pseudo/stroke_burst-0028", "value": 10 },
+      { "kind": "fileWrite", "target": "Folder.temp/Void_v1.0.ffx" },
+      { "kind": "applyPreset", "target": "BURST CTRL" },
+      { "kind": "createLayer", "target": "Stroke 1" },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Root Vectors Group/1/2/1/ADBE Vector Shape" },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Color", "value": [1, 1, 1, 1] },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Width", "value": 4.827 },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Line Cap", "value": 2 },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Line Join", "value": 2 },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 1", "value": 0 },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 1", "value": 0 },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 2", "value": 0 },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 2", "value": 0 },
+      { "kind": "addKeyframe", "target": "Stroke 1/ADBE Root Vectors Group/2/ADBE Vector Trim Start", "value": 100 },
+      { "kind": "addKeyframe", "target": "Stroke 1/ADBE Root Vectors Group/2/ADBE Vector Trim Start", "value": 0 },
+      { "kind": "addKeyframe", "target": "Stroke 1/ADBE Root Vectors Group/2/ADBE Vector Trim End", "value": 100 },
+      { "kind": "addKeyframe", "target": "Stroke 1/ADBE Root Vectors Group/2/ADBE Vector Trim End", "value": 0 },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Root Vectors Group/3/ADBE Vector Repeater Copies", "value": 8 },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Root Vectors Group/3/4/ADBE Vector Repeater Rotation", "value": 45 },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Transform Group/ADBE Position", "value": [0, 0, 0] },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Transform Group/ADBE Scale", "value": [100, 100, 100] },
+      { "kind": "setValue", "target": "Stroke 1/ADBE Transform Group/ADBE Rotate Z", "value": 22.5 },
+      { "kind": "createLayer", "target": "Stroke 2" },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Root Vectors Group/1/2/1/ADBE Vector Shape" },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Color", "value": [1, 1, 1, 1] },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Width", "value": 4.827 },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Line Cap", "value": 2 },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Line Join", "value": 2 },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 1", "value": 0 },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 1", "value": 0 },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 2", "value": 0 },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 2", "value": 0 },
+      { "kind": "addKeyframe", "target": "Stroke 2/ADBE Root Vectors Group/2/ADBE Vector Trim Start", "value": 100 },
+      { "kind": "addKeyframe", "target": "Stroke 2/ADBE Root Vectors Group/2/ADBE Vector Trim Start", "value": 0 },
+      { "kind": "addKeyframe", "target": "Stroke 2/ADBE Root Vectors Group/2/ADBE Vector Trim End", "value": 100 },
+      { "kind": "addKeyframe", "target": "Stroke 2/ADBE Root Vectors Group/2/ADBE Vector Trim End", "value": 0 },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Root Vectors Group/3/ADBE Vector Repeater Copies", "value": 8 },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Root Vectors Group/3/4/ADBE Vector Repeater Rotation", "value": 45 },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Transform Group/ADBE Position", "value": [0, 0, 0] },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Transform Group/ADBE Scale", "value": [100, 100, 100] },
+      { "kind": "setValue", "target": "Stroke 2/ADBE Transform Group/ADBE Rotate Z", "value": 45 },
+      { "kind": "setParent", "target": "Stroke 1", "value": "BURST CTRL" },
+      { "kind": "setParent", "target": "Stroke 2", "value": "BURST CTRL" },
+      { "kind": "setExpression", "target": "BURST CTRL/ADBE Root Vectors Group/1/2/1/ADBE Vector Rect Size" },
+      { "kind": "setExpression", "target": "BURST CTRL/ADBE Root Vectors Group/1/2/1/ADBE Vector Rect Position" },
+      { "kind": "setExpression", "target": "BURST CTRL/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Width" },
+      { "kind": "setExpression", "target": "Stroke 1/ADBE Root Vectors Group/1/2/1/ADBE Vector Shape" },
+      { "kind": "setExpression", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Color" },
+      { "kind": "setExpression", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Width" },
+      { "kind": "setExpression", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 1" },
+      { "kind": "setExpression", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 1" },
+      { "kind": "setExpression", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 2" },
+      { "kind": "setExpression", "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 2" },
+      { "kind": "setExpression", "target": "Stroke 1/ADBE Root Vectors Group/3/ADBE Vector Repeater Copies" },
+      { "kind": "setExpression", "target": "Stroke 1/ADBE Root Vectors Group/3/4/ADBE Vector Repeater Rotation" },
+      { "kind": "setExpression", "target": "Stroke 2/ADBE Root Vectors Group/1/2/1/ADBE Vector Shape" },
+      { "kind": "setExpression", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Color" },
+      { "kind": "setExpression", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Width" },
+      { "kind": "setExpression", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 1" },
+      { "kind": "setExpression", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 1" },
+      { "kind": "setExpression", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 2" },
+      { "kind": "setExpression", "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 2" },
+      { "kind": "setExpression", "target": "Stroke 2/ADBE Root Vectors Group/3/ADBE Vector Repeater Copies" },
+      { "kind": "setExpression", "target": "Stroke 2/ADBE Root Vectors Group/3/4/ADBE Vector Repeater Rotation" },
+      { "kind": "setExpression", "target": "Stroke 2/Transform/Rotation" },
+      { "kind": "endUndoGroup", "target": "app" }
+    ]
+  },
+  "expressions": [
+    {
+      "target": "BURST CTRL/ADBE Root Vectors Group/1/2/1/ADBE Vector Rect Size",
+      "controlBinding": null,
+      "expression": "try {\n\t[effect(\"Void\")(\"Width\"),effect(\"Void\")(\"Height\")];\n} catch (e) { value }",
+      "sim": {
+        "variable": "time",
+        "range": [0, 5],
+        "steps": 40,
+        "note": "Returns a constant [Width, Height] 2D vector from the Void pseudo-effect; sweeping time confirms static output"
+      }
+    },
+    {
+      "target": "BURST CTRL/ADBE Root Vectors Group/1/2/1/ADBE Vector Rect Position",
+      "controlBinding": null,
+      "expression": "try {\n\t[effect(\"Void\")(\"Offset X\"),effect(\"Void\")(\"Offset Y\")];\n} catch (e) { value }",
+      "sim": {
+        "variable": "time",
+        "range": [0, 5],
+        "steps": 40,
+        "note": "Returns a constant [Offset X, Offset Y] 2D vector from the Void pseudo-effect; sweeping time confirms static output"
+      }
+    },
+    {
+      "target": "BURST CTRL/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Width",
+      "controlBinding": null,
+      "expression": "value / Math.max(length(toComp([0,0]), toComp([0.7071,0.7071])), 0.001);",
+      "sim": {
+        "variable": "time",
+        "range": [0, 5],
+        "steps": 40,
+        "note": "Scales the property's own value by the inverse of a normalised unit-diagonal pixel length; produces a scale-invariant stroke width"
+      }
+    },
+    {
+      "target": "Stroke 1/ADBE Root Vectors Group/1/2/1/ADBE Vector Shape",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 1 Length",
+        "range": [0, 500]
+      },
+      "expression": "var ctrl = thisComp.layer(\"BURST CTRL\");\nvar strokeLength = ctrl.effect(\"StrokeBurst\")(\"Stroke 1 Length\");\nvar pt = fromComp(ctrl.transform.position);\nvar pt1 = [pt[0],pt[1]];\nvar pt2 = [pt[0]+strokeLength, pt[1]];\ncreatePath([pt2, pt1], [], [], false)",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 500],
+        "steps": 40,
+        "note": "Sweep Stroke 1 Length to observe how the stroke path endpoint moves radially outward from the burst center"
+      }
+    },
+    {
+      "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Color",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 1 Color",
+        "range": [0, 1]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 1 Color\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 1],
+        "steps": 40,
+        "note": "Passthrough color from StrokeBurst 'Stroke 1 Color' slider; sweeping the color channel luminance shows linear passthrough"
+      }
+    },
+    {
+      "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Width",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 1 Width",
+        "range": [0, 100]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 1 Width\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 40,
+        "note": "Direct passthrough of StrokeBurst 'Stroke 1 Width' parameter; confirms linear 1:1 mapping"
+      }
+    },
+    {
+      "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 1",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 1 Dash 1",
+        "range": [0, 200]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 1 Dash 1\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 200],
+        "steps": 40,
+        "note": "Passthrough of StrokeBurst 'Stroke 1 Dash 1'; confirms the dash segment length is directly controlled by the effect slider"
+      }
+    },
+    {
+      "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 1",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 1 Gap 1",
+        "range": [0, 200]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 1 Gap 1\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 200],
+        "steps": 40,
+        "note": "Passthrough of StrokeBurst 'Stroke 1 Gap 1'; confirms the gap length is directly controlled by the effect slider"
+      }
+    },
+    {
+      "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 2",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 1 Dash 2",
+        "range": [0, 200]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 1 Dash 2\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 200],
+        "steps": 40,
+        "note": "Passthrough of StrokeBurst 'Stroke 1 Dash 2'; second dash segment controlled by the effect slider"
+      }
+    },
+    {
+      "target": "Stroke 1/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 2",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 1 Gap 2",
+        "range": [0, 200]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 1 Gap 2\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 200],
+        "steps": 40,
+        "note": "Passthrough of StrokeBurst 'Stroke 1 Gap 2'; second gap controlled by the effect slider"
+      }
+    },
+    {
+      "target": "Stroke 1/ADBE Root Vectors Group/3/ADBE Vector Repeater Copies",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 1 Density",
+        "range": [1, 64]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 1 Density\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [1, 64],
+        "steps": 40,
+        "note": "Sweep Stroke 1 Density (integer copies for the repeater) to observe how burst spoke count changes"
+      }
+    },
+    {
+      "target": "Stroke 1/ADBE Root Vectors Group/3/4/ADBE Vector Repeater Rotation",
+      "controlBinding": null,
+      "expression": "360/content(\"Repeater 1\").copies",
+      "sim": {
+        "variable": "controlValue",
+        "range": [1, 64],
+        "steps": 40,
+        "note": "Derived from Repeater copies count; produces even angular spacing (360/N degrees). Sweep copies count as the driving variable."
+      }
+    },
+    {
+      "target": "Stroke 2/ADBE Root Vectors Group/1/2/1/ADBE Vector Shape",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 2 Length",
+        "range": [0, 500]
+      },
+      "expression": "var ctrl = thisComp.layer(\"BURST CTRL\");\nvar strokeLength = ctrl.effect(\"StrokeBurst\")(\"Stroke 2 Length\");\nvar pt = fromComp(ctrl.transform.position);\nvar pt1 = [pt[0],pt[1]];\nvar pt2 = [pt[0]+strokeLength, pt[1]];\ncreatePath([pt2, pt1], [], [], false)",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 500],
+        "steps": 40,
+        "note": "Sweep Stroke 2 Length to observe how the second stroke ring's path endpoint moves radially"
+      }
+    },
+    {
+      "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Color",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 2 Color",
+        "range": [0, 1]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 2 Color\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 1],
+        "steps": 40,
+        "note": "Passthrough color from StrokeBurst 'Stroke 2 Color'; sweeping confirms linear passthrough"
+      }
+    },
+    {
+      "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/ADBE Vector Stroke Width",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 2 Width",
+        "range": [0, 100]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 2 Width\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 40,
+        "note": "Direct passthrough of StrokeBurst 'Stroke 2 Width'; confirms linear 1:1 mapping"
+      }
+    },
+    {
+      "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 1",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 2 Dash 1",
+        "range": [0, 200]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 2 Dash 1\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 200],
+        "steps": 40,
+        "note": "Passthrough of StrokeBurst 'Stroke 2 Dash 1'"
+      }
+    },
+    {
+      "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 1",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 2 Gap 1",
+        "range": [0, 200]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 2 Gap 1\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 200],
+        "steps": 40,
+        "note": "Passthrough of StrokeBurst 'Stroke 2 Gap 1'"
+      }
+    },
+    {
+      "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Dash 2",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 2 Dash 2",
+        "range": [0, 200]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 2 Dash 2\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 200],
+        "steps": 40,
+        "note": "Passthrough of StrokeBurst 'Stroke 2 Dash 2'"
+      }
+    },
+    {
+      "target": "Stroke 2/ADBE Root Vectors Group/1/2/2/9/ADBE Vector Stroke Gap 2",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 2 Gap 2",
+        "range": [0, 200]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 2 Gap 2\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 200],
+        "steps": 40,
+        "note": "Passthrough of StrokeBurst 'Stroke 2 Gap 2'"
+      }
+    },
+    {
+      "target": "Stroke 2/ADBE Root Vectors Group/3/ADBE Vector Repeater Copies",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Stroke 2 Density",
+        "range": [1, 64]
+      },
+      "expression": "thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Stroke 2 Density\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [1, 64],
+        "steps": 40,
+        "note": "Sweep Stroke 2 Density to observe second-ring spoke count"
+      }
+    },
+    {
+      "target": "Stroke 2/ADBE Root Vectors Group/3/4/ADBE Vector Repeater Rotation",
+      "controlBinding": null,
+      "expression": "360/content(\"Repeater 1\").copies",
+      "sim": {
+        "variable": "controlValue",
+        "range": [1, 64],
+        "steps": 40,
+        "note": "Derived from Repeater copies count; produces even angular spacing (360/N degrees). Sweep copies count as the driving variable."
+      }
+    },
+    {
+      "target": "Stroke 2/Transform/Rotation",
+      "controlBinding": {
+        "control": "StrokeBurst effect",
+        "param": "Strokes Rotation Ofset",
+        "range": [0, 360]
+      },
+      "expression": "thisComp.layer(\"Stroke 1\").transform.rotation+thisComp.layer(\"BURST CTRL\").effect(\"StrokeBurst\")(\"Strokes Rotation Ofset\")",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 360],
+        "steps": 40,
+        "note": "Sweep Strokes Rotation Offset to observe how Stroke 2 rotates relative to Stroke 1; linear additive relationship"
+      }
+    }
+  ],
+  "notes": [
+    "HEADLESS script — no ScriptUI is built; the script runs entirely from the try/catch wrapper.",
+    "Effect parameters are configured via a pseudo-effect ('StrokeBurst', matchName 'Pseudo/stroke_burst') applied from an embedded FFX binary. The parameter internal IDs (e.g. Pseudo/stroke_burst-0008) are opaque; human-readable names are exposed in the AE Effect Controls panel.",
+    "A second pseudo-effect ('Void', matchName 'Pseudo/void') is applied to BURST CTRL to expose Width, Height, Offset X, and Offset Y as sliders that drive the rect geometry.",
+    "Stroke 1 and Stroke 2 are parented to BURST CTRL via setParentWithJump; their position/scale/rotation are inherited from BURST CTRL.",
+    "The 'Strokes Rotation Ofset' parameter name is intentionally misspelled in the script source (one 'f').",
+    "applyPreset() is AE-runtime-only; the fixture marks expected confidence as 'medium' for this reason.",
+    "All parameters support keyframe animation, but the script writes only two keyframe pairs (Trim Start/End) per stroke layer."
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "name": "Distributron",
+  "category": "paths",
+  "ui": "HEADLESS",
+  "consumes": {
+    "selection": ["layers", "comp"],
+    "minimum": "1 active comp + exactly 1 selected shape layer containing at least one path",
+    "description": "Reads the active CompItem; reads comp.selectedLayers and expects exactly 1 shape layer; reads all other layers in the comp as distributable targets; reads the shape layer's Anchor Point value to position the CTRL null; reads the shape layer's index to determine distribution range (minIndex = shapeLayer.index + 1, maxIndex = layers.length)."
+  },
+  "controls": [
+    {
+      "name": "Randomize Rotation",
+      "type": "slider",
+      "role": "adds random rotation variation (±value degrees) to each distributed layer independently",
+      "default": 0,
+      "range": [-10, 10]
+    },
+    {
+      "name": "Rotation Offset",
+      "type": "number",
+      "role": "sets a global rotation offset (degrees) added to every distributed layer's path-tangent angle",
+      "default": 0,
+      "range": [-360, 360]
+    },
+    {
+      "name": "Start Distribution Offset",
+      "type": "slider",
+      "role": "shifts the start of the distribution range along the path (pixels from path start)",
+      "default": 0,
+      "range": [0, 10]
+    },
+    {
+      "name": "End Distribution Offset",
+      "type": "slider",
+      "role": "shrinks the end of the distribution range along the path (pixels from path end)",
+      "default": 0,
+      "range": [0, 10]
+    },
+    {
+      "name": "Distribution setup",
+      "type": "group",
+      "role": "group header that contains the First/Last Layer Index and Distribution Path Layer controls",
+      "default": null
+    },
+    {
+      "name": "First Layer Index",
+      "type": "slider",
+      "role": "sets the comp layer index of the first layer to include in the distribution",
+      "default": 0,
+      "range": [0, 1000]
+    },
+    {
+      "name": "Last Layer Index",
+      "type": "slider",
+      "role": "sets the comp layer index of the last layer to include in the distribution",
+      "default": 0,
+      "range": [0, 1000]
+    },
+    {
+      "name": "Distribution Path Layer",
+      "type": "number",
+      "role": "references the shape layer whose mask path is used as the distribution path",
+      "default": null
+    }
+  ],
+  "functions": [
+    "guard: alerts and exits when the number of selected layers is not exactly 1",
+    "move the selected shape layer to index 1 if it is not already there",
+    "add a Mask to the shape layer and set its Mask Path expression to follow the first shape group path",
+    "create a CTRL null layer and parent it to the shape layer",
+    "position the CTRL null at the shape layer's anchor point",
+    "apply the 'Distribute Along the Path' pseudo-effect FFX binary to the CTRL null via a temp file",
+    "set the Distribution Path Layer effect control to the shape layer's index",
+    "set First Layer Index and Last Layer Index controls to the distributable layer range",
+    "for each distributable layer: parent it to the CTRL null",
+    "for each distributable layer: apply the path-following expression to its Position property",
+    "for each distributable layer: apply the path-following expression to its Rotation property",
+    "wrap all mutations in a single undo group named 'Distributron'"
+  ],
+  "scriptSim": {
+    "scenario": "success — distribute 3 layers along shape path",
+    "inputs": "Active comp 'Path Comp' (1920×1080, 24fps, 5s); 1 selected shape layer 'Path Shape' at index 1 with a shape group path; distributable layers 'Item A' (index 2), 'Item B' (index 3), 'Item C' (index 4)",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Distributron", "value": "Distributron" },
+      { "kind": "setExpression", "target": "Path Shape/Masks/Mask/Mask Path", "value": "thisLayer.content(1).content(1).path" },
+      { "kind": "createLayer", "target": "CTRL" },
+      { "kind": "setParent", "target": "CTRL" },
+      { "kind": "setValue", "target": "CTRL/Transform/Position" },
+      { "kind": "fileWrite", "target": "temp/Distribute Along Path_v1.1.0.ffx" },
+      { "kind": "applyPreset", "target": "CTRL" },
+      { "kind": "setValue", "target": "CTRL/Effects/Distribute Along the Path/Distribution Path Layer" },
+      { "kind": "setValue", "target": "CTRL/Effects/Distribute Along the Path/First Layer Index", "value": 2 },
+      { "kind": "setValue", "target": "CTRL/Effects/Distribute Along the Path/Last Layer Index", "value": 4 },
+      { "kind": "setParent", "target": "Item A" },
+      { "kind": "setExpression", "target": "Item A/Transform/Position" },
+      { "kind": "setExpression", "target": "Item A/Transform/Rotation" },
+      { "kind": "setParent", "target": "Item B" },
+      { "kind": "setExpression", "target": "Item B/Transform/Position" },
+      { "kind": "setExpression", "target": "Item B/Transform/Rotation" },
+      { "kind": "setParent", "target": "Item C" },
+      { "kind": "setExpression", "target": "Item C/Transform/Position" },
+      { "kind": "setExpression", "target": "Item C/Transform/Rotation" },
+      { "kind": "endUndoGroup", "target": "Distributron" }
+    ]
+  },
+  "expressions": [
+    {
+      "target": "Item A/Transform/Position",
+      "controlBinding": {
+        "control": "Start Distribution Offset",
+        "param": "Start Distribution Offset",
+        "range": [0, 10]
+      },
+      "expression": "function calcPathLength(path) {\n  var length = 0;\n  var numPoints = path.length;\n  for (var i = 1; i < numPoints; i++) {\n    length += lengthTo(path[i - 1], path[i]);\n  }\n  return length;\n}\nfunction lengthTo(point1, point2) {\n  return Math.sqrt(Math.pow(point2[0] - point1[0], 2) + Math.pow(point2[1] - point1[1], 2));\n}\nvar controlLayer = thisComp.layer(\"CTRL\");\nvar selectedPathLayer = controlLayer.effect(\"Distribute Along the Path\")(\"Distribution Path Layer \");\nvar pathProperty = selectedPathLayer.mask(\"Mask 1\").maskPath;\nvar time = time;\nvar path = pathProperty.points(time);\nvar pathLength = calcPathLength(path);\nvar randomRotation = controlLayer.effect(\"Distribute Along the Path\")(\"Randomize Rotation\");\nvar offsetRotation = controlLayer.effect(\"Distribute Along the Path\")(\"Rotation Offset\");\nvar startIndex = controlLayer.effect(\"Distribute Along the Path\")(\"First Layer Index\");\nvar endIndex = controlLayer.effect(\"Distribute Along the Path\")(\"Last Layer Index\");\nvar endOffset = controlLayer.effect(\"Distribute Along the Path\")(\"End Distribution Offset\");\nvar startOffset = controlLayer.effect(\"Distribute Along the Path\")(\"Start Distribution Offset\");\nvar effectivePathLength = pathLength - endOffset - startOffset;\nvar myIndex = index - startIndex;\nvar t = startOffset + myIndex / (endIndex - startIndex) * effectivePathLength;\nvar pos = pathProperty.pointOnPath(t / pathLength, time);\nvar tangent = pathProperty.normalOnPath(t / pathLength, time);\nvar angle = Math.atan2(tangent[1], tangent[0]) * 180 / Math.PI;\nvar rotation = angle + 90 + offsetRotation + randomRotation * (Math.random() - 0.5) * 2;\nif (thisProperty.name === \"Position\") {\n  pos;\n} else if (thisProperty.name === \"Rotation\") {\n  rotation;\n}\n",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 10],
+        "steps": 41,
+        "note": "Sweeps Start Distribution Offset from 0 to 10 (pixels along path); output is the 2D position on the path for 'Item A' (index 2, first of 3 distributed layers). As startOffset increases, the distributed position slides forward along the path. The effective path length shrinks by the same amount."
+      }
+    },
+    {
+      "target": "Item A/Transform/Rotation",
+      "controlBinding": {
+        "control": "Rotation Offset",
+        "param": "Rotation Offset",
+        "range": [-360, 360]
+      },
+      "expression": "function calcPathLength(path) {\n  var length = 0;\n  var numPoints = path.length;\n  for (var i = 1; i < numPoints; i++) {\n    length += lengthTo(path[i - 1], path[i]);\n  }\n  return length;\n}\nfunction lengthTo(point1, point2) {\n  return Math.sqrt(Math.pow(point2[0] - point1[0], 2) + Math.pow(point2[1] - point1[1], 2));\n}\nvar controlLayer = thisComp.layer(\"CTRL\");\nvar selectedPathLayer = controlLayer.effect(\"Distribute Along the Path\")(\"Distribution Path Layer \");\nvar pathProperty = selectedPathLayer.mask(\"Mask 1\").maskPath;\nvar time = time;\nvar path = pathProperty.points(time);\nvar pathLength = calcPathLength(path);\nvar randomRotation = controlLayer.effect(\"Distribute Along the Path\")(\"Randomize Rotation\");\nvar offsetRotation = controlLayer.effect(\"Distribute Along the Path\")(\"Rotation Offset\");\nvar startIndex = controlLayer.effect(\"Distribute Along the Path\")(\"First Layer Index\");\nvar endIndex = controlLayer.effect(\"Distribute Along the Path\")(\"Last Layer Index\");\nvar endOffset = controlLayer.effect(\"Distribute Along the Path\")(\"End Distribution Offset\");\nvar startOffset = controlLayer.effect(\"Distribute Along the Path\")(\"Start Distribution Offset\");\nvar effectivePathLength = pathLength - endOffset - startOffset;\nvar myIndex = index - startIndex;\nvar t = startOffset + myIndex / (endIndex - startIndex) * effectivePathLength;\nvar pos = pathProperty.pointOnPath(t / pathLength, time);\nvar tangent = pathProperty.normalOnPath(t / pathLength, time);\nvar angle = Math.atan2(tangent[1], tangent[0]) * 180 / Math.PI;\nvar rotation = angle + 90 + offsetRotation + randomRotation * (Math.random() - 0.5) * 2;\nif (thisProperty.name === \"Position\") {\n  pos;\n} else if (thisProperty.name === \"Rotation\") {\n  rotation;\n}\n",
+      "sim": {
+        "variable": "controlValue",
+        "range": [-180, 180],
+        "steps": 41,
+        "note": "Sweeps Rotation Offset from -180 to +180 degrees; output is the rotation of 'Item A' in degrees, which is the path tangent angle at its position plus 90 degrees plus the offset. Curve is linear (y = pathTangentAngle + 90 + x) for a fixed path position."
+      }
+    }
+  ],
+  "notes": [
+    "Script is HEADLESS — it runs inline with no ScriptUI window; all controls are pseudo-effect sliders on the generated CTRL null layer, manipulated from the AE Effects panel.",
+    "The same expression string is applied to both Position and Rotation of every distributed layer; the expression branches on thisProperty.name to return pos or rotation respectively.",
+    "The pseudo-effect FFX binary is written to Folder.temp at runtime and applied via layer.applyPreset(); this requires AE's 'Allow Scripts to Write Files and Access Network' preference to be enabled.",
+    "randomRotation uses Math.random() inside the expression, which re-evaluates every frame; this causes flickering unless Randomize Rotation is set to 0.",
+    "The mask expression 'thisLayer.content(1).content(1).path' hard-codes the first shape group's first content item; if the shape layer has additional groups or reordered contents, the mask may reference the wrong path.",
+    "The CTRL null is parented to the shape layer so it moves with the shape; all distributed layers are parented to CTRL so the whole rig moves together.",
+    "Shape layer is moved to comp index 1 (moveToBeginning) if it is not already there, which may reorder other layers.",
+    "First Layer Index and Last Layer Index are set automatically at script-run time; they can be animated post-run to change which layer range is distributed."
+  ]
+}

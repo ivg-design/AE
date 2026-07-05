@@ -620,11 +620,11 @@ var Ae = (function () {
 			var layerNameWordsToMatch = layerNameSplit.slice(0, numMatchWords).join(' '); // get the words to match from the current layer name
 			// Compare the words to match of the current layer name with the search name
 			if (searchNameWordsToMatch === layerNameWordsToMatch) {
-				matchingLayers.push({
-					index: i,
-					name: comp.layer(i).name,
-					type: comp.layer(i).typeName,
-				});
+					matchingLayers.push({
+						index: i,
+						name: comp.layer(i).name,
+						type: comp.layer(i).typeName
+					});
 			}
 		}
 

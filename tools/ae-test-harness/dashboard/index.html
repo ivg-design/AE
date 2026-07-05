@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AE Script Catalog · Capability Dashboard</title>
+<link rel="stylesheet" href="/style.css" />
+<!--
+================================================================================
+  DATA CONTRACT — what app.js expects the Assembler to produce.
+  Frozen against CAPABILITY.md + src/capability/schema.js. The Assemble agent
+  must emit dashboard/data/index.json matching the manifest shape below, and
+  one capability/<name>.model.json (+ optional .render.json) per script. The
+  front-end MERGES model + render by `name` at runtime (fetched lazily on
+  detail open) — the manifest itself only needs the index fields.
+
+  GET /data/index.json  ->  Manifest
+  ----------------------------------------------------------------------------
+  Manifest = {
+    generatedAt: string,           // ISO timestamp
+    count:       number,
+    scripts: [ ManifestEntry, ... ]
+  }
+  ManifestEntry = {
+    name:            string,       // script name, no extension (merge key)
+    category:        string,       // catalog folder
+    ui:              'DIALOG'|'PANEL'|'PALETTE'|'HEADLESS',
+    model:           string,       // path relative to harness root, e.g.
+                                   //   "capability/Guiderator.model.json"
+                                   //   -> fetched as /capability/Guiderator.model.json
+    render:          string|null,  // ".../<name>.render.json" or null
+    hasExpressions:  boolean,
+    hasScreenshot:   boolean
+  }
+  (Additive per-entry fields are tolerated and ignored.)
+
+  GET /capability/<name>.model.json  ->  CapabilityModel
+  ----------------------------------------------------------------------------
+  CapabilityModel = {
+    name, category, ui,
+    consumes:   { selection: string[], minimum: string, description: string },
+    controls:   [ { name, type, role, default,
+                    range?:[min,max], options?:string[] } ],
+    functions:  string[],
+    scriptSim:  { scenario, inputs,
+                  operations:[ { kind, target, value? } ] },
+    expressions:[ { target,
+                    controlBinding: { control, param, range:[min,max] } | null,
+                    expression: string,
+                    sim: { variable:'controlValue'|'time',
+                           range:[min,max], steps:number>=2, note } } ],
+    notes:      string[]
+  }
+
+  GET /capability/<name>.render.json  ->  RenderArtifacts (optional)
+  ----------------------------------------------------------------------------
+  RenderArtifacts = {
+    name,
+    screenshot:  string|null,      // path; UI uses /assets/ui/<name>.png by name
+    uiTreePath:  string|null,
+    expressionCurves: [ { target, xLabel, yLabel,
+                          samples:[ { x, y } ] } ],
+    notes: string[]
+  }
+
+  SCREENSHOTS: served at /assets/ui/<name>.png . The detail panel shows the
+  pixel-perfect ScriptUI capture when ui != 'HEADLESS' and the PNG loads;
+  otherwise a 'headless' badge.
+
+  EXPRESSION-SIM: per expression binding, an interactive slider over
+  controlBinding.range (falls back to sim.range) drives the LIVE evaluator
+  imported from /src/expr-eval/index.mjs ({ evaluate, sample }); output curve
+  is redrawn on a <canvas>. If the evaluator import or eval fails, a static
+  fallback curve from render.expressionCurves[] is drawn instead.
+
+  Every field is rendered DEFENSIVELY — missing/empty arrays and absent
+  sections collapse gracefully.
+================================================================================
+-->
+</head>
+<body>
+<header id="topbar">
+  <div class="brand">
+    <span class="logo">◣◤</span>
+    <h1>AE&nbsp;SCRIPT&nbsp;CATALOG <span class="sub">// capability harness</span></h1>
+  </div>
+  <div class="meta">
+    <input id="search" type="text" placeholder="filter scripts…" spellcheck="false" autocomplete="off" />
+    <select id="catfilter" title="category"><option value="">all categories</option></select>
+    <span id="stamp" class="stamp">loading…</span>
+  </div>
+</header>
+
+<main id="layout">
+  <section id="grid-pane">
+    <div id="grid" class="grid"></div>
+    <div id="grid-empty" class="empty" hidden>no scripts in manifest</div>
+  </section>
+
+  <aside id="detail" class="detail" aria-live="polite">
+    <div id="detail-empty" class="detail-hint">
+      <span class="ghost">◈</span>
+      <p>select a script</p>
+    </div>
+    <article id="detail-body" hidden></article>
+  </aside>
+</main>
+
+<footer id="statusbar">
+  <span id="status-text">ready</span>
+  <span class="spacer"></span>
+  <span class="legend"><i class="dot ok"></i>screenshot</span>
+  <span class="legend"><i class="dot expr"></i>expressions</span>
+  <span class="legend"><i class="dot headless"></i>headless</span>
+</footer>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>

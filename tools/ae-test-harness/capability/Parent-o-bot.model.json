@@ -1,0 +1,128 @@
+{
+  "name": "Parent-o-bot",
+  "category": "layers",
+  "ui": "DIALOG",
+  "consumes": {
+    "selection": ["layers", "comp"],
+    "minimum": "1 active CompItem + 1 selected target layer; comp must contain at least 1 additional layer to act as parent controller",
+    "description": "Reads app.project.activeItem (CompItem), iterates all comp layers to populate the dialog listbox, reads comp.selectedLayers for target layers, reads layer names and indices to resolve parent assignments, and reads existing effects to remove stale Multi_Parent instances before re-applying."
+  },
+  "controls": [
+    {
+      "name": "Layer List",
+      "type": "listbox",
+      "role": "selects up to two parent controller layers from all comp layers",
+      "default": null,
+      "options": []
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "dismisses the dialog without applying any changes",
+      "default": null
+    },
+    {
+      "name": "OK",
+      "type": "button",
+      "role": "confirms parent selection and triggers Multi_Parent effect application and expression generation",
+      "default": null
+    }
+  ],
+  "functions": [
+    "validate active composition and selected target layers before opening dialog",
+    "present listbox dialog listing all comp layers for parent selection",
+    "remove existing Multi_Parent pseudo-effect from each target layer",
+    "write FFX binary to temp file and apply Multi_Parent pseudo-effect preset to each target layer",
+    "set Parent 1 (and optionally Parent 2) layer-picker values on Multi_Parent effect",
+    "generate and assign Position blending expression to each target layer's Transform/Position",
+    "generate and assign Scale blending expression to each target layer's Transform/Scale",
+    "generate and assign Rotation blending expression to each target layer's Transform/Rotation",
+    "generate and assign Opacity blending expression to each target layer's Transform/Opacity",
+    "wrap all operations in an undo group"
+  ],
+  "scriptSim": {
+    "scenario": "success — one target layer, one parent selected in dialog",
+    "inputs": "Active comp 'Rig Comp' (1920x1080, 5 s, 30 fps) with two layers: 'Controller' (Null, index 1) and 'Target Shape' (Shape, index 2). 'Target Shape' is the selected target layer. Dialog: listbox item 0 ('Controller') selected, OK clicked.",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Parent-o-bot" },
+      { "kind": "fileWrite", "target": "temp/Multi_Parent_v1.0.ffx" },
+      { "kind": "applyPreset", "target": "Target Shape/Effects/Multi_Parent" },
+      { "kind": "setValue", "target": "Multi_Parent/Parent 1", "value": 1 },
+      { "kind": "setExpression", "target": "Transform/Position" },
+      { "kind": "setExpression", "target": "Transform/Scale" },
+      { "kind": "setExpression", "target": "Transform/Rotation" },
+      { "kind": "setExpression", "target": "Transform/Opacity" },
+      { "kind": "endUndoGroup", "target": "Parent-o-bot" }
+    ]
+  },
+  "expressions": [
+    {
+      "target": "Transform/Position",
+      "controlBinding": {
+        "control": "Position Influence",
+        "param": "Position Influence",
+        "range": [0, 100]
+      },
+      "expression": "var active = effect(\"Multi_Parent\")(\"Position\");\nvar influence = effect(\"Multi_Parent\")(\"Position Influence\") / 100;\nvar parent1 = effect(\"Multi_Parent\")(\"Parent 1\");\nvar parent2 = effect(\"Multi_Parent\")(\"Parent 2\");\n\nif (active == 0) {\n    transform.position;\n} else {\n    if ((!parent1 || parent1.index == thisLayer.index) && (!parent2 || parent2.index == thisLayer.index)) {\n        transform.position;\n    } else if (parent1 && parent1.index != thisLayer.index && parent2 && parent2.index != thisLayer.index) {\n        linear(influence, 0, 1, parent1.transform.position, parent2.transform.position);\n    } else {\n        var parentLayer = (parent1 && parent1.index != thisLayer.index) ? parent1 : parent2;\n        if (parentLayer) {\n            linear(influence, 0, 1, transform.position, parentLayer.transform.position);\n        } else {\n            transform.position;\n        }\n    }\n}",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps Position Influence slider 0-100; at 0 the layer's own position is returned unchanged, at 100 the position is fully blended toward the parent layer's position via linear()."
+      }
+    },
+    {
+      "target": "Transform/Scale",
+      "controlBinding": {
+        "control": "Scale Influence",
+        "param": "Scale Influence",
+        "range": [0, 100]
+      },
+      "expression": "var active = effect(\"Multi_Parent\")(\"Scale\");\nvar influence = effect(\"Multi_Parent\")(\"Scale Influence\") / 100;\nvar parent1Value = effect(\"Multi_Parent\")(\"Parent 1\").index;\nvar parent2Value = effect(\"Multi_Parent\")(\"Parent 2\").index;\nvar parent1Layer = (parent1Value && !isNaN(parent1Value) && parent1Value > 0) ? thisComp.layer(parent1Value) : null;\nvar parent2Layer = (parent2Value && !isNaN(parent2Value) && parent2Value > 0) ? thisComp.layer(parent2Value) : null;\nvar originalScale = transform.scale;\nif (active == 0 || (!parent1Layer && !parent2Layer)) {\n    originalScale;\n} else {\n    var baseParentScale = [100, 100];\n    if (parent1Layer) {\n        baseParentScale = parent1Layer.transform.scale;\n    } else if (parent2Layer) {\n        baseParentScale = parent2Layer.transform.scale;\n    }\n    var targetParentScale = parent2Layer ? parent2Layer.transform.scale : baseParentScale;\n    var adjustedScaleX = (originalScale[0] / baseParentScale[0]) * targetParentScale[0];\n    var adjustedScaleY = (originalScale[1] / baseParentScale[1]) * targetParentScale[1];\n    [\n        linear(influence, 0, 1, originalScale[0], adjustedScaleX),\n        linear(influence, 0, 1, originalScale[1], adjustedScaleY)\n    ];\n}",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps Scale Influence slider 0-100; uses proportional scale adjustment relative to the parent's scale, blending via linear() from the layer's own scale toward the adjusted parent-relative scale."
+      }
+    },
+    {
+      "target": "Transform/Rotation",
+      "controlBinding": {
+        "control": "Rotation Influence",
+        "param": "Rotation Influence",
+        "range": [0, 100]
+      },
+      "expression": "var active = effect(\"Multi_Parent\")(\"Rotation\");\nvar influence = effect(\"Multi_Parent\")(\"Rotation Influence\") / 100;\nvar parent1 = effect(\"Multi_Parent\")(\"Parent 1\");\nvar parent2 = effect(\"Multi_Parent\")(\"Parent 2\");\n\nif (active == 0) {\n    transform.rotation;\n} else {\n    if ((!parent1 || parent1.index == thisLayer.index) && (!parent2 || parent2.index == thisLayer.index)) {\n        transform.rotation;\n    } else if (parent1 && parent1.index != thisLayer.index && parent2 && parent2.index != thisLayer.index) {\n        linear(influence, 0, 1, parent1.transform.rotation, parent2.transform.rotation);\n    } else {\n        var parentLayer = (parent1 && parent1.index != thisLayer.index) ? parent1 : parent2;\n        if (parentLayer) {\n            linear(influence, 0, 1, transform.rotation, parentLayer.transform.rotation);\n        } else {\n            transform.rotation;\n        }\n    }\n}",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps Rotation Influence slider 0-100; at 0 returns own rotation, at 100 blends fully toward the parent layer's rotation via linear()."
+      }
+    },
+    {
+      "target": "Transform/Opacity",
+      "controlBinding": {
+        "control": "Opacity Influence",
+        "param": "Opacity Influence",
+        "range": [0, 100]
+      },
+      "expression": "var active = effect(\"Multi_Parent\")(\"Opacity\");\nvar influence = effect(\"Multi_Parent\")(\"Opacity Influence\") / 100;\nvar parent1 = effect(\"Multi_Parent\")(\"Parent 1\");\nvar parent2 = effect(\"Multi_Parent\")(\"Parent 2\");\n\nif (active == 0) {\n    transform.opacity;\n} else {\n    if ((!parent1 || parent1.index == thisLayer.index) && (!parent2 || parent2.index == thisLayer.index)) {\n        transform.opacity;\n    } else if (parent1 && parent1.index != thisLayer.index && parent2 && parent2.index != thisLayer.index) {\n        linear(influence, 0, 1, parent1.transform.opacity, parent2.transform.opacity);\n    } else {\n        var parentLayer = (parent1 && parent1.index != thisLayer.index) ? parent1 : parent2;\n        if (parentLayer) {\n            linear(influence, 0, 1, transform.opacity, parentLayer.transform.opacity);\n        } else {\n            transform.opacity;\n        }\n    }\n}",
+      "sim": {
+        "variable": "controlValue",
+        "range": [0, 100],
+        "steps": 41,
+        "note": "Sweeps Opacity Influence slider 0-100; at 0 returns own opacity, at 100 blends fully toward the parent layer's opacity via linear()."
+      }
+    }
+  ],
+  "notes": [
+    "The script has a variable-scope quirk: createExpression is called outside the per-target-layer loop and references `currentLayer`, which retains the last iteration's value — so expressions are always applied to the final target layer only, even when multiple layers are selected.",
+    "The Multi_Parent pseudo-effect is applied via a binary FFX blob written to the OS temp folder at runtime; applyPreset requires a real AE instance and cannot be simulated purely in JS.",
+    "Effect controls (Parent 1/2 layer pickers, Property Selector group, Position/Rotation/Scale/Opacity checkboxes, and influence sliders) are part of the pseudo-effect in AE's Effect Controls panel — they are not ScriptUI dialog controls.",
+    "Influence sliders on the pseudo-effect range 0-100 (percent); the expressions divide by 100 to normalise to 0-1 before passing to linear().",
+    "The selection-change listener on the listbox alerts if more than 2 items are selected but does not prevent it; the actual guard is at OK-time (`selectedItems.length <= 2`).",
+    "Compatible with 2D and 3D layers; works alongside existing AE parent constraints."
+  ]
+}

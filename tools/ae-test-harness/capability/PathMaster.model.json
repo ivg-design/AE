@@ -1,0 +1,124 @@
+{
+  "name": "PathMaster",
+  "category": "animation",
+  "ui": "DIALOG",
+
+  "consumes": {
+    "selection": ["comp", "properties", "layers"],
+    "minimum": "1 active composition + 1 selected ADBE Position property + 1 shape layer in the comp",
+    "description": "Reads the active CompItem, the first selected property (must be ADBE Position), and all shape layers (layers that have a Contents property group) present in the comp. Also inspects the chosen shape layer's Contents tree to enumerate groups and paths for user selection."
+  },
+
+  "controls": [
+    {
+      "name": "layerList",
+      "type": "listbox",
+      "role": "selects the shape layer whose path will be used for animation",
+      "default": null,
+      "options": []
+    },
+    {
+      "name": "treeView",
+      "type": "listbox",
+      "role": "selects a specific path from the chosen shape layer's Contents hierarchy",
+      "default": null,
+      "options": []
+    },
+    {
+      "name": "easingDropdown",
+      "type": "dropdown",
+      "role": "sets the cubic-bezier easing written into the Animation Easing marker comment",
+      "default": "Ease (0.25, 0.1, 0.25, 1.0)",
+      "options": [
+        "Ease (0.25, 0.1, 0.25, 1.0)",
+        "Ease-In-Out (0.42, 0.0, 0.58, 1.0)",
+        "88/66 (0.88, 0, 0.66, 1)",
+        "66/88 (0.34, 0, 0.12, 1)",
+        "Ease-In (0.42, 0.0, 1.0, 1.0)",
+        "EaseInSine (0.12, 0, 0.39, 0)",
+        "EaseOutSine (0.61, 1, 0.88, 1)",
+        "EaseInOutSine (0.37, 0, 0.63, 1)",
+        "EaseInQuad (0.11, 0, 0.5, 0)",
+        "EaseOutQuad (0.5, 1, 0.89, 1)",
+        "EaseInOutQuad (0.45, 0, 0.55, 1)",
+        "EaseInCubic (0.32, 0, 0.67, 0)",
+        "EaseOutCubic (0.33, 1, 0.68, 1)",
+        "EaseInOutCubic (0.65, 0, 0.35, 1)",
+        "EaseInQuart (0.5, 0, 0.75, 0)",
+        "EaseOutQuart (0.25, 1, 0.5, 1)",
+        "EaseInOutQuart (0.76, 0, 0.24, 1)",
+        "EaseInQuint (0.64, 0, 0.78, 0)",
+        "EaseOutQuint (0.22, 1, 0.36, 1)",
+        "EaseInOutQuint (0.83, 0, 0.17, 1)",
+        "EaseInExpo (0.7, 0, 0.84, 0)",
+        "EaseOutExpo (0.16, 1, 0.3, 1)",
+        "EaseInOutExpo (0.87, 0, 0.13, 1)",
+        "EaseInCirc (0.55, 0, 1, 0.45)",
+        "EaseOutCirc (0, 0.55, 0.45, 1)",
+        "EaseInOutCirc (0.85, 0, 0.15, 1)"
+      ]
+    },
+    {
+      "name": "durationInput",
+      "type": "text",
+      "role": "sets the animation duration in frames; converted to seconds (frames / frameRate) for the expression and marker",
+      "default": "60"
+    },
+    {
+      "name": "reverseCheck",
+      "type": "checkbox",
+      "role": "requests a Reverse Direction checkbox effect on the layer; when checked the expression reads effect(\"Reverse Direction\")(\"Checkbox\") > 0 to flip path traversal direction",
+      "default": false
+    }
+  ],
+
+  "functions": [
+    "validate that the active comp has a selected ADBE Position property",
+    "collect all shape layers (those with a Contents group) from the active comp",
+    "recursively extract shape groups and paths from a chosen shape layer's Contents hierarchy",
+    "present a three-step dialog flow: shape-layer selection, path tree selection, easing/duration/reverse settings",
+    "write a cubic-bezier path-following expression onto the selected Position property",
+    "add a Reverse Direction checkbox effect to the layer if one does not exist",
+    "remove any existing Animation Easing markers from the layer and add a fresh marker encoding the chosen easing, segment range, and duration",
+    "animate a layer's position along a chosen shape path using pointOnPath() with optional loop, ping-pong, partial segment, and reverse-direction support"
+  ],
+
+  "scriptSim": {
+    "scenario": "success – animate along shape path with ease-in-out",
+    "inputs": "Composition 'Scene Comp' (1920×1080, 24 fps, 10 s) containing shape layer 'Path Shape' (Group 1 > Path 1) and AV layer 'Animated Layer' with its Position property selected",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "PathMaster" },
+      { "kind": "setExpression",  "target": "Animated Layer/Transform/Position" },
+      { "kind": "setMarker",      "target": "Animated Layer" },
+      { "kind": "endUndoGroup",   "target": "PathMaster" }
+    ]
+  },
+
+  "expressions": [
+    {
+      "target": "Animated Layer/Transform/Position",
+      "controlBinding": {
+        "control": "reverseCheck",
+        "param": "Checkbox",
+        "range": [0, 1]
+      },
+      "expression": "// Animate layer along a shape path using pointOnPath().\n// Default fallback Easing: [0,0,1,1] (linear) if marker absent or invalid.\n// Partial segments by %, loop/ping-pong, reverse direction.\n\nvar defaultDuration = 2;\nvar defaultEasing   = [0,0,1,1];  // always fallback to linear\nvar defaultSegment  = [0,100];    // entire path\nvar defaultLoop     = \"none\";   // no loop or ping-pong by default\n\n// Reverse direction checkbox\nvar reverseDir = effect(\"Reverse Direction\")(\"Checkbox\") > 0;\n\nfunction clamp(v, mn, mx){ return Math.min(Math.max(v, mn), mx); }\n\n// Find marker with 'Animation' in the comment.\nvar markerData = null;\nfor(var mk=1; mk<=thisLayer.marker.numKeys; mk++){\n  var mVal = thisLayer.marker.key(mk);\n  if(mVal.comment && mVal.comment.indexOf(\"Animation\") !== -1){\n    markerData = mVal;\n    break;\n  }\n}\n\nvar startTime = markerData ? markerData.time : inPoint;\nvar duration  = markerData ? (markerData.duration > 0 ? markerData.duration : defaultDuration) : defaultDuration;\nvar easing    = defaultEasing;\nvar segment   = defaultSegment;\nvar loopMode  = defaultLoop;\n\nif(markerData){\n  // parse marker comment, e.g. \"Animation Easing: 0.42,0,0.58,1 || Segment 20 - 75% || Loop\"\n  var parts = markerData.comment.split(\"||\");\n  for(var i=0; i<parts.length; i++){ parts[i] = parts[i].replace(/^\\s+|\\s+$/g, \"\"); }\n\n  // parse Easing\n  var easeRE = /Easing:\\s*([-+]?[0-9]*\\.?[0-9]+),\\s*([-+]?[0-9]*\\.?[0-9]+),\\s*([-+]?[0-9]*\\.?[0-9]+),\\s*([-+]?[0-9]*\\.?[0-9]+)/;\n  for(var e=0; e<parts.length; e++){\n    if(parts[e].indexOf(\"Easing\")!==-1){\n      var m = parts[e].match(easeRE);\n      if(m){\n        easing = [ parseFloat(m[1]), parseFloat(m[2]), parseFloat(m[3]), parseFloat(m[4]) ];\n      }\n      break;\n    }\n  }\n\n  // parse Segment by percentage\n  var segRE = /Segment\\s+([0-9]+\\.?[0-9]*)%?\\s*-\\s*([0-9]+\\.?[0-9]*)%/i;\n  for(var s=0; s<parts.length; s++){\n    if(parts[s].indexOf(\"Segment\")!==-1){\n      var pm = parts[s].match(segRE);\n      if(pm){\n        segment = [ parseFloat(pm[1]), parseFloat(pm[2]) ];\n      }\n      break;\n    }\n  }\n\n  // parse Loop / PingPong\n  for(var l=0; l<parts.length; l++){\n    if(/loop/i.test(parts[l])){\n      loopMode = \"loop\";\n    } else if(/ping\\s*-?\\s*pong/i.test(parts[l])){\n      loopMode = \"pingpong\";\n    }\n  }\n}\n\n// Cubic Bezier function\nfunction cubicBezier(t, p1x,p1y, p2x,p2y){\n  function bz(tt, p0,p1,p2,p3){\n    var c=3*(p1-p0);\n    var b=3*(p2-p1)-c;\n    var a=1-c-b;\n    return ((a*tt+b)*tt + c)*tt + p0;\n  }\n  function getTForX(x, eps){\n    var guess=x;\n    for(var i=0;i<10;i++){\n      var xEst = bz(guess, 0,p1x,p2x,1);\n      var dx   = (bz(guess+eps, 0,p1x,p2x,1)-xEst)/eps;\n      if(Math.abs(xEst-x)<eps) return guess;\n      guess -= (xEst-x)/dx;\n    }\n    return guess;\n  }\n  var eps=1e-5;\n  var solved=getTForX(t, eps);\n  return bz(solved, 0, p1y,p2y,1);\n}\n\n// Loop/pingpong\nfunction getLoopedProgress(tm, st, dur, mode){\n  var locT = tm - st;\n  function cl(v){return clamp(v,0,1);} // shorthand\n\n  if(mode==='none'){\n    return cl(locT/dur);\n  } else if(mode==='loop'){\n    if(dur<=0) return 0;\n    var mv = locT%dur; if(mv<0) mv+=dur;\n    return cl(mv/dur);\n  } else if(mode==='pingpong'){\n    if(dur<=0) return 0;\n    var cycle=2*dur;\n    var mv2= locT%cycle; if(mv2<0) mv2+=cycle;\n    if(mv2<=dur){\n      return cl(mv2/dur);\n    } else {\n      return cl(1 - ((mv2-dur)/dur));\n    }\n  }\n  return 0;\n}\n\n// 1) raw progress\nvar rawP = getLoopedProgress(time, startTime, duration, loopMode);\n// 2) eased\nvar eased = cubicBezier(rawP, easing[0], easing[1], easing[2], easing[3]);\n// 3) reverse?\nvar finalP = reverseDir ? 1 - eased : eased;\n\n// 4) partial by %\nvar segStart = clamp(segment[0], 0, 100)/100;\nvar segEnd   = clamp(segment[1], 0, 100)/100;\nif(segEnd<segStart){ var tmp=segStart; segStart=segEnd; segEnd=tmp; }\nvar subP = linear(finalP, 0,1, segStart, segEnd);\n\n// 5) pointOnPath(subP)\n// We'll call .toComp() on the actual shape layer:\nvar shapeLayer = thisComp.layer(\"Path Shape\");\nvar thePath    = thisComp.layer(\"Path Shape\")(\"Contents\")(\"Group 1\")(\"Path 1\")(\"Path\");\nvar pathPos    = thePath.pointOnPath(subP); // local coords\nvar compPos    = shapeLayer.toComp(pathPos);\n\n// if this layer is parented, fromComp\nif(thisLayer.hasParent){\n  compPos = parent.fromComp(compPos);\n}\n\ncompPos; // done.\n",
+      "sim": {
+        "variable": "time",
+        "range": [0, 2],
+        "steps": 41,
+        "note": "Sweeps time from 0 to 2 s (the defaultDuration for a 48-frame animation at 24 fps) to plot the layer's progress along the path under Ease-In-Out easing (0.42, 0, 0.58, 1) with no loop, full segment 0–100%, and reverseDir=false"
+      }
+    }
+  ],
+
+  "notes": [
+    "The script runs in a strict three-dialog sequence (shape-layer list → path tree → easing/duration). Cancelling any dialog exits without making changes.",
+    "The ScriptUI listbox and dropdownlist are populated via the positional 3rd argument of add(); the harness scriptui root ignores that form and creates empty lists, so the harness cannot reach the success branch without a fix to the scriptui root's Control.add() handling.",
+    "The Reverse Direction checkbox is implemented as an ADBE Checkbox Control effect named 'Reverse Direction' added to the layer; the expression reads it at runtime via effect(\"Reverse Direction\")(\"Checkbox\").",
+    "Easing values are embedded in the Animation Easing marker comment using the pattern 'Animation Easing: p1x,p1y,p2x,p2y || Segment start - end%'; if the marker is absent or malformed the expression falls back to linear [0,0,1,1].",
+    "The expression supports three loop modes: none (clamp), loop (modulo), and pingpong (back-and-forth); the mode is read from the marker comment at runtime.",
+    "For parented layers the expression converts the path position through toComp() then back through parent.fromComp() to stay correct in local space.",
+    "durationSeconds is baked into the expression source at write-time as a numeric literal (e.g. 2 for 48 frames at 24 fps); it also sets the marker duration so both stay in sync."
+  ]
+}

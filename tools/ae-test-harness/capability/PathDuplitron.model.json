@@ -1,0 +1,66 @@
+{
+  "name": "PathDuplitron",
+  "category": "paths",
+  "ui": "PANEL",
+
+  "consumes": {
+    "selection": ["comp", "layers", "keyframes"],
+    "minimum": "1 active composition + 1 selected layer with a Position property that has at least 1 selected keyframe",
+    "description": "Reads app.project.activeItem (must be a CompItem), then comp.selectedLayers[0], then layer.property('Position'), and finally positionProp.selectedKeys. The Copy path also enumerates all position keyframes (numKeys) to write shape-path vertices. The Paste path only needs the same preconditions to verify before issuing an executeCommand(20)."
+  },
+
+  "controls": [
+    {
+      "name": "Copy",
+      "type": "button",
+      "role": "copies position keyframe tangent data to clipboard via a temporary shape layer intermediate",
+      "default": null
+    },
+    {
+      "name": "Paste",
+      "type": "button",
+      "role": "pastes previously copied tangent data onto the selected position keyframes via AE paste command",
+      "default": null
+    },
+    {
+      "name": "Close",
+      "type": "button",
+      "role": "closes the panel window",
+      "default": null
+    }
+  ],
+
+  "functions": [
+    "validate that the active item is a CompItem and that a layer is selected before acting",
+    "guard against layers without a Position property or with no keyframes selected",
+    "create a temporary shape layer and write position keyframe values as shape-path vertices via setValueAtTime for each keyframe",
+    "execute AE internal Copy command (id 10313) to copy the shape path with its tangent data to the clipboard",
+    "remove the temporary shape layer after the copy",
+    "execute AE internal Paste command (id 20) to apply previously copied tangent data to the selected position keyframes"
+  ],
+
+  "scriptSim": {
+    "scenario": "success – copy position keyframe tangents via shape layer intermediate",
+    "inputs": "Composition 'Motion Comp' (1920×1080, 24 fps, 10 s) with AV layer 'Animated Ball' selected; Position has 3 keyframes at t=0 ([200,540]), t=2 ([960,200]), t=4 ([1720,540]); first two keyframes selected",
+    "operations": [
+      { "kind": "createLayer", "target": "comp-pathduplitron-01 (addShape — intermediate shape layer)" },
+      { "kind": "setValueAtTime", "target": "shapeLayer/Contents/ADBE Vector Shape - Group/ADBE Vector Shape", "value": "[200, 540] at t=0" },
+      { "kind": "setValueAtTime", "target": "shapeLayer/Contents/ADBE Vector Shape - Group/ADBE Vector Shape", "value": "[960, 200] at t=2" },
+      { "kind": "setValueAtTime", "target": "shapeLayer/Contents/ADBE Vector Shape - Group/ADBE Vector Shape", "value": "[1720, 540] at t=4" },
+      { "kind": "executeCommand", "target": "app.executeCommand(10313)", "value": 10313 },
+      { "kind": "deleteLayer", "target": "shapeLayer (intermediate removed via shapeLayer.remove())" }
+    ]
+  },
+
+  "expressions": [],
+
+  "notes": [
+    "The panel opens as a floating 'palette' Window using a ScriptUI resource string; it remains open for repeated copy/paste operations within the same AE session.",
+    "Copy stores tangent data in the AE clipboard via executeCommand(10313); the clipboard is session-scoped and cleared by a new Copy or by closing AE.",
+    "The shape-layer intermediate (addShape) is created and immediately destroyed within the same Copy invocation; it is never visible to the user for more than a single frame.",
+    "setValueAtTime writes ALL position keyframes (positionProp.numKeys), not just the selected subset — the selected keyframes only gate whether the Copy runs at all.",
+    "Paste is a thin wrapper around executeCommand(20); it requires that a prior Copy (or any AE clipboard content) is available; no tangent merging is done in script — AE's native paste handles the transfer.",
+    "No beginUndoGroup/endUndoGroup wrapping is present; each operation is undoable individually (or not at all for executeCommand).",
+    "The script is compatible with both 2D and 3D Position properties; 3D layers expose keyValue as [x,y,z] but the script only reads indices 0 and 1, so Z is silently dropped into the 2D shape path vertex."
+  ]
+}

@@ -5,7 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - 2025-01-13
+## [Unreleased]
+
+### Added
+- Vendored Smallpath `AdobeColorPicker` v2.0 under `vendors/AdobeColorPicker` and embedded a sanitized local copy in `ChromaBlenderizer`.
+
+### Changed
+- Replaced `Limb-a-tron` with the imported `2.7.0` regular/noodle limb rig and updated its front matter, feature descriptions, and catalog documentation.
+- Updated `ChromaBlenderizer` to `2.3.1` with a modeless palette, swatch-only color picking, clearer target-selection guidance, swatch/picker tooltips, white default swatches, and repeat-apply workflow.
+
+### Fixed
+- Fixed `ChromaBlenderizer` swatch picks so the selected picker color updates the config used by `Apply Colors`.
+
+## [2.0.0] - 2025-08-13
 
 ### Added
 - Comprehensive monorepo structure with `packages/` organization

@@ -622,6 +622,16 @@ export function scanIncludes(code) {
       includes.push({ kind: '#include', target: hash[2], line: lineNo });
     }
 
+    // Malformed preprocessor directive: "// @'include ..." etc. AE's
+    // preprocessor parses `// @<token>` even though acorn sees a comment,
+    // and a quote right after the @ aborts the WHOLE script with
+    // "Unable to execute script at line N. Syntax error" (real incident:
+    // Centralizer 2.0.2). Treat as include-blocking so it can't ship.
+    const mal = /^\s*\/\/\s*@\s*['"]/.exec(line);
+    if (mal) {
+      includes.push({ kind: 'malformed-directive', target: line.trim(), line: lineNo });
+    }
+
     const ev = EVALFILE_RE.exec(line);
     if (ev) {
       const target = ev[2] != null ? ev[2] : (ev[3] || '').trim();

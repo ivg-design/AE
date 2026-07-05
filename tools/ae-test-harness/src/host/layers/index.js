@@ -289,6 +289,12 @@ function createLayer(def, { emit, buildProps, ctx, registry }) {
     index: def.index,
     name: def.name,
     matchName: layerMatchName,
+    // AE: a layer IS the top-level PropertyGroup and its parentProperty is
+    // null (scripts walk `while (prop.parentProperty !== null)` and rely on
+    // the walk terminating AT the layer). Root-level property groups parent
+    // to the layer (see properties/index.js), so this must be an explicit
+    // null, not undefined.
+    parentProperty: null,
     enabled: def.enabled !== false,
     locked: def.locked === true,
     threeDLayer: def.threeDLayer === true,

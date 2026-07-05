@@ -33,6 +33,7 @@ JSX/
 │   └── cep-extensions/
 │       └── frame-navigator/ # React-based CEP extension
 ├── tools/                   # Scripting modules and utilities
+├── vendors/                 # Vendored third-party scripting libraries
 ├── docs/                    # Documentation
 └── dist/                    # Production builds
 ```
@@ -45,7 +46,7 @@ JSX/
 |--------|-------------|
 | **[PathMaster](packages/ae-scripts/src/animation/PathMaster.jsx)** | Advanced path following animation with easing, loops, segments, and markers |
 | **[Linearizer](packages/ae-scripts/src/animation/Linearizer.jsx)** | Property linking with driver-based interpolation for complex animations |
-| **[Limb-a-tron](packages/ae-scripts/src/animation/Limb-a-tron.jsx)** | Complete IK rig system for character limbs with curvature control |
+| **[Limb-a-tron](packages/ae-scripts/src/animation/Limb-a-tron.jsx)** | IK/FK limb rig with regular/noodle bodies, outline trims, and intelligent bake mode |
 
 ### Composition Scripts (4)
 
@@ -60,7 +61,7 @@ JSX/
 
 | Script | Description |
 |--------|-------------|
-| **[ChromaBlenderizer](packages/ae-scripts/src/effects/ChromaBlenderizer.jsx)** | Advanced color interpolation across selected properties |
+| **[ChromaBlenderizer](packages/ae-scripts/src/effects/ChromaBlenderizer.jsx)** | Modeless color interpolation palette with bundled AdobeColorPicker swatches |
 | **[sfxMaster](packages/ae-scripts/src/effects/sfxMaster.jsx)** | Centralized audio control system with Voice/SFX/Music sliders |
 | **[BurstMate](packages/ae-scripts/src/effects/BurstMate.jsx)** | Animated stroke burst effect generator |
 | **[Sync-o-tron](packages/ae-scripts/src/effects/Sync-o-tron.jsx)** | Audio-reactive visual property synchronization |
@@ -108,7 +109,7 @@ JSX/
 ## Featured Scripts
 
 ### Core Animation Tools
-- **Limb-a-tron** - Industry-standard IK rigging system
+- **Limb-a-tron** - IK/FK limb rigging with regular/noodle body modes and bake cleanup
 - **PathMaster** - Professional path animation with cubic-bezier easing
 - **Linearizer** - Complex property linking and driver systems
 
@@ -191,7 +192,7 @@ The repository includes reusable scripting modules in `tools/scripting-modules/`
 
 ## Version Information
 
-All scripts are currently at version 2.0.0 following the major reorganization and standardization completed in January 2025. Each script includes comprehensive JSDoc documentation with:
+Scripts use per-file versions in their JSDoc front matter. The repository baseline was standardized at `2.0.0`, and individual scripts now carry later patch/minor versions where they have been audited or updated. Each script includes JSDoc documentation with:
 - Detailed functionality descriptions
 - Step-by-step usage instructions
 - System requirements

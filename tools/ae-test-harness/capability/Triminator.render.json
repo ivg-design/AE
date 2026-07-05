@@ -1,0 +1,11 @@
+{
+  "name": "Triminator",
+  "screenshot": null,
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "HEADLESS ui mode: no ScriptUI dialog is shown, so no screenshot or UITree was captured.",
+    "expressions[] is empty: no expression curves to evaluate.",
+    "UI render skipped — script runs immediately without a dialog on invocation."
+  ]
+}

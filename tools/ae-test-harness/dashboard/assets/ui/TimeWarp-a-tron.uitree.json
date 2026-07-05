@@ -1,0 +1,180 @@
+{
+  "type": "Dialog",
+  "children": [
+    {
+      "type": "group",
+      "text": "Pick Layer Group",
+      "properties": {
+        "size": {},
+        "preferredSize": {},
+        "orientation": "row",
+        "enabled": true,
+        "visible": true
+      },
+      "children": [
+        {
+          "type": "group",
+          "properties": {
+            "size": [
+              130,
+              100
+            ],
+            "preferredSize": {},
+            "alignChildren": [
+              "center",
+              "center"
+            ],
+            "orientation": "column",
+            "enabled": true,
+            "visible": true
+          },
+          "children": [
+            {
+              "type": "button",
+              "name": "pickTimeRemapButton",
+              "text": "🟢",
+              "properties": {
+                "size": [
+                  120,
+                  40
+                ],
+                "preferredSize": {},
+                "enabled": true,
+                "visible": true
+              },
+              "handlers": [
+                "onClick"
+              ]
+            },
+            {
+              "type": "statictext",
+              "text": "Pick Time\nRemapped Layer",
+              "properties": {
+                "bounds": [
+                  0,
+                  0,
+                  120,
+                  40
+                ],
+                "size": {},
+                "preferredSize": {},
+                "alignment": "center",
+                "alignChildren": [
+                  "center",
+                  "center"
+                ],
+                "enabled": true,
+                "visible": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "properties": {
+            "size": [
+              130,
+              100
+            ],
+            "preferredSize": {},
+            "alignChildren": [
+              "center",
+              "center"
+            ],
+            "orientation": "column",
+            "enabled": true,
+            "visible": true
+          },
+          "children": [
+            {
+              "type": "button",
+              "name": "pickControllerButton",
+              "text": "🟢",
+              "properties": {
+                "size": [
+                  120,
+                  40
+                ],
+                "preferredSize": {},
+                "enabled": true,
+                "visible": true
+              },
+              "handlers": [
+                "onClick"
+              ]
+            },
+            {
+              "type": "statictext",
+              "text": "Pick Time\nRemap Controller",
+              "properties": {
+                "bounds": [
+                  0,
+                  0,
+                  120,
+                  40
+                ],
+                "size": {},
+                "preferredSize": {},
+                "alignment": "center",
+                "alignChildren": [
+                  "center",
+                  "center"
+                ],
+                "enabled": true,
+                "visible": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "text": "Control Group",
+      "properties": {
+        "size": {},
+        "preferredSize": {},
+        "orientation": "row",
+        "enabled": true,
+        "visible": true
+      },
+      "children": [
+        {
+          "type": "button",
+          "name": "okButton",
+          "text": "OK",
+          "properties": {
+            "size": [
+              120,
+              40
+            ],
+            "preferredSize": {},
+            "enabled": true,
+            "visible": true
+          },
+          "handlers": [
+            "onClick"
+          ]
+        },
+        {
+          "type": "button",
+          "name": "cancelButton",
+          "text": "Cancel",
+          "properties": {
+            "size": [
+              120,
+              40
+            ],
+            "preferredSize": {},
+            "enabled": true,
+            "visible": true
+          },
+          "handlers": [
+            "onClick"
+          ]
+        }
+      ]
+    }
+  ],
+  "title": "TimeWarp-a-tron"
+}

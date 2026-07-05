@@ -1,0 +1,89 @@
+{
+  "name": "Sync-o-tron",
+  "screenshot": "dashboard/assets/ui/Sync-o-tron.png",
+  "uiTreePath": null,
+  "expressionCurves": [
+    {
+      "target": "Shape Layer 1/Transform/Opacity",
+      "xLabel": "Audio Reactor Output Power (0–100)",
+      "yLabel": "Opacity value (0–100)",
+      "samples": [
+        {"x":0,"y":0},{"x":2.5,"y":2.5},{"x":5,"y":5},{"x":7.5,"y":7.5},
+        {"x":10,"y":10},{"x":12.5,"y":12.5},{"x":15,"y":15},{"x":17.5,"y":17.5},
+        {"x":20,"y":20},{"x":22.5,"y":22.5},{"x":25,"y":25},{"x":27.5,"y":27.5},
+        {"x":30,"y":30},{"x":32.5,"y":32.5},{"x":35,"y":35},{"x":37.5,"y":37.5},
+        {"x":40,"y":40},{"x":42.5,"y":42.5},{"x":45,"y":45},{"x":47.5,"y":47.5},
+        {"x":50,"y":50},{"x":52.5,"y":52.5},{"x":55,"y":55},{"x":57.5,"y":57.5},
+        {"x":60,"y":60},{"x":62.5,"y":62.5},{"x":65,"y":65},{"x":67.5,"y":67.5},
+        {"x":70,"y":70},{"x":72.5,"y":72.5},{"x":75,"y":75},{"x":77.5,"y":77.5},
+        {"x":80,"y":80},{"x":82.5,"y":82.5},{"x":85,"y":85},{"x":87.5,"y":87.5},
+        {"x":90,"y":90},{"x":92.5,"y":92.5},{"x":95,"y":95},{"x":97.5,"y":97.5},
+        {"x":100,"y":100}
+      ]
+    },
+    {
+      "target": "<layer>/Effects/<propName>_Easing Type (2D unified — Position)",
+      "xLabel": "Audio Reactor Output Power (0–100)",
+      "yLabel": "Position component px (outMin=0, outMax=500, linear, unified XY)",
+      "samples": [
+        {"x":0,"y":0},{"x":2.5,"y":12.5},{"x":5,"y":25},{"x":7.5,"y":37.5},
+        {"x":10,"y":50},{"x":12.5,"y":62.5},{"x":15,"y":75},{"x":17.5,"y":87.5},
+        {"x":20,"y":100},{"x":22.5,"y":112.5},{"x":25,"y":125},{"x":27.5,"y":137.5},
+        {"x":30,"y":150},{"x":32.5,"y":162.5},{"x":35,"y":175},{"x":37.5,"y":187.5},
+        {"x":40,"y":200},{"x":42.5,"y":212.5},{"x":45,"y":225},{"x":47.5,"y":237.5},
+        {"x":50,"y":250},{"x":52.5,"y":262.5},{"x":55,"y":275},{"x":57.5,"y":287.5},
+        {"x":60,"y":300},{"x":62.5,"y":312.5},{"x":65,"y":325},{"x":67.5,"y":337.5},
+        {"x":70,"y":350},{"x":72.5,"y":362.5},{"x":75,"y":375},{"x":77.5,"y":387.5},
+        {"x":80,"y":400},{"x":82.5,"y":412.5},{"x":85,"y":425},{"x":87.5,"y":437.5},
+        {"x":90,"y":450},{"x":92.5,"y":462.5},{"x":95,"y":475},{"x":97.5,"y":487.5},
+        {"x":100,"y":500}
+      ]
+    },
+    {
+      "target": "<layer>/<3D property> (3D unified — 3D Position)",
+      "xLabel": "Audio Reactor Output Power (0–100)",
+      "yLabel": "X/Y position component px (outMin=0, outMax=500, ease smooth in-out, unified XY)",
+      "samples": [
+        {"x":0,"y":0},{"x":2.5,"y":0.9219},{"x":5,"y":3.625},{"x":7.5,"y":8.0156},
+        {"x":10,"y":14},{"x":12.5,"y":21.4844},{"x":15,"y":30.375},{"x":17.5,"y":40.5781},
+        {"x":20,"y":52},{"x":22.5,"y":64.5469},{"x":25,"y":78.125},{"x":27.5,"y":92.6406},
+        {"x":30,"y":108},{"x":32.5,"y":124.1094},{"x":35,"y":140.875},{"x":37.5,"y":158.2031},
+        {"x":40,"y":176},{"x":42.5,"y":194.1719},{"x":45,"y":212.625},{"x":47.5,"y":231.2656},
+        {"x":50,"y":250},{"x":52.5,"y":268.7344},{"x":55,"y":287.375},{"x":57.5,"y":305.8281},
+        {"x":60,"y":324},{"x":62.5,"y":341.7969},{"x":65,"y":359.125},{"x":67.5,"y":375.8906},
+        {"x":70,"y":392},{"x":72.5,"y":407.3594},{"x":75,"y":421.875},{"x":77.5,"y":435.4531},
+        {"x":80,"y":448},{"x":82.5,"y":459.4219},{"x":85,"y":469.625},{"x":87.5,"y":478.5156},
+        {"x":90,"y":486},{"x":92.5,"y":491.9844},{"x":95,"y":496.375},{"x":97.5,"y":499.0781},
+        {"x":100,"y":500}
+      ]
+    },
+    {
+      "target": "<layer>/<Color property>",
+      "xLabel": "Audio Reactor Output Power (0–100)",
+      "yLabel": "Green channel (1.0=green → 0.0=blue, easeType=1 linear)",
+      "samples": [
+        {"x":0,"y":1},{"x":2.5,"y":0.975},{"x":5,"y":0.95},{"x":7.5,"y":0.925},
+        {"x":10,"y":0.9},{"x":12.5,"y":0.875},{"x":15,"y":0.85},{"x":17.5,"y":0.825},
+        {"x":20,"y":0.8},{"x":22.5,"y":0.775},{"x":25,"y":0.75},{"x":27.5,"y":0.725},
+        {"x":30,"y":0.7},{"x":32.5,"y":0.675},{"x":35,"y":0.65},{"x":37.5,"y":0.625},
+        {"x":40,"y":0.6},{"x":42.5,"y":0.575},{"x":45,"y":0.55},{"x":47.5,"y":0.525},
+        {"x":50,"y":0.5},{"x":52.5,"y":0.475},{"x":55,"y":0.45},{"x":57.5,"y":0.425},
+        {"x":60,"y":0.4},{"x":62.5,"y":0.375},{"x":65,"y":0.35},{"x":67.5,"y":0.325},
+        {"x":70,"y":0.3},{"x":72.5,"y":0.275},{"x":75,"y":0.25},{"x":77.5,"y":0.225},
+        {"x":80,"y":0.2},{"x":82.5,"y":0.175},{"x":85,"y":0.15},{"x":87.5,"y":0.125},
+        {"x":90,"y":0.1},{"x":92.5,"y":0.075},{"x":95,"y":0.05},{"x":97.5,"y":0.025},
+        {"x":100,"y":0}
+      ]
+    }
+  ],
+  "notes": [
+    "UI mode is PALETTE (dockable); uiTree captured via runFixtureScenario with the success-1d scenario.",
+    "PNG rendered via SDB service at 2x device scale; logical size 303x93 px, physical 606x186 px, 21 KB.",
+    "Expression curves computed using the expr-eval engine with pre-declared implicit variables injected as globals to work around strict-mode implicit-global semantics.",
+    "Curve 1 (1D Opacity): easeType=1 (linear), outMin=0, outMax=100 — perfect linear identity mapping.",
+    "Curve 2 (2D unified Position): easeType=1 (linear), outMin=0, outMax=500 — linear scale 0–500 px applied equally to both X and Y.",
+    "Curve 3 (3D unified Position): easeType=1 triggers ease() in the 3D branch (smooth in-out cubic Hermite), outMin=0, outMax=500; X and Y follow the same ease curve, Z holds original.",
+    "Curve 4 (Color): easeType=1 (linear), startColor=[0,1,0,1] (green), endColor=[0,0,1,1] (blue); plots the green channel (1.0→0.0). wrapPropertyValue returns non-array wrappers for Color params; evaluated with pre-resolved raw arrays injected as globals.",
+    "The fixture harness produced an alert 'Failed to update the expression. Property address could not be retrieved.' — findPropertyByAddress() regex resolution is not modeled by the properties subsystem; the effect controls (Opacity_Easing Type, Opacity_Min Output, Opacity_Max Output) ARE created (setValue ops confirmed in log)."
+  ]
+}

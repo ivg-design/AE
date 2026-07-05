@@ -1,0 +1,182 @@
+{
+  "name": "Centralizer",
+  "screenshot": null,
+  "uiTreePath": null,
+  "expressionCurves": [
+    {
+      "target": "ShapeLayer/Effects/Center X/Slider",
+      "xLabel": "time (s)",
+      "yLabel": "Center X coordinate (px)",
+      "samples": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 0.125,
+          "y": 0
+        },
+        {
+          "x": 0.25,
+          "y": 0
+        },
+        {
+          "x": 0.375,
+          "y": 0
+        },
+        {
+          "x": 0.5,
+          "y": 0
+        },
+        {
+          "x": 0.625,
+          "y": 0
+        },
+        {
+          "x": 0.75,
+          "y": 0
+        },
+        {
+          "x": 0.875,
+          "y": 0
+        },
+        {
+          "x": 1,
+          "y": 0
+        },
+        {
+          "x": 1.125,
+          "y": 0
+        },
+        {
+          "x": 1.25,
+          "y": 0
+        },
+        {
+          "x": 1.375,
+          "y": 0
+        },
+        {
+          "x": 1.5,
+          "y": 0
+        },
+        {
+          "x": 1.625,
+          "y": 0
+        },
+        {
+          "x": 1.75,
+          "y": 0
+        },
+        {
+          "x": 1.875,
+          "y": 0
+        },
+        {
+          "x": 2,
+          "y": 0
+        },
+        {
+          "x": 2.125,
+          "y": 0
+        },
+        {
+          "x": 2.25,
+          "y": 0
+        },
+        {
+          "x": 2.375,
+          "y": 0
+        },
+        {
+          "x": 2.5,
+          "y": 0
+        },
+        {
+          "x": 2.625,
+          "y": 0
+        },
+        {
+          "x": 2.75,
+          "y": 0
+        },
+        {
+          "x": 2.875,
+          "y": 0
+        },
+        {
+          "x": 3,
+          "y": 0
+        },
+        {
+          "x": 3.125,
+          "y": 0
+        },
+        {
+          "x": 3.25,
+          "y": 0
+        },
+        {
+          "x": 3.375,
+          "y": 0
+        },
+        {
+          "x": 3.5,
+          "y": 0
+        },
+        {
+          "x": 3.625,
+          "y": 0
+        },
+        {
+          "x": 3.75,
+          "y": 0
+        },
+        {
+          "x": 3.875,
+          "y": 0
+        },
+        {
+          "x": 4,
+          "y": 0
+        },
+        {
+          "x": 4.125,
+          "y": 0
+        },
+        {
+          "x": 4.25,
+          "y": 0
+        },
+        {
+          "x": 4.375,
+          "y": 0
+        },
+        {
+          "x": 4.5,
+          "y": 0
+        },
+        {
+          "x": 4.625,
+          "y": 0
+        },
+        {
+          "x": 4.75,
+          "y": 0
+        },
+        {
+          "x": 4.875,
+          "y": 0
+        },
+        {
+          "x": 5,
+          "y": 0
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "UI mode is DIALOG but the success scenario uses the AVLayer code path which bypasses the ScriptUI palette entirely; no window was created so no UITree was captured.",
+    "Expression for \"ShapeLayer/Effects/Center X/Slider\": 41/41 sample points errored (expression calls path.points() which requires AE runtime; evaluator returned errors). 0 points plotted from non-error samples."
+  ]
+}

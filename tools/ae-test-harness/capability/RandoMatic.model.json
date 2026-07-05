@@ -1,0 +1,88 @@
+{
+  "name": "RandoMatic",
+  "category": "utilities",
+  "ui": "DIALOG",
+  "consumes": {
+    "selection": ["comp", "properties", "keyframes"],
+    "minimum": "1 active composition + 1 selected property with at least 1 selected keyframe",
+    "description": "Reads app.project.activeItem (must be a CompItem), then comp.selectedProperties to detect which properties have selected keyframes and to determine maxDimensionality (1D scalar vs 2D/3D array value). Iterates property.selectedKeys and calls property.keySelected(j) for each key index."
+  },
+  "controls": [
+    {
+      "name": "Start Range X",
+      "type": "text",
+      "role": "sets the lower bound of the randomisation range for the X (or scalar) dimension",
+      "default": "0"
+    },
+    {
+      "name": "End Range X",
+      "type": "text",
+      "role": "sets the upper bound of the randomisation range for the X (or scalar) dimension",
+      "default": "100"
+    },
+    {
+      "name": "Start Range Y",
+      "type": "text",
+      "role": "sets the lower bound of the randomisation range for the Y dimension (shown for 2D/3D properties only)",
+      "default": "0"
+    },
+    {
+      "name": "End Range Y",
+      "type": "text",
+      "role": "sets the upper bound of the randomisation range for the Y dimension (shown for 2D/3D properties only)",
+      "default": "100"
+    },
+    {
+      "name": "Start Range Z",
+      "type": "text",
+      "role": "sets the lower bound of the randomisation range for the Z dimension (shown for 3D properties only)",
+      "default": "0"
+    },
+    {
+      "name": "End Range Z",
+      "type": "text",
+      "role": "sets the upper bound of the randomisation range for the Z dimension (shown for 3D properties only)",
+      "default": "100"
+    },
+    {
+      "name": "OK",
+      "type": "button",
+      "role": "validates inputs and applies randomisation to all selected keyframes",
+      "default": null
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "closes the dialog without making any changes",
+      "default": null
+    }
+  ],
+  "functions": [
+    "validates that an active composition is selected before opening the dialog",
+    "validates that at least one property with keyframes is selected before opening the dialog",
+    "detects the maximum dimensionality of selected properties to show 1–3 range-input rows (X / Y / Z)",
+    "validates all range inputs for non-numeric values using parseFloat and NaN detection",
+    "computes a uniform-random value for each dimension using startRange + Math.random() * (endRange − startRange)",
+    "applies the random value to every selected keyframe on every selected property via property.setValueAtKey",
+    "wraps all keyframe mutations in a single undo group labelled 'RandoMatic'"
+  ],
+  "scriptSim": {
+    "scenario": "success – randomise 2D Position keyframes in range",
+    "inputs": "Active comp 'Rando Comp' (1920×1080, 24fps, 5s); one Shape layer with a 2D TwoD Position property ('Shape Layer 1/Transform/Position') carrying 3 keyframes at t=0, 1.5, 3 s — all three selected. Dialog range inputs: Start Range X=−50, End Range X=50, Start Range Y=−30, End Range Y=30. OK clicked.",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "RandoMatic" },
+      { "kind": "setValue", "target": "Shape Layer 1/Transform/Position" },
+      { "kind": "setValue", "target": "Shape Layer 1/Transform/Position" },
+      { "kind": "setValue", "target": "Shape Layer 1/Transform/Position" },
+      { "kind": "endUndoGroup", "target": "" }
+    ]
+  },
+  "expressions": [],
+  "notes": [
+    "The number of range-input rows is dynamic: 1 row for scalar properties, 2 rows for 2D (e.g. Position), 3 rows for 3D (e.g. Position on a 3D layer). Controls Y and Z only appear when maxDimensionality >= 2 / 3.",
+    "Randomisation uses a uniform distribution (Math.random()). Actual keyframe values are non-deterministic; the harness can only assert operation kind and target, not exact values.",
+    "The script preserves keyframe timing and interpolation — only the value at each keyframe index is changed via setValueAtKey.",
+    "Input validation alerts inline and keeps the dialog open; it does not close on a bad-input OK click.",
+    "No AE expressions are written by this script; expressions[] is empty."
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "name": "Guiderator",
+  "category": "composition",
+  "ui": "PANEL",
+
+  "consumes": {
+    "selection": ["comp"],
+    "minimum": "1 active composition (CompItem)",
+    "description": "Reads app.project.activeItem to obtain the target CompItem. Also reads app.activeViewer.views[0].options.guidesLocked to reflect the current lock state on the lock button. No layer or keyframe selection is required."
+  },
+
+  "controls": [
+    {
+      "name": "Position Input",
+      "type": "text",
+      "role": "accepts a pixel position or arithmetic expression (e.g. '1920/2') which is evaluated and used as the guide coordinate",
+      "default": ""
+    },
+    {
+      "name": "H",
+      "type": "button",
+      "role": "adds a horizontal guide at the evaluated input position (calls comp.addGuide(0, value))",
+      "default": null
+    },
+    {
+      "name": "V",
+      "type": "button",
+      "role": "adds a vertical guide at the evaluated input position (calls comp.addGuide(1, value))",
+      "default": null
+    },
+    {
+      "name": "Lock",
+      "type": "button",
+      "role": "toggles the guide-locked state of the active viewer (view.options.guidesLocked); label shows 🔐 when locked, 🔓 when unlocked",
+      "default": null
+    }
+  ],
+
+  "functions": [
+    "evaluate arithmetic expression entered in the position input field",
+    "add a horizontal guide to the active composition at the specified pixel position",
+    "add a vertical guide to the active composition at the specified pixel position",
+    "toggle the guide-locked state of the active viewer",
+    "alert the user when the input is empty, non-numeric, or no composition is active"
+  ],
+
+  "scriptSim": {
+    "scenario": "success — add horizontal guide at 540",
+    "inputs": "Active composition 'Main Comp' (1920×1080, 30 fps, 10 s); no layers selected; position input set to '540'; H button clicked",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "Add Guide" },
+      { "kind": "endUndoGroup",   "target": "Add Guide" }
+    ]
+  },
+
+  "expressions": [],
+
+  "notes": [
+    "comp.addGuide() is not an OPERATION_KIND; the harness cannot intercept it — success scenarios have expectedConfidence 'low'.",
+    "The position input uses eval() internally to resolve arithmetic expressions before addGuide is called; the result is rounded to 2 decimal places.",
+    "The lock button reads app.activeViewer.views[0].options.guidesLocked; if no viewer is present the label defaults to 🔐 and the toggle is a no-op.",
+    "addGuide(0, value) adds a horizontal guide; addGuide(1, value) adds a vertical guide — the axis argument is the inverse of the button label direction.",
+    "Script targets ES3 (ECMA3) — no arrow functions, let/const, or template literals."
+  ]
+}

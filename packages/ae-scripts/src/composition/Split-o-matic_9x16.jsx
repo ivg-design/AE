@@ -7,8 +7,8 @@
  *
  * @name Split-o-matic_9x16
  * @author IVG Design
- * @version 2.0.0
- * @date 2025-08-13
+ * @version 2.0.1
+ * @date 2026-06-02
  * @license MIT
  * @ui HEADLESS
  * 
@@ -46,6 +46,10 @@
  * • Naming convention follows social media best practices
  * • Script uses compCode system for reliable composition generation
  * • All compositions are properly labeled for easy identification
+ *
+ * @changelog
+ * - 2.0.1 (2026-06-02): Removed an ECMA 3-incompatible trailing comma from the returned metadata object.
+ * - 2.0.0 (2025-08-13): Renamed and documented during repository standardization.
  */
 
 // Originally created using compCode v1.2.2
@@ -676,7 +680,7 @@ function compCode_20230625_131536() {
 	comp2_comp.openInViewer();
 
 	return {
-		compItem: comp2_comp,
+		compItem: comp2_comp
 	};
 
 	function findProjectItem(searchFolder, recursion, userData) {

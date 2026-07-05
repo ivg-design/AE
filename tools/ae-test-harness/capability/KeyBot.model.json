@@ -1,0 +1,106 @@
+{
+  "name": "KeyBot",
+  "category": "keyframes",
+  "ui": "PANEL",
+  "consumes": {
+    "selection": ["layers", "keyframes", "properties"],
+    "minimum": "1 active comp + 1 selected layer + 1 selected numeric property with at least 1 selected keyframe",
+    "description": "Reads app.project.activeItem (CompItem), comp.selectedLayers, layer.selectedProperties filtered to numeric propertyValueTypes, and iterates property.keySelected(k) to find chosen keyframes. Reads property.keyValue(k) for each selected keyframe to compute the new value."
+  },
+  "controls": [
+    {
+      "name": "X",
+      "type": "checkbox",
+      "role": "enables modification of the X (index 0) dimension of keyframe values",
+      "default": false
+    },
+    {
+      "name": "Y",
+      "type": "checkbox",
+      "role": "enables modification of the Y (index 1) dimension of keyframe values",
+      "default": false
+    },
+    {
+      "name": "Z",
+      "type": "checkbox",
+      "role": "enables modification of the Z (index 2) dimension of keyframe values (only applied when property has 3+ components)",
+      "default": false
+    },
+    {
+      "name": "edittext1",
+      "type": "text",
+      "role": "numeric input value for the X dimension operation",
+      "default": ""
+    },
+    {
+      "name": "edittext2",
+      "type": "text",
+      "role": "numeric input value for the Y dimension operation",
+      "default": ""
+    },
+    {
+      "name": "edittext3",
+      "type": "text",
+      "role": "numeric input value for the Z dimension operation",
+      "default": ""
+    },
+    {
+      "name": "equals_button",
+      "type": "button",
+      "role": "sets selected keyframe dimension values to the input number (replace/set operation)",
+      "default": null
+    },
+    {
+      "name": "plus_button",
+      "type": "button",
+      "role": "adds the input number to selected keyframe dimension values",
+      "default": null
+    },
+    {
+      "name": "minus_button",
+      "type": "button",
+      "role": "subtracts the input number from selected keyframe dimension values",
+      "default": null
+    },
+    {
+      "name": "multiply_button",
+      "type": "button",
+      "role": "multiplies selected keyframe dimension values by the input number",
+      "default": null
+    },
+    {
+      "name": "divide_button",
+      "type": "button",
+      "role": "divides selected keyframe dimension values by the input number; returns original value if input is zero",
+      "default": null
+    }
+  ],
+  "functions": [
+    "validate active composition and selection before operating",
+    "iterate selected layers and their selected numeric properties",
+    "identify selected keyframes via property.keySelected(k)",
+    "apply a chosen mathematical operation (set, add, subtract, multiply, divide) per enabled dimension (X/Y/Z) to each selected keyframe value",
+    "guard against division by zero by preserving the original value",
+    "write modified values back with property.setValueAtKey(k, newValue)",
+    "wrap all mutations in an undo group for one-step reversal"
+  ],
+  "scriptSim": {
+    "scenario": "success — add 50 to X on selected Position keyframes",
+    "inputs": "Active comp 'Main Comp' (1920×1080, 24fps); 1 selected layer 'Shape Layer 1' (Shape); selected property 'Transform/Position' (TwoD) with 2 keyframes at t=0 ([100,200]) and t=2 ([500,300]), both selected; X checkbox enabled, edittext1='50', plus_button clicked",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "KeyBot" },
+      { "kind": "setValueAtTime", "target": "Transform/Position", "value": [150, 200] },
+      { "kind": "setValueAtTime", "target": "Transform/Position", "value": [550, 300] },
+      { "kind": "endUndoGroup", "target": "KeyBot" }
+    ]
+  },
+  "expressions": [],
+  "notes": [
+    "Only processes properties whose propertyValueType matches one of the numeric AE constant codes (6413–6417, 6423, 6424) — non-numeric or group properties are silently skipped.",
+    "Input fields are disabled by default; each is enabled only when its corresponding axis checkbox is checked.",
+    "Z-axis modification is silently skipped when the property has fewer than 3 components (e.g. TwoD Position).",
+    "parseFloat on an empty or non-numeric input returns NaN, which then falls back to 0 via the || 0 guard, so unchecked/empty dimensions effectively add/subtract 0.",
+    "All keyframes in the property are iterated (1..numKeys); only those returning true for keySelected(k) are modified — preserving timing and interpolation on all keyframes.",
+    "The panel is docked via the standard thisObj/Panel pattern; it remains persistent across compositions."
+  ]
+}

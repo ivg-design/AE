@@ -13,10 +13,9 @@ import { validateFixture } from '../../src/contracts/index.js';
  *    Guard: layer has no Position property → alert("The selected layer does not have a Position property.")
  *    Guard: no keyframes selected on Position → alert("Please select one or more keyframes.")
  *    Success:
- *      1. createLayer (addShape — intermediate shape layer)
- *      2. setValueAtTime on each position keyframe mapped to shape path vertices
- *      3. executeCommand(10313)  — AE Copy command
- *      4. deleteLayer (shapeLayer.remove())
+ *      1. executeCommand — AE Copy menu command (via findMenuCommandId),
+ *         driving AE's native keyframe clipboard (v2.0.1 removed the broken
+ *         shape-layer intermediate that wrote invalid values to a SHAPE prop)
  *
  *  Paste button (pasteTangents):
  *    Guard: no active comp → alert("Please select a composition.")
@@ -257,12 +256,15 @@ const fixture = {
   scenarios: [
     // ------------------------------------------------------------------
     // (a) SUCCESS – Copy: panel loads, user clicks Copy.
-    //     Script creates a temp shape layer, writes position keyframe
-    //     values as shape path vertices via setValueAtTime, executes
-    //     AE Copy command (10313), then removes the intermediate layer.
+    //     v2.0.1: the script selects the position keyframes and runs the
+    //     AE Copy menu command (findMenuCommandId('Copy')), letting AE's
+    //     native keyframe clipboard carry full tangent/ease data. The old
+    //     shape-layer intermediate (createLayer/setValueAtTime/deleteLayer)
+    //     was removed — it wrote invalid values to a SHAPE property and
+    //     threw in real AE.
     // ------------------------------------------------------------------
     {
-      name: 'success – copy position keyframe tangents via shape layer intermediate',
+      name: 'success – copy position keyframes via AE copy command',
       kind: 'success',
       host: successHost,
       actions: [
@@ -272,16 +274,8 @@ const fixture = {
         { type: 'click', target: 'Copy' },
       ],
       expectedOperations: [
-        // addShape() creates the intermediate shape layer
-        { kind: 'createLayer' },
-        // setValueAtTime called once per position keyframe (3 keyframes)
-        { kind: 'setValueAtTime' },
-        { kind: 'setValueAtTime' },
-        { kind: 'setValueAtTime' },
-        // AE internal Copy command
-        { kind: 'executeCommand', meta: { commandId: 10313 } },
-        // shapeLayer.remove()
-        { kind: 'deleteLayer' },
+        // AE Copy menu command drives the native keyframe clipboard
+        { kind: 'executeCommand' },
       ],
       expectedConfidence: 'medium',
     },

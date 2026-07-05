@@ -1,0 +1,12 @@
+{
+  "name": "RandoMatic",
+  "screenshot": "dashboard/assets/ui/RandoMatic.png",
+  "uiTreePath": null,
+  "expressionCurves": [],
+  "notes": [
+    "UITree captured from the success scenario (2D Position, 3 keyframes selected; Start Range X=-50, End Range X=50, Start Range Y=-30, End Range Y=30).",
+    "PNG rendered via SDB at 2x device scale factor; physical resolution 674x246 px (CSS 336x123).",
+    "expressions[] is empty — RandoMatic writes no AE expressions; no expression curves to plot.",
+    "Keyframe values are non-deterministic (Math.random()); the fixture scenario asserts kind+target only, not exact values."
+  ]
+}

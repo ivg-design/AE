@@ -1,0 +1,109 @@
+{
+  "name": "KeyCloneMatic",
+  "category": "keyframes",
+  "ui": "DIALOG",
+
+  "consumes": {
+    "selection": ["layers", "keyframes", "properties", "comp"],
+    "minimum": "1 active comp + 1 selected layer with at least 1 selected keyframe on a time-varying property",
+    "description": "Reads app.project.activeItem (must be a CompItem), iterates comp.selectedLayers, then each layer's selectedProperties, then iterates all keyframes checking keySelected(i). Captures keyTime, keyValue, interpolation types, temporal ease, spatial tangents, label colour, and roving state for each selected keyframe."
+  },
+
+  "controls": [
+    {
+      "name": "Interval Duration (frames)",
+      "type": "number",
+      "role": "sets the number of frames between successive clone sets",
+      "default": 100,
+      "range": [1, 99999]
+    },
+    {
+      "name": "No. of Repetitions",
+      "type": "number",
+      "role": "sets how many times the selected keyframe block is cloned (ignored when Comp Duration is checked)",
+      "default": 5,
+      "range": [1, 99999]
+    },
+    {
+      "name": "Comp Duration",
+      "type": "checkbox",
+      "role": "auto-calculates repetitions to fill the remaining composition duration",
+      "default": false
+    },
+    {
+      "name": "Temporal Decay",
+      "type": "checkbox",
+      "role": "enables progressive interval shortening across repetitions using the selected decay curve",
+      "default": false
+    },
+    {
+      "name": "Decay Duration (frames)",
+      "type": "number",
+      "role": "sets the total frame span over which the temporal decay effect is applied",
+      "default": 1200,
+      "range": [1, 99999]
+    },
+    {
+      "name": "Decay Type",
+      "type": "dropdown",
+      "role": "selects the easing curve (Linear, Ease In, or Ease Out) used to calculate per-repetition decay factors",
+      "default": "Linear",
+      "options": ["Linear", "Ease In", "Ease Out"]
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "closes the dialog without performing any operation",
+      "default": null
+    },
+    {
+      "name": "Proceed",
+      "type": "button",
+      "role": "validates inputs and triggers keyframe duplication",
+      "default": null
+    }
+  ],
+
+  "functions": [
+    "collect all selected keyframes from all selected layers and their selected properties",
+    "detect the global in-point and out-point of the selected keyframe block",
+    "calculate per-repetition interval with optional linear, ease-in, or ease-out temporal decay",
+    "clone each selected keyframe to a new time offset, preserving value, interpolation type, temporal ease, spatial tangents, roving flag, and label colour",
+    "auto-calculate repetition count to fill remaining comp duration when Comp Duration is enabled",
+    "guard against missing active composition and missing keyframe selection with user alerts",
+    "wrap all operations in a single undo group for safe reversal"
+  ],
+
+  "scriptSim": {
+    "scenario": "success — duplicate 2 keyframes x3 reps at 24f interval (linear, no decay)",
+    "inputs": "Main Comp (1920x1080, 20 s, 24 fps) — Shape Layer 1 selected; Transform/Position property selected with 2 keyframes at t=0 s ([100,540]) and t=1 s ([500,540]); intervalInput=24, repetitionsInput=3, no comp duration, no temporal decay",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "KeyCloneMatic" },
+      { "kind": "addKeyframe",    "target": "Transform/Position" },
+      { "kind": "setValue",       "target": "Transform/Position" },
+      { "kind": "addKeyframe",    "target": "Transform/Position" },
+      { "kind": "setValue",       "target": "Transform/Position" },
+      { "kind": "addKeyframe",    "target": "Transform/Position" },
+      { "kind": "setValue",       "target": "Transform/Position" },
+      { "kind": "addKeyframe",    "target": "Transform/Position" },
+      { "kind": "setValue",       "target": "Transform/Position" },
+      { "kind": "addKeyframe",    "target": "Transform/Position" },
+      { "kind": "setValue",       "target": "Transform/Position" },
+      { "kind": "addKeyframe",    "target": "Transform/Position" },
+      { "kind": "setValue",       "target": "Transform/Position" },
+      { "kind": "endUndoGroup",   "target": "KeyCloneMatic" }
+    ]
+  },
+
+  "expressions": [],
+
+  "notes": [
+    "The script calls app.beginUndoGroup() and app.endUndoGroup() unconditionally at the top-level script scope, so both calls appear even when guard alerts abort the duplication.",
+    "Keyframe cloning uses property.addKey(newTime) + setValueAtKey(), so the harness logs these as 'addKeyframe' + 'setValue' pairs, not 'setValueAtTime'.",
+    "The ease() helper in the source is a simple linear interpolation (c*t/d + b), making 'Ease In' and 'Ease Out' modes also linear in the current implementation — not cubic.",
+    "When Comp Duration is checked, repetitions are auto-calculated using a formula that references 'durationPerSet' before it is declared, which is a var-hoisting bug; the variable will be undefined at that point. The fixture does not exercise Comp Duration mode.",
+    "Custom-value keyframes (PropertyValueType.CUSTOM_VALUE) have their value stored as null and are skipped during setValueAtKey, matching the guard in the Keyframe constructor.",
+    "All keyframe property types are supported: spatial (TwoD_SPATIAL / ThreeD_SPATIAL), color, path (Mask Shape / Vector Shape), and standard numeric properties.",
+    "The script targets Adobe After Effects CS6 or later (ExtendScript / ES3 environment)."
+  ]
+}

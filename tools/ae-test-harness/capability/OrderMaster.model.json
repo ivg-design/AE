@@ -1,0 +1,62 @@
+{
+  "name": "OrderMaster",
+  "category": "layers",
+  "ui": "DIALOG",
+
+  "consumes": {
+    "selection": ["layers", "properties"],
+    "minimum": "1 active comp + ≥2 contiguous selected layers, OR 1 selected ShapeLayer with ≥2 contiguous shape groups selected in its properties",
+    "description": "Reads app.project.activeItem (must be a Composition) and its selectedLayers array. If >1 layers are selected, inspects their indices for contiguity. If exactly 1 ShapeLayer is selected, inspects its selectedProperties for contiguous NAMED_GROUP PropertyGroups."
+  },
+
+  "controls": [
+    {
+      "name": "Randomize",
+      "type": "checkbox",
+      "role": "toggles between reverse-order and randomized arrangement",
+      "default": false
+    },
+    {
+      "name": "Proceed",
+      "type": "button",
+      "role": "executes the reordering operation with the current Randomize setting",
+      "default": null
+    },
+    {
+      "name": "Cancel",
+      "type": "button",
+      "role": "closes the dialog without reordering",
+      "default": null
+    }
+  ],
+
+  "functions": [
+    "validate that selected layers or shape groups form a contiguous block",
+    "reverse the order of selected contiguous layers within a composition",
+    "randomize the order of selected contiguous layers within a composition",
+    "reverse the order of selected contiguous shape groups within a ShapeLayer",
+    "randomize the order of selected contiguous shape groups within a ShapeLayer",
+    "wrap all reordering operations in a single undo group"
+  ],
+
+  "scriptSim": {
+    "scenario": "reverse two contiguous layers",
+    "inputs": "comp 'Main Comp' (1920×1080, 24fps, 10s) with two AV layers (Layer A at index 1, Layer B at index 2) both selected; Randomize unchecked",
+    "operations": [
+      { "kind": "beginUndoGroup", "target": "OrderMaster" },
+      { "kind": "reorder", "target": "layer[index=1]", "value": "moveBefore/moveAfter to reverse Layer A and Layer B" },
+      { "kind": "endUndoGroup", "target": "OrderMaster" }
+    ]
+  },
+
+  "expressions": [],
+
+  "notes": [
+    "Contiguous selection is strictly enforced: any gap in layer indices or shape group propertyIndex triggers an alert and aborts.",
+    "Randomization uses a Fisher-Yates shuffle (Math.random()) — result is non-deterministic.",
+    "Shape group reordering targets only PropertyGroup items whose propertyType === PropertyType.NAMED_GROUP in selectedProperties.",
+    "All layer/group properties and animations are preserved; only stack order changes.",
+    "Operations are atomic per undo group — either all moves succeed or the undo group still wraps whatever did execute.",
+    "Script targets Adobe After Effects CS6 or later (ES3 ExtendScript environment)."
+  ]
+}
