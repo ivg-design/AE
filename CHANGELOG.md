@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2026-07-04]
+
+### Added
+- **New scripts (4):**
+  - `Elast-o-matic` `1.0.0` — elastic overshoot / gravity bounce after a keyframe; hold Cmd/Ctrl at launch to switch variant.
+  - `Reseterator` `1.0.0` — zero the transform origin of selected layers (layer anchor to `[0,0,0]`, nested shape groups re-centered).
+  - `Opac-o-bot` `1.0.0` — parenting for Opacity via expression.
+  - `Controllerizer` `1.0.0` — gather selected properties from any layers onto one Controller Null as expression controls.
+- **IVGD Command Bar** (`packages/ae-scripts/toolbar/IVGD Command Bar.jsx`) — dockable, resizable ScriptUI panel with one icon button per bundled script; responsive reflow, bundled tooltips, `ivg-scripts/` auto-discovery, and live Cmd/Ctrl variant-icon swapping.
+- **Website** (`site/`) — self-contained static catalog, per-script docs viewer, animated hero, and a **Build-a-bar** client-side ZIP generator (checked scripts + the Command Bar). Deployed as an independent Vercel project to https://forge.mograph.life/apps/ae.
+- **Test harness** (`tools/ae-test-harness`) — vitest pipeline: ES3 static parse (acorn), malformed-`@include` scan, expression syntax, functional sandbox, and ScriptUI capture. All 32 distributed scripts pass.
+- `site/tools/build-data.mjs` — parses script front matter into `scripts.json` / `meta.json`, applies curated taglines from `copy-overrides.json`, and copies icons/docs/scripts/toolbar/template project into `site/` for self-containment.
+- Bundled `Sync-o-tron.aep` template project that auto-imports on launch.
+
+### Changed
+- Rewrote all 32 distributed-script docs with a fixed section order (What it does → Controls & options → Usage → Notes → Requirements & edge cases → How it works) and purpose-first taglines.
+- Bumped audited scripts: `Sync-o-tron` `2.1.4`, `Rectangulator` `2.1.5`, `Centralizer` `2.1.0`, `Distributron` `1.1.2`.
+
+### Fixed
+- `Centralizer` — removed a malformed `@include` comment that raised a line-87 syntax error; added multiselect, parametric-shape (Rect/Ellipse/Star), and image/precomp support with a union bounding box.
+- `Rectangulator` — inlined dependencies, seeded the controller from the original rectangle, guarded expression control lookups, and fixed a stale path-group reference and the anchor-point control.
+- `Sync-o-tron` — fixed the property-type probe (no value read / expression probing), a folder-nested reactor lookup, a multi-property build stall (expression suspend/restore), 3D per-axis expression generation, and the palette not closing after apply.
+
+### Removed
+- Excluded `Onionizer`, `PathDuplitron`, and `Split-o-matic_9x16` from distribution (still present in `src/`, omitted from the bundle, Command Bar, and website).
+
+## [Earlier Unreleased]
+
 ### Added
 - Vendored Smallpath `AdobeColorPicker` v2.0 under `vendors/AdobeColorPicker` and embedded a sanitized local copy in `ChromaBlenderizer`.
 
