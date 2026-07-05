@@ -19,7 +19,7 @@
   const MOUSE_RADIUS = 170;  // px of cursor influence
   const MOUSE_FORCE = 6;     // gentle push — icons drift away, never bounce hard
   const MAX_SPEED = 2.8;     // hard cap so the cursor can never fling an icon
-  const DRIFT = 0.18;        // base wander speed
+  const DRIFT = 0.5;         // base wander speed (now the real on-screen speed)
   const DAMP = 0.94;         // velocity damping toward drift
 
   const sprites = [];
@@ -46,7 +46,7 @@
       vx: Math.cos(angle) * spd, vy: Math.sin(angle) * spd,
       // gentle per-sprite drift target so motion never fully stops
       dvx: Math.cos(angle) * spd, dvy: Math.sin(angle) * spd,
-      rot: rnd(-0.25, 0.25), rotV: rnd(-0.002, 0.002),
+      rot: rnd(-0.25, 0.25), rotV: rnd(-0.0038, 0.0038),
       alpha: rnd(0.7, 1) * OPACITY,
       s: SPRITE * rnd(0.82, 1.12)   // slight size variety, still bounded
     };
@@ -105,8 +105,6 @@
         const a = rnd(0, Math.PI * 2), spd = rnd(0.5, 1) * DRIFT;
         p.dvx = Math.cos(a) * spd; p.dvy = Math.sin(a) * spd;
       }
-      p.vx += (p.dvx - p.vx) * 0.02;
-      p.vy += (p.dvy - p.vy) * 0.02;
 
       // cursor repulsion — soft quadratic falloff so nothing snaps near the cursor
       if (mouse.active) {
@@ -120,20 +118,32 @@
         }
       }
 
-      p.vx *= DAMP; p.vy *= DAMP;
+      // damp only the DEVIATION from the drift target, so the base wander speed
+      // is preserved (never damped to a crawl) while cursor/collision impulses decay
+      p.vx = p.dvx + (p.vx - p.dvx) * DAMP;
+      p.vy = p.dvy + (p.vy - p.dvy) * DAMP;
       // hard speed cap keeps every push gentle — cursor or collision alike
       const sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
       if (sp > MAX_SPEED) { p.vx = p.vx / sp * MAX_SPEED; p.vy = p.vy / sp * MAX_SPEED; }
       p.x += p.vx; p.y += p.vy;
       p.rot += p.rotV;
 
-      // wrap the instant an icon is fully off-screen — it reappears on the
-      // opposite edge (margin = its own half-size, not a full sprite dead-zone)
+      // when an icon goes fully off one edge, re-enter it from JUST OFF the
+      // opposite edge and slide it inward — a smooth glide, never a pop, and
+      // the enforced inward velocity means it never parks off-screen
       const m = p.s / 2;
-      if (p.x < -m) p.x = W + m;
-      else if (p.x > W + m) p.x = -m;
-      if (p.y < -m) p.y = H + m;
-      else if (p.y > H + m) p.y = -m;
+      if (p.x < -m || p.x > W + m) {
+        const fromLeft = p.x < -m, dir = fromLeft ? -1 : 1;
+        p.x = fromLeft ? W + m : -m;
+        p.vx = dir * Math.max(Math.abs(p.vx), 0.9);
+        p.dvx = dir * Math.max(Math.abs(p.dvx), DRIFT * 0.7);
+      }
+      if (p.y < -m || p.y > H + m) {
+        const fromTop = p.y < -m, dir = fromTop ? -1 : 1;
+        p.y = fromTop ? H + m : -m;
+        p.vy = dir * Math.max(Math.abs(p.vy), 0.9);
+        p.dvy = dir * Math.max(Math.abs(p.dvy), DRIFT * 0.7);
+      }
 
       ctx.save();
       ctx.globalAlpha = p.alpha;
@@ -148,8 +158,8 @@
   function start(imgs) {
     if (!imgs.length) return;
     resize();
-    // Density scales with hero area but stays bounded so the larger icons never crowd the text.
-    const count = Math.max(6, Math.min(12, Math.round((W * H) / 120000)));
+    // Density scales with hero area — a fuller field, still bounded so it won't wall off the text.
+    const count = Math.max(12, Math.min(24, Math.round((W * H) / 34000)));
     for (let i = 0; i < count; i++) {
       sprites.push(makeSprite(imgs[i % imgs.length]));
     }
