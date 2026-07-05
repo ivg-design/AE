@@ -12,12 +12,13 @@
   let dpr = Math.min(window.devicePixelRatio || 1, 2);
   let W = 0, H = 0;
 
-  // Fixed on-screen sprite size — small enough to stay behind the text, large
-  // enough not to look like noise. Source art is 256px, drawn at ~40px = crisp.
-  const SPRITE = 44;
-  const OPACITY = 0.5;       // faint so the headline stays readable
-  const MOUSE_RADIUS = 150;  // px of cursor influence
-  const MOUSE_FORCE = 26;    // push strength
+  // Fixed on-screen sprite size — large, floating script icons behind the text.
+  // Source art is 256px+, drawn at ~112px = a clean downscale (crisp).
+  const SPRITE = 112;
+  const OPACITY = 0.45;      // faint so the headline stays readable
+  const MOUSE_RADIUS = 170;  // px of cursor influence
+  const MOUSE_FORCE = 4;     // gentle push — icons drift away, never bounce hard
+  const MAX_SPEED = 2.2;     // hard cap so the cursor can never fling an icon
   const DRIFT = 0.18;        // base wander speed
   const DAMP = 0.94;         // velocity damping toward drift
 
@@ -54,6 +55,25 @@
   function step() {
     ctx.clearRect(0, 0, W, H);
     const half = SPRITE;
+
+    // pairwise collision — icons nudge each other apart instead of overlapping
+    for (let i = 0; i < sprites.length; i++) {
+      const a = sprites[i];
+      for (let j = i + 1; j < sprites.length; j++) {
+        const b = sprites[j];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const d2 = dx * dx + dy * dy;
+        const minD = (a.s + b.s) * 0.44;   // ~visible radius sum (art has transparent margins)
+        if (d2 > 0.01 && d2 < minD * minD) {
+          const d = Math.sqrt(d2);
+          const nx = dx / d, ny = dy / d;
+          const push = ((minD - d) / minD) * 0.6;   // proportional to overlap, gentle
+          a.vx -= nx * push; a.vy -= ny * push;
+          b.vx += nx * push; b.vy += ny * push;
+        }
+      }
+    }
+
     for (let i = 0; i < sprites.length; i++) {
       const p = sprites[i];
 
@@ -65,18 +85,22 @@
       p.vx += (p.dvx - p.vx) * 0.02;
       p.vy += (p.dvy - p.vy) * 0.02;
 
-      // cursor repulsion
+      // cursor repulsion — soft quadratic falloff so nothing snaps near the cursor
       if (mouse.active) {
         const dx = p.x - mouse.x, dy = p.y - mouse.y;
         const d2 = dx * dx + dy * dy;
         if (d2 < MOUSE_RADIUS * MOUSE_RADIUS && d2 > 0.01) {
           const d = Math.sqrt(d2);
-          const f = (1 - d / MOUSE_RADIUS) * MOUSE_FORCE / d;
+          const t = 1 - d / MOUSE_RADIUS;
+          const f = t * t * MOUSE_FORCE / d;
           p.vx += dx * f; p.vy += dy * f;
         }
       }
 
       p.vx *= DAMP; p.vy *= DAMP;
+      // hard speed cap keeps every push gentle — cursor or collision alike
+      const sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (sp > MAX_SPEED) { p.vx = p.vx / sp * MAX_SPEED; p.vy = p.vy / sp * MAX_SPEED; }
       p.x += p.vx; p.y += p.vy;
       p.rot += p.rotV;
 
@@ -99,8 +123,8 @@
   function start(imgs) {
     if (!imgs.length) return;
     resize();
-    // Density scales with hero area but stays bounded so it never crowds the text.
-    const count = Math.max(14, Math.min(30, Math.round((W * H) / 46000)));
+    // Density scales with hero area but stays bounded so the larger icons never crowd the text.
+    const count = Math.max(6, Math.min(12, Math.round((W * H) / 120000)));
     for (let i = 0; i < count; i++) {
       sprites.push(makeSprite(imgs[i % imgs.length]));
     }
