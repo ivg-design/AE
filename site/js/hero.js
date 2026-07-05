@@ -17,8 +17,8 @@
   const SPRITE = 112;
   const OPACITY = 0.45;      // faint so the headline stays readable
   const MOUSE_RADIUS = 170;  // px of cursor influence
-  const MOUSE_FORCE = 4;     // gentle push — icons drift away, never bounce hard
-  const MAX_SPEED = 2.2;     // hard cap so the cursor can never fling an icon
+  const MOUSE_FORCE = 6;     // gentle push — icons drift away, never bounce hard
+  const MAX_SPEED = 2.8;     // hard cap so the cursor can never fling an icon
   const DRIFT = 0.18;        // base wander speed
   const DAMP = 0.94;         // velocity damping toward drift
 
@@ -52,9 +52,32 @@
     };
   }
 
+  // Spread the icons over a jittered grid so every one is fully visible and
+  // separated on load — no clumping or off-screen spawns.
+  function layoutOnLoad() {
+    const n = sprites.length;
+    if (!n) return;
+    const cols = Math.max(1, Math.round(Math.sqrt(n * (W / Math.max(1, H)))));
+    const rows = Math.ceil(n / cols);
+    const cells = [];
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) cells.push([c, r]);
+    // shuffle so icon order isn't an obvious grid
+    for (let i = cells.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = cells[i]; cells[i] = cells[j]; cells[j] = t;
+    }
+    const cw = W / cols, ch = H / rows;
+    for (let i = 0; i < n; i++) {
+      const p = sprites[i];
+      const cell = cells[i % cells.length];
+      const pad = p.s / 2 + 4;                    // keep the whole icon on-screen
+      p.x = Math.min(W - pad, Math.max(pad, cell[0] * cw + cw * rnd(0.25, 0.75)));
+      p.y = Math.min(H - pad, Math.max(pad, cell[1] * ch + ch * rnd(0.25, 0.75)));
+    }
+  }
+
   function step() {
     ctx.clearRect(0, 0, W, H);
-    const half = SPRITE;
 
     // pairwise collision — icons nudge each other apart instead of overlapping
     for (let i = 0; i < sprites.length; i++) {
@@ -104,11 +127,13 @@
       p.x += p.vx; p.y += p.vy;
       p.rot += p.rotV;
 
-      // wrap around the full hero so icons cover the whole width
-      if (p.x < -half) p.x = W + half;
-      else if (p.x > W + half) p.x = -half;
-      if (p.y < -half) p.y = H + half;
-      else if (p.y > H + half) p.y = -half;
+      // wrap the instant an icon is fully off-screen — it reappears on the
+      // opposite edge (margin = its own half-size, not a full sprite dead-zone)
+      const m = p.s / 2;
+      if (p.x < -m) p.x = W + m;
+      else if (p.x > W + m) p.x = -m;
+      if (p.y < -m) p.y = H + m;
+      else if (p.y > H + m) p.y = -m;
 
       ctx.save();
       ctx.globalAlpha = p.alpha;
@@ -128,6 +153,7 @@
     for (let i = 0; i < count; i++) {
       sprites.push(makeSprite(imgs[i % imgs.length]));
     }
+    layoutOnLoad();   // guarantee all icons are visible and spread on load
     if (reduce) { step(); cancelAnimationFrame(raf); raf = null; return; } // draw one static frame
     step();
 
