@@ -548,4 +548,7 @@ Docs & updates: ${REPO}
   renderLibrary();
   renderBuilder();
   icons(document.body);
+  // Grids are populated — release the first-render height reserve so filtering
+  // to a smaller category resizes the catalog window instead of leaving a gap.
+  document.documentElement.classList.remove('pre-render');
 })();
