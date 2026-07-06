@@ -167,11 +167,20 @@
     if (reduce) { step(); cancelAnimationFrame(raf); raf = null; return; } // draw one static frame
     step();
 
-    hero.addEventListener('pointermove', (e) => {
+    // Track the cursor at the window level (with a mousemove fallback) so plain
+    // hover always registers — some browsers/extensions suppress pointermove on
+    // the target element, which made the effect only respond while dragging.
+    function onMove(e) {
       const r = hero.getBoundingClientRect();
-      mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.active = true;
-    });
-    hero.addEventListener('pointerleave', () => { mouse.active = false; mouse.x = mouse.y = -9999; });
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      if (x >= 0 && y >= 0 && x <= r.width && y <= r.height) {
+        mouse.x = x; mouse.y = y; mouse.active = true;
+      } else {
+        mouse.active = false; mouse.x = mouse.y = -9999;
+      }
+    }
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('mousemove', onMove, { passive: true });
     window.addEventListener('resize', () => { resize(); });
   }
 
