@@ -716,6 +716,7 @@ body.modal-open { overflow: hidden; }
 /* ---------- responsive ---------- */
 @media (max-width: 1080px) {
   .kbar-row { grid-template-columns: repeat(8, 1fr); }
+  .builder .kbar-grid { min-height: 600px; }   /* 8 cols -> 5 tile-lines */
   .script-grid { grid-template-columns: repeat(2, 1fr); }
   .dm-body { flex-direction: column; }
   .dm-right { width: 100%; }
@@ -725,6 +726,7 @@ body.modal-open { overflow: hidden; }
 @media (max-width: 760px) {
   .container { width: calc(100% - 40px); }
   .kbar-row { grid-template-columns: repeat(5, 1fr); }
+  .builder .kbar-grid { min-height: 936px; }   /* 5 cols -> 8 tile-lines */
   .win-body { flex-direction: column; }
   .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
   .script-grid { grid-template-columns: 1fr; }
@@ -762,7 +764,11 @@ body.modal-open { overflow: hidden; }
 }
 .seg-btn .lucide { width: 14px; height: 14px; }
 .seg-btn:hover { color: var(--text-primary); border-color: var(--text-muted); }
-.builder .kbar-grid { padding: 20px; gap: 12px; }
+/* Reserve the grid's rendered height so the 32 JS-injected tiles fill into
+   pre-allocated space instead of growing the section after a late data fetch
+   (was causing CLS up to ~0.6 desktop / ~1.0 mobile for users scrolled here).
+   Heights are exact for the 32-tile catalog at each column count. */
+.builder .kbar-grid { padding: 20px; gap: 12px; min-height: 376px; }
 .builder .kbar-row { gap: 12px; }
 .builder .kbar-tile { position: relative; cursor: pointer; height: 104px; }
 .builder .kbar-tile .tick {

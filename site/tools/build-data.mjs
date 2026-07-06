@@ -455,6 +455,39 @@ function main() {
   );
 
   // -------------------------------------------------------------------------
+  // Inline a lean copy of the catalog into index.html between markers, so the
+  // landing page's grids render synchronously on first paint instead of after
+  // a data fetch. That fetch used to leave the grids empty until it resolved,
+  // growing the sections under the reader and causing large layout shift (CLS)
+  // — the #builder/#library issue Cloudflare RUM flagged. Only the fields the
+  // landing UI reads are inlined; the full docs text stays in scripts.json.
+  // -------------------------------------------------------------------------
+  const LITE_FIELDS = ["id", "name", "category", "version", "ui", "tagline", "icon", "lucide", "srcPath"];
+  const lite = entries.map((e) => {
+    const o = {};
+    for (const k of LITE_FIELDS) o[k] = e[k];
+    return o;
+  });
+  const INDEX_HTML = path.join(SITE_DIR, "index.html");
+  const START = "<!-- INLINE_SCRIPTS_DATA:START -->";
+  const END = "<!-- INLINE_SCRIPTS_DATA:END -->";
+  try {
+    let html = fs.readFileSync(INDEX_HTML, "utf8");
+    // Escape "<" so a tagline can never break out of the <script> element.
+    const json = JSON.stringify(lite).replace(/</g, "\\u003c");
+    const block = `${START}\n  <script>window.__SCRIPTS__=${json};</script>\n  ${END}`;
+    const re = new RegExp(`${START}[\\s\\S]*?${END}`);
+    if (re.test(html)) {
+      fs.writeFileSync(INDEX_HTML, html.replace(re, block), "utf8");
+      console.log(`  ${INDEX_HTML} (inlined ${lite.length} scripts)`);
+    } else {
+      console.warn(`  ! index.html missing INLINE_SCRIPTS_DATA markers — inline skipped`);
+    }
+  } catch (err) {
+    console.warn(`  ! could not inline catalog into index.html: ${err.message}`);
+  }
+
+  // -------------------------------------------------------------------------
   // Console report
   // -------------------------------------------------------------------------
   console.log(`\nParsed ${entries.length} scripts.\n`);

@@ -14,7 +14,12 @@
   const catByKey = Object.fromEntries(CATEGORIES.map(c => [c.key, c]));
   const REPO = 'https://github.com/ivg-design/ae';
 
-  const scripts = await fetch('data/scripts.json').then(r => r.json());
+  // Prefer the catalog data inlined in the page (window.__SCRIPTS__) so the
+  // grids render synchronously on first paint — no fetch round-trip, no layout
+  // shift. Fall back to the JSON fetch if the inline block is absent.
+  const scripts = Array.isArray(window.__SCRIPTS__)
+    ? window.__SCRIPTS__
+    : await fetch('data/scripts.json').then(r => r.json());
   scripts.sort((a, b) => a.name.localeCompare(b.name));
   const byId = Object.fromEntries(scripts.map(s => [s.id, s]));
 

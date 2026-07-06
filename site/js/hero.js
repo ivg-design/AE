@@ -184,20 +184,23 @@
     window.addEventListener('resize', () => { resize(); });
   }
 
-  // Load icon images from the catalog, then kick off.
-  fetch('data/scripts.json')
-    .then((r) => r.json())
-    .then((scripts) => {
-      const srcs = scripts.filter((s) => s.icon).map((s) => s.icon);
-      let pending = srcs.length;
-      const imgs = [];
-      if (!pending) return;
-      srcs.forEach((src) => {
-        const img = new Image();
-        img.onload = () => { imgs.push(img); if (--pending === 0) start(imgs); };
-        img.onerror = () => { if (--pending === 0) start(imgs); };
-        img.src = src;
-      });
-    })
-    .catch(() => {});
+  // Load icon images from the catalog, then kick off. Prefer the inline
+  // catalog (window.__SCRIPTS__) to skip a redundant fetch; fall back to JSON.
+  function begin(scripts) {
+    const srcs = scripts.filter((s) => s.icon).map((s) => s.icon);
+    let pending = srcs.length;
+    const imgs = [];
+    if (!pending) return;
+    srcs.forEach((src) => {
+      const img = new Image();
+      img.onload = () => { imgs.push(img); if (--pending === 0) start(imgs); };
+      img.onerror = () => { if (--pending === 0) start(imgs); };
+      img.src = src;
+    });
+  }
+  if (Array.isArray(window.__SCRIPTS__)) {
+    begin(window.__SCRIPTS__);
+  } else {
+    fetch('data/scripts.json').then((r) => r.json()).then(begin).catch(() => {});
+  }
 })();
