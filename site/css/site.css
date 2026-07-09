@@ -824,12 +824,16 @@ body.modal-open { overflow: hidden; }
   display: flex; align-items: center; justify-content: space-between; gap: 24px;
   background: var(--bg-alt); padding: 14px 24px;
   border-top: 1px solid var(--border);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
-.builder-foot-l { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+.builder-foot-l { display: flex; align-items: baseline; gap: 18px 18px; flex-wrap: wrap; flex: 1 1 auto; min-width: 0; }
 .builder-foot .cnt { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent-text); }
 .builder-note { font-size: 12.5px; color: var(--text-secondary); }
-.builder-foot .btn { padding: 12px 20px; font-size: 14px; flex: none; }
+.builder-foot .btn { padding: 12px 20px; font-size: 14px; flex: none; white-space: nowrap; }
+@media (max-width: 600px) {
+  .builder-foot { flex-direction: column; align-items: stretch; }
+  .builder-foot .btn { justify-content: center; }
+}
 @media (max-width: 900px) {
   .builder-head { flex-direction: column; }
   .builder .kbar-row { gap: 8px; }
