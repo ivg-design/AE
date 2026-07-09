@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IVG Toolkit — 33 After Effects scripts</title>
+  <script type="importmap">
+  { "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+  }}
+  </script>
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=11" />
   <link rel="icon" type="image/png" sizes="256x256" href="assets/ae-toolkit.png?v=11" />
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=11" />
@@ -122,11 +128,15 @@
         </div>
         <span class="hint-pill"><i data-lucide="package-plus"></i>Pick scripts → get a dockable AE panel bundle</span>
       </div>
+      <div class="logo3d" id="logo3d" role="img" aria-label="Build-a-Bar — rotating 3D logo">
+        <canvas id="logo3dCanvas"></canvas>
+        <div class="logo3d-fallback"><img src="assets/logo-landscape.webp" alt="Build-a-Bar" loading="lazy" /></div>
+      </div>
       <div class="kbar">
         <div class="builder-head">
           <div class="builder-copy">
             <span class="t">Check the tools you want — get a ready-to-dock bundle.</span>
-            <span class="d">The zip contains the dockable <b>IVGD&nbsp;Command&nbsp;Bar</b> panel plus your scripts in an <code>ivg-scripts</code> subfolder. Drop both into <span class="mono">ScriptUI&nbsp;Panels</span>: only the command bar appears in AE's Window menu, and its buttons reflow when docked vertical, horizontal, or as a grid.</span>
+            <span class="d">The zip contains the dockable <b>Build-a-Bar</b> panel plus your scripts in an <code>ivg-scripts</code> subfolder. Drop both into <span class="mono">ScriptUI&nbsp;Panels</span>: only the command bar appears in AE's Window menu, and its buttons reflow when docked vertical, horizontal, or as a grid. Prefer a real plugin? Grab the native macOS / Windows build below.</span>
           </div>
           <div class="builder-actions">
             <button class="seg-btn" id="selAll"><i data-lucide="check-check"></i>Select all</button>
@@ -293,5 +303,6 @@
   <script src="vendor/jszip.min.js"></script>
   <script src="js/hero.js?v=12"></script>
   <script src="js/app.js?v=13"></script>
+  <script type="module" src="js/logo3d.js?v=1"></script>
 </body>
 </html>

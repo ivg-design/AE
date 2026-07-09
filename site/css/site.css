@@ -877,3 +877,41 @@ body.modal-open { overflow: hidden; }
   transition: opacity .15s ease;
 }
 .builder .kbar-tile.info-src { border-color: var(--accent); }
+
+/* ---- Build-a-Bar 3D logo stage ------------------------------------------ */
+.logo3d {
+  position: relative;
+  width: 100%;
+  height: clamp(220px, 33vw, 400px);
+  margin: 6px 0 22px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  background:
+    radial-gradient(120% 90% at 50% 40%, #1a1620 0%, rgba(12,13,17,0) 60%),
+    linear-gradient(180deg, #101218 0%, #0c0d11 100%);
+  isolation: isolate;
+}
+.logo3d::before {                      /* copper pool of light behind the logo */
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(58% 52% at 50% 54%, rgba(241,90,36,.17), rgba(241,90,36,0) 70%);
+  pointer-events: none; z-index: 0;
+}
+.logo3d canvas {
+  position: relative; z-index: 1;
+  display: block; width: 100% !important; height: 100% !important;
+  cursor: grab;
+}
+.logo3d-fallback { display: none; }
+.logo3d--fallback canvas { display: none; }
+.logo3d--fallback .logo3d-fallback {
+  display: grid; place-items: center;
+  position: absolute; inset: 0; z-index: 1; padding: 6%;
+}
+.logo3d--fallback .logo3d-fallback img {
+  max-width: min(560px, 80%); height: auto;
+  filter: drop-shadow(0 12px 30px rgba(0,0,0,.5));
+}
+@media (max-width: 640px) { .logo3d { height: clamp(180px, 46vw, 260px); } }
+@media (prefers-reduced-motion: reduce) { .logo3d canvas { cursor: default; } }
