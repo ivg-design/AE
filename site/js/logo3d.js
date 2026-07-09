@@ -1,5 +1,6 @@
 // logo3d.js — Build-a-Bar 3D logo: shiny copper/anodized metal, studio
-// reflections, gentle idle spin + pointer parallax. Self-contained, lazy,
+// reflections. Idle: gentle horizontal sway (−45°..+45° yaw). Pointer: tilts
+// toward the cursor, ±45° on both yaw (X) and pitch (Y). Self-contained, lazy,
 // respects reduced-motion, pauses when off-screen.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -36,11 +37,9 @@ if (stage && canvas && window.WebGLRenderingContext) {
     cool.position.set(-2, -3, -6);
     scene.add(key, warm, cool);
 
-    // Pivot the model tilts on (pointer parallax); spin lives on an inner group.
-    const pivot = new THREE.Group();
-    const spinner = new THREE.Group();
-    pivot.add(spinner);
-    scene.add(pivot);
+    // Single rig carries both the idle sway and the pointer tilt.
+    const rig = new THREE.Group();
+    scene.add(rig);
 
     const loader = new GLTFLoader();
     let loaded = false;
@@ -62,7 +61,7 @@ if (stage && canvas && window.WebGLRenderingContext) {
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         model.position.sub(center);
-        spinner.add(model);
+        rig.add(model);
         // Frame to the logo's height (it's a wide, short plaque) with headroom
         // for the idle spin + pointer tilt, and a tiny top-down angle.
         const size = box.getSize(new THREE.Vector3());
@@ -77,16 +76,17 @@ if (stage && canvas && window.WebGLRenderingContext) {
       () => { stage.classList.add('logo3d--fallback'); }
     );
 
-    // Pointer parallax (damped) + idle spin.
-    let targetX = 0, targetY = 0, curX = 0, curY = 0, spin = 0;
+    // Pointer drives yaw + pitch toward the cursor, clamped to ±45°.
+    const MAX = Math.PI / 4;                 // 45°
+    let mx = 0, my = 0, active = false, curYaw = 0, curPitch = 0;
+    const clamp = (v) => Math.max(-1, Math.min(1, v));
     const onMove = (e) => {
       const r = stage.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5;
-      const py = (e.clientY - r.top) / r.height - 0.5;
-      targetY = px * 0.7;           // yaw toward cursor
-      targetX = py * 0.4;           // pitch toward cursor
+      mx = clamp(((e.clientX - r.left) / r.width - 0.5) * 2);   // -1..1
+      my = clamp(((e.clientY - r.top) / r.height - 0.5) * 2);
+      active = true;
     };
-    const onLeave = () => { targetX = 0; targetY = 0; };
+    const onLeave = () => { active = false; };
     stage.addEventListener('pointermove', onMove);
     stage.addEventListener('pointerleave', onLeave);
 
@@ -106,18 +106,21 @@ if (stage && canvas && window.WebGLRenderingContext) {
         .observe(stage);
     }
 
-    function frame() {
+    const t0 = performance.now();
+    function frame(now) {
       requestAnimationFrame(frame);
       if (!loaded || !visible) return;
-      if (!reduce) spin += 0.0032;
-      curX += (targetX - curX) * 0.06;
-      curY += (targetY - curY) * 0.06;
-      spinner.rotation.y = spin;
-      pivot.rotation.x = curX;
-      pivot.rotation.y = curY;
+      const t = (now - t0) / 1000;
+      let ty, tp;
+      if (reduce) { ty = 0; tp = 0; }
+      else if (active) { ty = -mx * MAX; tp = -my * MAX; }             // lean toward cursor, ±45°
+      else { ty = Math.sin(t * 0.55) * MAX; tp = Math.sin(t * 0.32) * MAX * 0.12; } // idle sway
+      curYaw += (ty - curYaw) * 0.07;
+      curPitch += (tp - curPitch) * 0.07;
+      rig.rotation.set(curPitch, curYaw, 0);
       renderer.render(scene, camera);
     }
-    frame();
+    requestAnimationFrame(frame);
   } else {
     stage.classList.add('logo3d--fallback');
   }

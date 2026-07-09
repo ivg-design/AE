@@ -802,7 +802,7 @@ body.modal-open { overflow: hidden; }
 .builder .kbar-tile.sel .tick { display: flex; }
 .builder .kbar-tile.sel img, .builder .kbar-tile.sel > .lucide { opacity: 1; filter: none; }
 .kbar-plat {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px;
   padding: 18px 24px 4px;
 }
 .plat-btn {
@@ -812,13 +812,13 @@ body.modal-open { overflow: hidden; }
   border-radius: 10px; transition: border-color .15s, background .15s, color .15s;
 }
 .plat-btn .lucide { width: 17px; height: 17px; color: var(--text-muted); margin-bottom: 4px; }
-.plat-btn .pn { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.plat-btn .pn { font-size: 13px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
 .plat-btn .pd { font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono); }
 .plat-btn:hover { border-color: var(--text-muted); }
 .plat-btn.is-on { border-color: var(--accent); background: var(--accent-soft); }
 .plat-btn.is-on .lucide, .plat-btn.is-on .pn { color: var(--accent-text); }
 .plat-btn.is-on .pd { color: var(--text-secondary); }
-@media (max-width: 640px) { .kbar-plat { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 820px) { .kbar-plat { grid-template-columns: repeat(2, 1fr); } }
 
 .builder-foot {
   display: flex; align-items: center; justify-content: space-between; gap: 24px;
@@ -878,24 +878,20 @@ body.modal-open { overflow: hidden; }
 }
 .builder .kbar-tile.info-src { border-color: var(--accent); }
 
-/* ---- Build-a-Bar 3D logo stage ------------------------------------------ */
+/* ---- Build-a-Bar 3D logo (top-left of the command-bar card) -------------- */
+.builder-head { align-items: center; gap: 22px; }
+.builder-head .builder-copy { flex: 1 1 auto; max-width: none; }
+.builder-head .builder-actions { align-self: flex-start; }
 .logo3d {
-  position: relative;
-  width: 100%;
-  height: clamp(220px, 33vw, 400px);
-  margin: 6px 0 22px;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid var(--border-soft);
-  background:
-    radial-gradient(120% 90% at 50% 40%, #1a1620 0%, rgba(12,13,17,0) 60%),
-    linear-gradient(180deg, #101218 0%, #0c0d11 100%);
-  isolation: isolate;
+  flex: 0 0 clamp(196px, 21vw, 288px);
+  width: clamp(196px, 21vw, 288px);
+  height: clamp(144px, 15vw, 190px);
+  position: relative; isolation: isolate;
+  margin: -6px -4px -6px -8px;              /* hug the card's inner top-left */
 }
-.logo3d::before {                      /* copper pool of light behind the logo */
-  content: "";
-  position: absolute; inset: 0;
-  background: radial-gradient(58% 52% at 50% 54%, rgba(241,90,36,.17), rgba(241,90,36,0) 70%);
+.logo3d::before {                          /* copper pool of light behind the logo */
+  content: ""; position: absolute; inset: -10% -6% -4%;
+  background: radial-gradient(56% 52% at 50% 54%, rgba(241,90,36,.22), rgba(241,90,36,0) 70%);
   pointer-events: none; z-index: 0;
 }
 .logo3d canvas {
@@ -905,13 +901,10 @@ body.modal-open { overflow: hidden; }
 }
 .logo3d-fallback { display: none; }
 .logo3d--fallback canvas { display: none; }
-.logo3d--fallback .logo3d-fallback {
-  display: grid; place-items: center;
-  position: absolute; inset: 0; z-index: 1; padding: 6%;
+.logo3d--fallback .logo3d-fallback { display: grid; place-items: center; position: absolute; inset: 0; z-index: 1; }
+.logo3d--fallback .logo3d-fallback img { max-width: 96%; height: auto; filter: drop-shadow(0 10px 24px rgba(0,0,0,.5)); }
+@media (max-width: 820px) {
+  .builder-head { flex-direction: column; align-items: stretch; }
+  .logo3d { flex: none; width: min(300px, 72%); height: 168px; margin: -4px auto 4px; }
 }
-.logo3d--fallback .logo3d-fallback img {
-  max-width: min(560px, 80%); height: auto;
-  filter: drop-shadow(0 12px 30px rgba(0,0,0,.5));
-}
-@media (max-width: 640px) { .logo3d { height: clamp(180px, 46vw, 260px); } }
 @media (prefers-reduced-motion: reduce) { .logo3d canvas { cursor: default; } }
