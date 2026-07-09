@@ -1,5 +1,42 @@
 [
   {
+    "id": "2-3-ik-rigger",
+    "name": "2-3_IK_Rigger",
+    "displayName": "2-3 IK Rigger",
+    "category": "animation",
+    "version": "1.0.0",
+    "ui": "PALETTE",
+    "tagline": "Turns a set of existing layers into a working 2- or 3-segment IK chain.",
+    "description": "Turns a set of existing layers into a working 2- or 3-segment IK chain. You pick the limb segments, the limb tip, and a controller/goal layer; the script parents the chain and writes a law-of-cosines IK rotation expression onto each segment so the whole chain solves to follow the goal. A \"Change IK Direction\" checkbox is added to the goal so you can flip the elbow/knee bend, and (in 3-layer mode) a \"Rotate Tip\" checkbox controls whether the tip tracks the chain.",
+    "functionality": [
+      "Builds a 2-layer (upper/lower/tip) or 3-layer (upper/middle/lower/tip) IK chain.",
+      "Parents the segments into a chain and drives each segment's Rotation via a closed-form IK expression (2-bone and 3-bone law-of-cosines solvers).",
+      "Adds a \"Change IK Direction\" checkbox to the goal to flip the bend direction.",
+      "Adds a \"Rotate Tip\" checkbox to the goal in 3-layer mode.",
+      "Refresh re-reads the active comp's layers into every dropdown.",
+      "Validates the active comp, the layer count, distinct picks, and locked layers before it touches anything, inside a single undo group."
+    ],
+    "usage": [
+      "In your composition, create/position the layers you want as the chain: - Upper segment, (Middle segment for 3-layer), Lower segment, a Limb Tip layer at the very end of the chain (e.g. the hand/foot), and a Goal layer (typically a Null) that you will animate to drive the chain.",
+      "Set each segment layer's ANCHOR POINT on the joint it rotates around (the upper anchor at the shoulder/hip, lower anchor at the elbow/knee, tip anchor at the wrist/ankle). The IK math measures from these anchors.",
+      "Run the script, choose \"Two Layer IK Setup\" or \"Three Layer IK Setup\", and assign each dropdown to the matching layer (Set Limb Controller/Goal = the null).",
+      "Click Apply. Animate the Goal null to pose the chain; toggle \"Change IK Direction\" on the goal to flip the bend."
+    ],
+    "requirements": [
+      "An active composition with at least the required number of layers (4 for 2-layer: upper, lower, tip, goal; 5 for 3-layer).",
+      "Layers unlocked. Expression engine support for length(), clamp(), radiansToDegrees(), toWorld(), and effect() references."
+    ],
+    "notes": [
+      "The catalog filename is 2-3_IK_Rigger.jsx; the toolbar slug is 2-3-ik-rigger.",
+      "ExtendScript wrapper code is ECMA-3 compatible; the rig logic lives in AE expressions applied to each segment's Rotation.",
+      "Re-running Apply reuses the existing goal checkboxes instead of duplicating them."
+    ],
+    "icon": "assets/icons/2-3-ik-rigger.webp",
+    "lucide": "bone",
+    "docPath": "docs/2-3_IK_Rigger.md",
+    "srcPath": "scripts/animation/2-3_IK_Rigger.jsx"
+  },
+  {
     "id": "limb-a-tron",
     "name": "Limb-a-tron",
     "displayName": "Limb-a-tron",
@@ -35,7 +72,7 @@
       "ExtendScript wrapper code is ECMA-3 compatible; property expressions use the After Effects expression engine.",
       "Bake mode preserves animated appearances while pruning inactive regular/noodle groups where possible."
     ],
-    "icon": "assets/icons/limb-a-tron.png",
+    "icon": "assets/icons/limb-a-tron.webp",
     "lucide": "square-code",
     "docPath": "docs/Limb-a-tron.md",
     "srcPath": "scripts/animation/Limb-a-tron.jsx"
@@ -83,7 +120,7 @@
       "Driver property dimensions are handled automatically",
       "All operations wrapped in undo groups for safety"
     ],
-    "icon": "assets/icons/linearizer.png",
+    "icon": "assets/icons/linearizer.webp",
     "lucide": "trending-up",
     "docPath": "docs/Linearizer.md",
     "srcPath": "scripts/animation/Linearizer.jsx"
@@ -118,7 +155,7 @@
     ],
     "requirements": [],
     "notes": [],
-    "icon": "assets/icons/pathmaster.png",
+    "icon": "assets/icons/pathmaster.webp",
     "lucide": "square-code",
     "docPath": "docs/PathMaster.md",
     "srcPath": "scripts/animation/PathMaster.jsx"
@@ -148,7 +185,7 @@
     ],
     "requirements": [],
     "notes": [],
-    "icon": "assets/icons/guiderator.png",
+    "icon": "assets/icons/guiderator.webp",
     "lucide": "ruler",
     "docPath": "docs/Guiderator.md",
     "srcPath": "scripts/composition/Guiderator.jsx"
@@ -190,7 +227,7 @@
       "Expression references specific composition names - avoid renaming",
       "Background color is set to dark gray (38, 38, 38) for professional look"
     ],
-    "icon": "assets/icons/slidotron-16x9.png",
+    "icon": "assets/icons/slidotron-16x9.webp",
     "lucide": "gallery-horizontal",
     "docPath": "docs/Slidotron_16x9.md",
     "srcPath": "scripts/composition/Slidotron_16x9.jsx"
@@ -233,7 +270,7 @@
       "Optimized for vertical viewing on mobile devices and social platforms",
       "Background color is set to dark gray (38, 38, 38) for professional look"
     ],
-    "icon": "assets/icons/slidotron-9x16.png",
+    "icon": "assets/icons/slidotron-9x16.webp",
     "lucide": "gallery-vertical",
     "docPath": "docs/Slidotron_9x16.md",
     "srcPath": "scripts/composition/Slidotron_9x16.jsx"
@@ -274,7 +311,7 @@
       "Dash controls provide fine detail customization options",
       "All parameters support keyframe animation for motion graphics"
     ],
-    "icon": "assets/icons/burstmate.png",
+    "icon": "assets/icons/burstmate.webp",
     "lucide": "asterisk",
     "docPath": "docs/BurstMate.md",
     "srcPath": "scripts/effects/BurstMate.jsx"
@@ -319,7 +356,7 @@
       "Layer selection alone is not enough; select the actual color property rows before applying.",
       "Start/End swatches set the generated range directly with the bundled picker."
     ],
-    "icon": "assets/icons/chromablenderizer.png",
+    "icon": "assets/icons/chromablenderizer.webp",
     "lucide": "square-code",
     "docPath": "docs/ChromaBlenderizer.md",
     "srcPath": "scripts/effects/ChromaBlenderizer.jsx"
@@ -361,7 +398,7 @@
       "Nested compositions are processed recursively",
       "All operations wrapped in undo group named \"SFX Master\""
     ],
-    "icon": "assets/icons/sfxmaster.png",
+    "icon": "assets/icons/sfxmaster.webp",
     "lucide": "square-code",
     "docPath": "docs/sfxMaster.md",
     "srcPath": "scripts/effects/sfxMaster.jsx"
@@ -379,7 +416,7 @@
     "usage": [],
     "requirements": [],
     "notes": [],
-    "icon": "assets/icons/sync-o-tron.png",
+    "icon": "assets/icons/sync-o-tron.webp",
     "lucide": "audio-lines",
     "docPath": "docs/Sync-o-tron.md",
     "srcPath": "scripts/effects/Sync-o-tron.jsx"
@@ -416,7 +453,7 @@
       "The Inertial expression reads the last keyframe before the current time, so it activates after every keyframe, not just the final one.",
       "Deleting the generated effect disables the expression (it will error politely); remove the expression from the property to fully undo by hand."
     ],
-    "icon": "assets/icons/elast-o-matic.png",
+    "icon": "assets/icons/elast-o-matic.webp",
     "lucide": "activity",
     "docPath": "docs/Elast-o-matic.md",
     "srcPath": "scripts/keyframes/Elast-o-matic.jsx"
@@ -466,7 +503,7 @@
       "All operations are wrapped in undo groups for easy reversal",
       "The panel remains docked and available for repeated use across compositions"
     ],
-    "icon": "assets/icons/keybot.png",
+    "icon": "assets/icons/keybot.webp",
     "lucide": "calculator",
     "docPath": "docs/KeyBot.md",
     "srcPath": "scripts/keyframes/KeyBot.jsx"
@@ -518,7 +555,7 @@
       "The decay system uses mathematical easing functions for smooth temporal transitions",
       "Memory-efficient processing handles large keyframe selections without performance impact"
     ],
-    "icon": "assets/icons/keyclonematic.png",
+    "icon": "assets/icons/keyclonematic.webp",
     "lucide": "copy",
     "docPath": "docs/KeyCloneMatic.md",
     "srcPath": "scripts/keyframes/KeyCloneMatic.jsx"
@@ -567,7 +604,7 @@
       "All operations are wrapped in a single undo group for clean workflow integration",
       "If properties have expressions, it keyframes the expression result, not the underlying value"
     ],
-    "icon": "assets/icons/valuatron.png",
+    "icon": "assets/icons/valuatron.webp",
     "lucide": "sliders-horizontal",
     "docPath": "docs/Valuatron.md",
     "srcPath": "scripts/keyframes/Valuatron.jsx"
@@ -601,7 +638,7 @@
       "Expressions reference \"Controller Null\" and the control BY NAME - renaming the null or a control breaks its links. Duplicate layer names can misdirect Slider/Angle links only if their generated control names collide.",
       "Property groups and unsupported value types (e.g. Shape paths, text) are skipped and reported at the end of the run."
     ],
-    "icon": "assets/icons/controllerizer.png",
+    "icon": "assets/icons/controllerizer.webp",
     "lucide": "settings-2",
     "docPath": "docs/Controllerizer.md",
     "srcPath": "scripts/layers/Controllerizer.jsx"
@@ -639,7 +676,7 @@
       "The null is placed at the top of the layer stack",
       "All operations are wrapped in an undo group named \"NullBot\""
     ],
-    "icon": "assets/icons/nullbot.png",
+    "icon": "assets/icons/nullbot.webp",
     "lucide": "box-select",
     "docPath": "docs/NullBot.md",
     "srcPath": "scripts/layers/NullBot.jsx"
@@ -671,7 +708,7 @@
       "The expression references the parent BY NAME - renaming the parent (or having duplicate layer names in the comp) breaks or misdirects the link. Re-run after renames.",
       "To make a child fade independently again, just delete the expression from its Opacity."
     ],
-    "icon": "assets/icons/opac-o-bot.png",
+    "icon": "assets/icons/opac-o-bot.webp",
     "lucide": "blend",
     "docPath": "docs/Opac-o-bot.md",
     "srcPath": "scripts/layers/Opac-o-bot.jsx"
@@ -722,7 +759,7 @@
       "Large selections are handled efficiently without performance degradation",
       "All reordering operations are atomic - either all succeed or none are applied"
     ],
-    "icon": "assets/icons/ordermaster.png",
+    "icon": "assets/icons/ordermaster.webp",
     "lucide": "square-code",
     "docPath": "docs/OrderMaster.md",
     "srcPath": "scripts/layers/OrderMaster.jsx"
@@ -774,7 +811,7 @@
       "System is compatible with existing parenting hierarchies and constraints",
       "Binary effect data is embedded for cross-project compatibility and portability"
     ],
-    "icon": "assets/icons/parent-o-bot.png",
+    "icon": "assets/icons/parent-o-bot.webp",
     "lucide": "square-code",
     "docPath": "docs/Parent-o-bot.md",
     "srcPath": "scripts/layers/Parent-o-bot.jsx"
@@ -784,7 +821,7 @@
     "name": "Rectangulator",
     "displayName": "Rectangulator",
     "category": "layers",
-    "version": "2.1.5",
+    "version": "2.1.6",
     "ui": "HEADLESS",
     "tagline": "Convert a parametric rectangle into a bezier shape with independent per-corner rounding and a 9-point anchor grid, driven by one effect.",
     "description": "Rectangulator rebuilds a parametric (Rectangle tool) rectangle as a custom bezier shape with independently roundable corners and a nine-point anchor grid, preserving the original fills, strokes, and transform. A \"Rectangulator Controls\" effect drives it entirely by expression: Rectangle Width/Height sliders, four per-corner rounding sliders, and a nine-item Anchor Point popup, all keyframeable.",
@@ -826,7 +863,7 @@
       "The system is intended to support shape layer parenting and pre-compositions",
       "Binary effect data ensures cross-project compatibility and settings persistence"
     ],
-    "icon": "assets/icons/rectangulator.png",
+    "icon": "assets/icons/rectangulator.webp",
     "lucide": "vector-square",
     "docPath": "docs/Rectangulator.md",
     "srcPath": "scripts/layers/Rectangulator.jsx"
@@ -857,7 +894,7 @@
       "Layer Position, Scale and Rotation are left untouched - only anchors and shape-group internal transforms are reset, so layers may shift visually if their anchor carried an offset.",
       "Works on any layer type; the recursive shape-group reset only affects shape layers (others simply get their anchor reset)."
     ],
-    "icon": "assets/icons/reseterator.png",
+    "icon": "assets/icons/reseterator.webp",
     "lucide": "rotate-ccw",
     "docPath": "docs/Reseterator.md",
     "srcPath": "scripts/layers/Reseterator.jsx"
@@ -899,7 +936,7 @@
       "Stroke and shadow effects enhance text visibility across various backgrounds",
       "Position offsets allow for precise subtitle placement within composition bounds"
     ],
-    "icon": "assets/icons/subtitleforge.png",
+    "icon": "assets/icons/subtitleforge.webp",
     "lucide": "captions",
     "docPath": "docs/SubtitleForge.md",
     "srcPath": "scripts/layers/SubtitleForge.jsx"
@@ -950,7 +987,7 @@
       "All text formatting and existing animations are preserved during processing",
       "Multiple instances of the same text get individual range selectors within one animator"
     ],
-    "icon": "assets/icons/textmate.png",
+    "icon": "assets/icons/textmate.webp",
     "lucide": "type",
     "docPath": "docs/TextMate.md",
     "srcPath": "scripts/layers/TextMate.jsx"
@@ -1001,7 +1038,7 @@
       "All time calculations are automatically compensated for composition frame rate",
       "Multiple layers can share the same controller for synchronized time control"
     ],
-    "icon": "assets/icons/timewarp-a-tron.png",
+    "icon": "assets/icons/timewarp-a-tron.webp",
     "lucide": "square-code",
     "docPath": "docs/TimeWarp-a-tron.md",
     "srcPath": "scripts/layers/TimeWarp-a-tron.jsx"
@@ -1047,7 +1084,7 @@
       "Bounding box guides create comprehensive rectangular boundary references",
       "Tool maintains composition guide organization and naming conventions"
     ],
-    "icon": "assets/icons/centralizer.png",
+    "icon": "assets/icons/centralizer.webp",
     "lucide": "crosshair",
     "docPath": "docs/Centralizer.md",
     "srcPath": "scripts/paths/Centralizer.jsx"
@@ -1093,7 +1130,7 @@
       "Pseudo effect binary data embedded for compatibility",
       "All operations wrapped in undo group \"Distributron\""
     ],
-    "icon": "assets/icons/distributron.png",
+    "icon": "assets/icons/distributron.webp",
     "lucide": "waypoints",
     "docPath": "docs/Distributron.md",
     "srcPath": "scripts/paths/Distributron.jsx"
@@ -1139,7 +1176,7 @@
       "Compatible with various shape types: rectangles, ellipses, custom paths",
       "UI dialog is resizable and provides intuitive selection workflow"
     ],
-    "icon": "assets/icons/originator.png",
+    "icon": "assets/icons/originator.webp",
     "lucide": "crosshair",
     "docPath": "docs/Originator.md",
     "srcPath": "scripts/paths/Originator.jsx"
@@ -1185,7 +1222,7 @@
       "Original masks remain on source layer (non-destructive)",
       "All operations wrapped in undo group \"Trace-o-matic\""
     ],
-    "icon": "assets/icons/trace-o-matic.png",
+    "icon": "assets/icons/trace-o-matic.webp",
     "lucide": "pen-tool",
     "docPath": "docs/Trace-o-matic.md",
     "srcPath": "scripts/paths/Trace-o-matic.jsx"
@@ -1237,7 +1274,7 @@
       "The system preserves existing path animation while adding controllable vertices",
       "Open/Closed path switching affects the connection between first and last vertices"
     ],
-    "icon": "assets/icons/vertexmaster.png",
+    "icon": "assets/icons/vertexmaster.webp",
     "lucide": "square-code",
     "docPath": "docs/VertexMaster.md",
     "srcPath": "scripts/paths/VertexMaster.jsx"
@@ -1288,7 +1325,7 @@
       "The system preserves existing keyframe timing while updating values at current time",
       "Multi-dimensional properties (Position, Scale) are processed component-wise for accuracy"
     ],
-    "icon": "assets/icons/iteratron.png",
+    "icon": "assets/icons/iteratron.webp",
     "lucide": "square-code",
     "docPath": "docs/Iteratron.md",
     "srcPath": "scripts/utilities/Iteratron.jsx"
@@ -1334,7 +1371,7 @@
       "Range inputs support both positive and negative values for complete flexibility",
       "Script includes built-in NaN detection array utility for robust error handling"
     ],
-    "icon": "assets/icons/randomatic.png",
+    "icon": "assets/icons/randomatic.webp",
     "lucide": "shuffle",
     "docPath": "docs/RandoMatic.md",
     "srcPath": "scripts/utilities/RandoMatic.jsx"
@@ -1380,7 +1417,7 @@
       "Tool maintains shape layer integrity while adding effects to contents structure",
       "Compatible with both simple and complex nested shape layer configurations"
     ],
-    "icon": "assets/icons/triminator.png",
+    "icon": "assets/icons/triminator.webp",
     "lucide": "scissors",
     "docPath": "docs/Triminator.md",
     "srcPath": "scripts/utilities/Triminator.jsx"

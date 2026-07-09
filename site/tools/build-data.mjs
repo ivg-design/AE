@@ -59,6 +59,7 @@ const LUCIDE_MAP = {
   onionizer: "layers",
   randomatic: "shuffle",
   triminator: "scissors",
+  "2-3-ik-rigger": "bone",
 };
 const DEFAULT_LUCIDE = "square-code";
 
@@ -306,25 +307,13 @@ function main() {
       const ui = normalizeUi(scalars.ui);
       const version = scalars.version.trim();
 
-      let icon = findIcon(baseName, iconIndex);
-      // Owner-verified art corrections: "Centralizer.png" is actually the
-      // Originator glyph, and "PathDuplitron.png" is the Distributron glyph.
-      if (baseName === "Distributron") icon = findIcon("PathDuplitron", iconIndex);
-      if (baseName === "Reseterator") icon = "assets/img/reset-psr.png";
-      if (baseName === "Opac-o-bot") icon = "assets/img/parent-opacity-to-parent.png";
-      if (baseName === "Controllerizer") icon = "assets/img/create-control-null.png";
-      if (baseName === "Linearizer") icon = "assets/img/apply-linear-expression.png";
-      if (baseName === "Trace-o-matic") icon = "assets/img/auto-trace.png";
-      // 2026-07-04 icon drop: high-res sources in assets/img/, web-sized copies
-      // (256px) generated in assets/img/web/ keyed by slug. Originator's art was
-      // re-rendered from assets/icons/Centralizer.svg after the PNG was reclaimed
-      // by Centralizer's own new icon.
-      const WEB_ICONS = ["guiderator", "slidotron-16x9", "slidotron-9x16", "burstmate",
-        "sync-o-tron", "keybot", "rectangulator", "subtitleforge", "textmate",
-        "centralizer", "originator"];
-      const webSlug = baseName.toLowerCase().replace(/_/g, "-");
-      if (WEB_ICONS.indexOf(webSlug) !== -1) icon = "assets/img/web/" + webSlug + ".png";
       const slug = slugify(baseName);
+      // Website icons: ONE source of truth — 256px PNGs rasterized from the
+      // curated toolbar SVG set into assets/web-icons/<slug>.png (regenerate via
+      // ae/native/ivgd-command-bar/tools/rasterize-web-icons.mjs). The SVG set is
+      // correctly named per script, so no per-script corrections are needed.
+      const webIconRel = "assets/web-icons/" + slug + ".webp";
+      const icon = fs.existsSync(path.join(REPO_ROOT, webIconRel)) ? webIconRel : null;
       const lucide = LUCIDE_MAP[slug] || DEFAULT_LUCIDE;
 
       if (icon) iconFound.push(slug);
@@ -410,8 +399,9 @@ function main() {
   for (const e of entries) {
     if (e.icon) {
       const iconSrc = path.join(REPO_ROOT, e.icon);
-      if (cp(iconSrc, path.join(SITE_DIR, "assets", "icons", `${e.id}.png`))) {
-        e.icon = `assets/icons/${e.id}.png`;
+      const ext = path.extname(e.icon) || ".webp";
+      if (cp(iconSrc, path.join(SITE_DIR, "assets", "icons", `${e.id}${ext}`))) {
+        e.icon = `assets/icons/${e.id}${ext}`;
       } else {
         e.icon = null;
       }
@@ -425,7 +415,7 @@ function main() {
     }
   }
   const TOOLBAR = path.join(REPO_ROOT, "ae/packages/ae-scripts/toolbar");
-  cp(path.join(TOOLBAR, "IVGD Command Bar.jsx"), path.join(SITE_DIR, "scripts/toolbar/IVGD Command Bar.jsx"));
+  cp(path.join(TOOLBAR, "Build-a-Bar.jsx"), path.join(SITE_DIR, "scripts/toolbar/Build-a-Bar.jsx"));
   const iconDir = path.join(TOOLBAR, "icons");
   for (const f of fs.existsSync(iconDir) ? fs.readdirSync(iconDir) : []) {
     if (/\.png$/i.test(f)) cp(path.join(iconDir, f), path.join(SITE_DIR, "scripts/toolbar/icons", f));
@@ -471,18 +461,44 @@ function main() {
   const INDEX_HTML = path.join(SITE_DIR, "index.html");
   const START = "<!-- INLINE_SCRIPTS_DATA:START -->";
   const END = "<!-- INLINE_SCRIPTS_DATA:END -->";
+  const TOOLKIT_VERSION = "1.0.1";
+  const BASE = "https://forge.mograph.life/apps/ae/";
   try {
     let html = fs.readFileSync(INDEX_HTML, "utf8");
-    // Escape "<" so a tagline can never break out of the <script> element.
+    const N = String(entries.length);
+    // 1) inline catalog data
     const json = JSON.stringify(lite).replace(/</g, "\\u003c");
     const block = `${START}\n  <script>window.__SCRIPTS__=${json};</script>\n  ${END}`;
     const re = new RegExp(`${START}[\\s\\S]*?${END}`);
-    if (re.test(html)) {
-      fs.writeFileSync(INDEX_HTML, html.replace(re, block), "utf8");
-      console.log(`  ${INDEX_HTML} (inlined ${lite.length} scripts)`);
-    } else {
-      console.warn(`  ! index.html missing INLINE_SCRIPTS_DATA markers — inline skipped`);
-    }
+    if (re.test(html)) html = html.replace(re, block);
+    else console.warn(`  ! index.html missing INLINE_SCRIPTS_DATA markers — inline skipped`);
+    // 2) keep the visible + SEO script counts in lock-step with the catalog
+    html = html
+      .replace(/\b\d+ scripts that delete/g, `${N} scripts that delete`)
+      .replace(/Search \d+ scripts/g, `Search ${N} scripts`)
+      .replace(/\b\d+ (free )?After Effects scripts/g, (m, f) => `${N} ${f || ""}After Effects scripts`)
+      .replace(/\b\d+ production-ready/g, `${N} production-ready`);
+    // 3) regenerate the JSON-LD graph from the current catalog (never stale)
+    const desc = `${N} production-ready After Effects scripts for rigging, keyframes, paths, effects and audio — plus a dockable command bar. Free under MIT.`;
+    const ld = { "@context": "https://schema.org", "@graph": [
+      { "@type": "WebSite", "@id": BASE + "#website", url: BASE, name: "IVG Toolkit", description: desc,
+        inLanguage: "en", publisher: { "@type": "Organization", name: "IVG Design", url: "https://forge.mograph.life/" } },
+      { "@type": "SoftwareApplication", "@id": BASE + "#app", name: "IVG Toolkit", applicationCategory: "DesignApplication",
+        operatingSystem: "Adobe After Effects CC 2019+", softwareVersion: TOOLKIT_VERSION, url: BASE, description: desc,
+        softwareRequirements: "Adobe After Effects CC 2019 or later", downloadUrl: BASE + "download/ae-scripts.zip",
+        license: "https://opensource.org/licenses/MIT", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        author: { "@type": "Organization", name: "IVG Design" } },
+      { "@type": "ItemList", "@id": BASE + "#scripts", name: "IVG Toolkit scripts", numberOfItems: entries.length,
+        itemListElement: entries.map((e, i) => ({ "@type": "ListItem", position: i + 1, name: e.displayName || e.name,
+          description: e.tagline || "", url: BASE + "docs.html?s=" + e.id })) },
+      { "@type": "BreadcrumbList", itemListElement: [
+        { "@type": "ListItem", position: 1, name: "IVG Design", item: "https://forge.mograph.life/" },
+        { "@type": "ListItem", position: 2, name: "IVG Toolkit", item: BASE } ] },
+    ] };
+    html = html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/,
+      `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>`);
+    fs.writeFileSync(INDEX_HTML, html, "utf8");
+    console.log(`  ${INDEX_HTML} (inlined ${lite.length} scripts, count ${N}, JSON-LD, v${TOOLKIT_VERSION})`);
   } catch (err) {
     console.warn(`  ! could not inline catalog into index.html: ${err.message}`);
   }

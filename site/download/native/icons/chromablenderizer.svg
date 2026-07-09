@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 499.93599 499.57747">
+  <g id="Layer_2-2" data-name="Layer 2">
+    <g id="Chroma-Blenderizer">
+      <polygon points="309.73633 105.67995 278.87572 105.67995 278.87572 153.39394 226.80149 153.39394 226.80149 105.67995 195.94082 105.67995 252.8386 7.18742 309.73633 105.67995" fill="#feed03"/>
+      <polygon points="385.64616 433.90174 400.69428 406.97794 359.00727 383.71185 384.39947 338.28061 426.08647 361.5467 441.13462 334.62284 499.44182 432.28879 385.64616 433.90174" fill="#f8881d"/>
+      <polygon points="114.28983 435.93288 99.24172 409.00908 140.92872 385.743 115.53652 340.31176 73.84952 363.57784 58.80137 336.65398 .49417 434.31994 114.28983 435.93288" fill="#f0f"/>
+      <g>
+        <g>
+          <polygon points="356.97467 414.68431 304.90599 385.82349 304.90599 322.98209 356.97467 352.49726 356.97467 414.68431" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="409.04335 385.82349 356.97467 414.68431 356.97467 352.49726 409.04335 323.59286 409.04335 385.82349" fill="#03d1ed" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="356.97467 294.16898 409.04335 323.59286 356.97467 352.4864 304.90599 322.98209 356.97467 294.16898" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="148.69996 413.61413 95.61499 384.75331 95.61499 322.56626 148.69996 351.42708 148.69996 413.61413" fill="#feed03" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="200.76864 384.75331 148.69996 413.61413 148.69996 351.42708 200.76864 322.63598 200.76864 384.75331" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="148.69996 293.13167 200.76864 322.63598 148.69996 351.41622 95.61499 322.56626 148.69996 293.13167" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="252.83732 413.61413 200.76864 384.75331 200.76864 322.00321 252.83732 351.42708 252.83732 413.61413" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="304.90599 384.75331 252.83732 413.61413 252.83732 351.42708 304.90599 322.56626 304.90599 384.75331" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="254.67051 292.12668 304.90599 322.56626 252.83732 351.42708 200.76864 322.00321 254.67051 292.12668" fill="#194edc" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="200.76864 442.78927 148.69996 413.92845 148.69996 351.08705 200.76864 380.60222 200.76864 442.78927" fill="#f8881d" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="252.83732 413.92845 200.76864 442.78927 200.76864 380.60222 252.83732 351.69782 252.83732 413.92845" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="200.76864 322.27395 252.83732 351.69782 200.76863 380.59136 148.69996 351.08705 200.76864 322.27395" fill="#f8881d" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="304.90599 443.57785 252.83732 414.71703 252.83732 351.87563 304.90599 381.39081 304.90599 443.57785" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="356.97467 414.71703 304.90599 443.57785 304.90599 381.39081 356.97467 352.4864 356.97467 414.71703" fill="#f0f" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="304.90599 323.06253 356.97467 352.4864 304.90599 381.37994 252.83732 351.87563 304.90599 323.06253" fill="#f0f" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="252.83732 472.39096 200.76864 443.53014 200.76864 380.68874 252.83732 410.20391 252.83732 472.39096" fill="red" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="304.90599 443.53014 252.83732 472.39096 252.83732 410.20391 304.90599 381.2995 304.90599 443.53014" fill="red" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="252.83732 351.87563 304.90599 381.2995 252.83731 410.19305 200.76864 380.68874 252.83732 351.87563" fill="red" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+      </g>
+      <g>
+        <g>
+          <polygon points="252.83732 293.97965 200.76864 265.11883 200.76864 202.36874 252.83732 231.79261 252.83732 293.97965" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="304.90599 265.11883 252.83732 293.97965 252.83732 231.79261 304.90599 202.93178 304.90599 265.11883" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="254.67051 172.49221 304.90599 202.93178 252.83732 231.79261 200.76864 202.36874 254.67051 172.49221" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="200.76864 322.88406 148.69996 294.02324 148.69996 231.18184 200.76864 260.69702 200.76864 322.88406" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="252.83732 294.02324 200.76864 322.88406 200.76864 260.69702 252.83732 231.79261 252.83732 294.02324" fill="#f0f" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="200.76864 202.36874 252.83732 231.79261 200.76863 260.68615 148.69996 231.18184 200.76864 202.36874" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="304.90599 323.31061 252.83732 294.44979 252.83732 231.60839 304.90599 261.12356 304.90599 323.31061" fill="#f8881d" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="356.97467 294.44979 304.90599 323.31061 304.90599 261.12356 356.97467 232.21916 356.97467 294.44979" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="304.90599 202.79528 356.97467 232.21916 304.90599 261.1127 252.83732 231.60839 304.90599 202.79528" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="357.20143 352.73448 305.13275 323.87366 305.13275 261.03226 357.20143 290.54743 357.20143 352.73448" fill="#feed03" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="409.27011 323.87366 357.20143 352.73448 357.20143 290.54743 409.27011 261.64303 409.27011 323.87366" fill="#feed03" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="357.20143 232.21916 409.27011 261.64303 357.20142 290.53657 305.13275 261.03226 357.20143 232.21916" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="148.69996 351.6643 95.61499 322.80348 95.61499 260.61643 148.69996 289.47725 148.69996 351.6643" fill="#03d1ed" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="200.76864 322.80348 148.69996 351.6643 148.69996 289.47725 200.76864 260.68615 200.76864 322.80348" fill="#03d1ed" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="148.69996 231.18184 200.76864 260.68615 148.69996 289.46639 95.61499 260.61643 148.69996 231.18184" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+      </g>
+      <g>
+        <g>
+          <polygon points="252.83732 233.0454 200.76864 204.18457 200.76864 141.43448 252.83732 170.85835 252.83732 233.0454" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="304.90599 204.18457 252.83732 233.0454 252.83732 170.85835 304.90599 141.99753 304.90599 204.18457" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="254.67051 111.55795 304.90599 141.99753 252.83732 170.85835 200.76864 141.43448 254.67051 111.55795" fill="red" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="200.76864 261.9498 148.69996 233.08898 148.69996 170.24759 200.76864 199.76276 200.76864 261.9498" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="252.83732 233.08898 200.76864 261.9498 200.76864 199.76276 252.83732 170.85835 252.83732 233.08898" fill="#f8881d" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="200.76864 141.43448 252.83732 170.85835 200.76863 199.75189 148.69996 170.24759 200.76864 141.43448" fill="#f8881d" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="304.90599 262.37635 252.83732 233.51553 252.83732 170.67413 304.90599 200.1893 304.90599 262.37635" fill="#f0f" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="356.97467 233.51553 304.90599 262.37635 304.90599 200.1893 356.97467 171.2849 356.97467 233.51553" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="304.90599 141.86103 356.97467 171.2849 304.90599 200.17844 252.83732 170.67413 304.90599 141.86103" fill="#f0f" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="357.20143 291.80022 305.13275 262.9394 305.13275 200.098 357.20143 229.61318 357.20143 291.80022" fill="#03d1ed" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="409.27011 262.9394 357.20143 291.80022 357.20143 229.61318 409.27011 200.70877 409.27011 262.9394" fill="#03d1ed" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="357.20143 171.2849 409.27011 200.70877 357.20142 229.60231 305.13275 200.098 357.20143 171.2849" fill="#03d1ed" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+        <g>
+          <polygon points="148.69996 290.73004 95.61499 261.86922 95.61499 199.68217 148.69996 228.543 148.69996 290.73004" fill="#feed03" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="200.76864 261.86922 148.69996 290.73004 148.69996 228.543 200.76864 199.75189 200.76864 261.86922" fill="#feed03" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+          <polygon points="148.69996 170.24759 200.76864 199.75189 148.69996 228.53213 95.61499 199.68217 148.69996 170.24759" fill="#feed03" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.03025"/>
+        </g>
+      </g>
+      <rect id="sizer" width="499.93599" height="499.57747" fill="none"/>
+    </g>
+  </g>
+</svg>

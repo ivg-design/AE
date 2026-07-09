@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 499.93599 499.57747">
+  <g id="Layer_2-2" data-name="Layer 2">
+    <g id="Centralizer">
+      <g>
+        <polyline points="37.31849 139.34418 37.31849 37.26647 138.88967 37.26647" fill="none" stroke="#03d1ed" stroke-linecap="round" stroke-linejoin="round" stroke-width="40.85717"/>
+        <polyline points="361.04632 37.59052 463.26652 37.59052 463.26652 139.02012" fill="none" stroke="#03d1ed" stroke-linecap="round" stroke-linejoin="round" stroke-width="40.85717"/>
+        <polyline points="463.26652 360.55735 463.26652 462.63506 361.69534 462.63506" fill="none" stroke="#03d1ed" stroke-linecap="round" stroke-linejoin="round" stroke-width="40.85717"/>
+        <polyline points="139.53869 462.311 37.31849 462.311 37.31849 360.88141" fill="none" stroke="#03d1ed" stroke-linecap="round" stroke-linejoin="round" stroke-width="40.85717"/>
+      </g>
+      <g>
+        <rect width="74.63697" height="74.53293" rx="7.22415" ry="7.22415" fill="#ff8a12"/>
+        <rect x="425.29902" width="74.63697" height="74.53293" rx="7.22415" ry="7.22415" fill="#ff8a12"/>
+        <rect y="425.04454" width="74.63697" height="74.53293" rx="7.22415" ry="7.22415" fill="#ff8a12"/>
+        <rect x="425.29902" y="425.04454" width="74.63697" height="74.53293" rx="7.22415" ry="7.22415" fill="#ff8a12"/>
+      </g>
+      <rect x="223.07133" y="46.64636" width="53.79333" height="406.28475" rx="26.89664" ry="26.89664" transform="translate(499.75673 -.17926) rotate(90)" fill="#cf3c99"/>
+      <rect x="223.03378" y="46.92954" width="53.86842" height="405.71839" rx="26.91541" ry="26.91541" transform="translate(499.93599 499.57747) rotate(-180)" fill="#cf3c99"/>
+      <ellipse cx="249.968" cy="249.7887" rx="63.86946" ry="63.78043" fill="#194edc"/>
+      <ellipse cx="249.968" cy="249.7887" rx="26.53002" ry="26.49304" fill="#feed03"/>
+    </g>
+  </g>
+</svg>

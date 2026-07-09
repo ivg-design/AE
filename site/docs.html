@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Docs — IVG Toolkit</title>
-  <meta name="description" content="Full documentation for all 32 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements." />
+  <meta name="description" content="Full documentation for all 33 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements." />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=11" />
   <link rel="icon" type="image/png" sizes="256x256" href="assets/ae-toolkit.png?v=11" />
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=11" />
@@ -50,6 +50,14 @@
       display: flex; flex-direction: column; gap: 4px;
       position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
     }
+    /* styled scrollbar for the left script panel + right TOC (unstyled default stood out) */
+    .doc-side, .doc-toc { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.16) transparent; }
+    .doc-side::-webkit-scrollbar, .doc-toc::-webkit-scrollbar { width: 8px; }
+    .doc-side::-webkit-scrollbar-track, .doc-toc::-webkit-scrollbar-track { background: transparent; }
+    .doc-side::-webkit-scrollbar-thumb, .doc-toc::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+    }
+    .doc-side:hover::-webkit-scrollbar-thumb, .doc-toc:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,.26); background-clip: padding-box; }
     .doc-side .search {
       display: flex; align-items: center; gap: 8px;
       background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
@@ -174,16 +182,16 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="IVG Toolkit" />
   <meta property="og:title" content="Docs — IVG Toolkit After Effects scripts" />
-  <meta property="og:description" content="Full documentation for all 32 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements." />
+  <meta property="og:description" content="Full documentation for all 33 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements." />
   <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs.html" />
   <meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Docs — IVG Toolkit After Effects scripts" />
-  <meta name="twitter:description" content="Full documentation for all 32 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements." />
+  <meta name="twitter:description" content="Full documentation for all 33 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements." />
   <meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
   <meta name="theme-color" content="#0b0b0f" />
   <link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt (AI overview)" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","@id":"https://forge.mograph.life/apps/ae/docs.html#page","url":"https://forge.mograph.life/apps/ae/docs.html","name":"Docs — IVG Toolkit After Effects scripts","description":"Full documentation for all 32 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements.","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Docs","item":"https://forge.mograph.life/apps/ae/docs.html"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","@id":"https://forge.mograph.life/apps/ae/docs.html#page","url":"https://forge.mograph.life/apps/ae/docs.html","name":"Docs — IVG Toolkit After Effects scripts","description":"Full documentation for all 33 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements.","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Docs","item":"https://forge.mograph.life/apps/ae/docs.html"}]}]}</script>
   <!-- ae-seo:end -->
 </head>
 <body>
@@ -191,7 +199,7 @@
     <a class="l" href="index.html">
       <span class="mark"><i data-lucide="zap"></i></span>
       <span class="brand">IVG Toolkit</span>
-      <span class="ver">v1.0</span>
+      <span class="ver">v1.0.1</span>
     </a>
     <div class="r">
       <a href="index.html#library">Library</a>

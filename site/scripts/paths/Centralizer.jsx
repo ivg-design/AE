@@ -164,69 +164,90 @@
         return node;
     }
 
-    /** Accumulated (position - anchor) of every ancestor Vector Group, so a
-     *  group-local box can be shifted into LAYER space. Group scale/rotation
-     *  are not compounded (documented approximation). */
-    function groupOffsetOf(node) {
-        var off = [0, 0];
+    /** The four corners of a size-w×h box centred on c, as [x,y] points. */
+    function boxCorners(c, w, h) {
+        return [
+            [c[0] - w / 2, c[1] - h / 2], [c[0] + w / 2, c[1] - h / 2],
+            [c[0] + w / 2, c[1] + h / 2], [c[0] - w / 2, c[1] + h / 2]
+        ];
+    }
+
+    /** Map a point through one Vector Group's Transform: the full AE affine
+     *  P' = position + R(rotation) * (scale ∘ (P - anchor)). Missing sub-
+     *  properties fall back to identity so partial groups are still safe. */
+    function xformByGroup(P, tr) {
+        // pair(v, d): use v only when it is a real [x,y]; else fall back to d.
+        function pair(v, d) {
+            return (v && typeof v.length === "number" && v.length >= 2 &&
+                typeof v[0] === "number" && typeof v[1] === "number") ? v : d;
+        }
+        var pos = [0, 0], anc = [0, 0], scl = [100, 100], rot = 0;
+        try { pos = pair(tr.property("ADBE Vector Position").value, pos); } catch (eP) { }
+        try { anc = pair(tr.property("ADBE Vector Anchor Point").value, anc); } catch (eA) { }
+        try { scl = pair(tr.property("ADBE Vector Scale").value, scl); } catch (eS) { }
+        try { var rv = tr.property("ADBE Vector Rotation").value; if (typeof rv === "number") rot = rv; } catch (eR) { }
+        var dx = (P[0] - anc[0]) * (scl[0] / 100);
+        var dy = (P[1] - anc[1]) * (scl[1] / 100);
+        var rad = rot * Math.PI / 180, cs = Math.cos(rad), sn = Math.sin(rad);
+        return [pos[0] + dx * cs - dy * sn, pos[1] + dx * sn + dy * cs];
+    }
+
+    /** Push a set of group-local points up through every ancestor Vector Group
+     *  transform (position, anchor, SCALE and ROTATION — not just translation),
+     *  landing them in LAYER space. */
+    function pointsToLayerSpace(node, pts) {
         var parent = node.parentProperty;
         while (parent) {
             try {
                 if (parent.matchName === "ADBE Vector Group") {
                     var tr = parent.property("ADBE Vector Transform Group");
                     if (tr) {
-                        var gp = tr.property("ADBE Vector Position").value;
-                        var ga = tr.property("ADBE Vector Anchor Point").value;
-                        off[0] += gp[0] - ga[0];
-                        off[1] += gp[1] - ga[1];
+                        for (var i = 0; i < pts.length; i++) pts[i] = xformByGroup(pts[i], tr);
                     }
                 }
             } catch (e) { }
             if (parent.matchName === "ADBE Root Vectors Group") break;
             parent = parent.parentProperty;
         }
-        return off;
+        return pts;
     }
 
-    /** Layer-space bounding box of one leaf, or null when unmeasurable. */
+    /** Layer-space bounding box of one leaf, or null when unmeasurable. The
+     *  leaf's local extent is expressed as corner points, transformed through
+     *  the group chain, then re-min/maxed (so scale, rotation and nested groups
+     *  are all respected — a rotated box yields the AABB of its mapped corners). */
     function bboxOfLeaf(node, kind) {
-        var minX, minY, maxX, maxY, pos, size;
+        var pts = [], pos, size;
         try {
             if (kind === "path") {
                 var sh = node.property("ADBE Vector Shape").value;
                 var verts = sh.vertices;
                 if (!verts || verts.length === 0) return null;
-                minX = maxX = verts[0][0];
-                minY = maxY = verts[0][1];
-                for (var i = 1; i < verts.length; i++) {
-                    if (verts[i][0] < minX) minX = verts[i][0];
-                    if (verts[i][0] > maxX) maxX = verts[i][0];
-                    if (verts[i][1] < minY) minY = verts[i][1];
-                    if (verts[i][1] > maxY) maxY = verts[i][1];
-                }
+                for (var i = 0; i < verts.length; i++) pts.push([verts[i][0], verts[i][1]]);
             } else if (kind === "rect") {
                 pos = node.property("ADBE Vector Rect Position").value;
                 size = node.property("ADBE Vector Rect Size").value;
-                minX = pos[0] - size[0] / 2; maxX = pos[0] + size[0] / 2;
-                minY = pos[1] - size[1] / 2; maxY = pos[1] + size[1] / 2;
+                pts = boxCorners(pos, size[0], size[1]);
             } else if (kind === "ellipse") {
                 pos = node.property("ADBE Vector Ellipse Position").value;
                 size = node.property("ADBE Vector Ellipse Size").value;
-                minX = pos[0] - size[0] / 2; maxX = pos[0] + size[0] / 2;
-                minY = pos[1] - size[1] / 2; maxY = pos[1] + size[1] / 2;
+                pts = boxCorners(pos, size[0], size[1]);
             } else if (kind === "star") {
                 pos = node.property("ADBE Vector Star Position").value;
                 var r = node.property("ADBE Vector Star Outer Radius").value;
-                minX = pos[0] - r; maxX = pos[0] + r;
-                minY = pos[1] - r; maxY = pos[1] + r;
+                pts = boxCorners(pos, r * 2, r * 2);
             } else {
                 return null;
             }
-            var off = groupOffsetOf(node);
-            return {
-                minX: minX + off[0], maxX: maxX + off[0],
-                minY: minY + off[1], maxY: maxY + off[1]
-            };
+            pointsToLayerSpace(node, pts);
+            var minX = pts[0][0], maxX = pts[0][0], minY = pts[0][1], maxY = pts[0][1];
+            for (var j = 1; j < pts.length; j++) {
+                if (pts[j][0] < minX) minX = pts[j][0];
+                if (pts[j][0] > maxX) maxX = pts[j][0];
+                if (pts[j][1] < minY) minY = pts[j][1];
+                if (pts[j][1] > maxY) maxY = pts[j][1];
+            }
+            return { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
         } catch (e) {
             return null;
         }

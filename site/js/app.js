@@ -65,8 +65,19 @@
 
   // ---------- bundle builder (02 — THE COMMAND BAR) ----------
   const selected = new Set();
-  const PANEL_PATH = 'scripts/toolbar/IVGD Command Bar.jsx';
+  let platform = 'jsx';
+  const PANEL_PATH = 'scripts/toolbar/Build-a-Bar.jsx';
   const PANEL_ICON = id => `scripts/toolbar/icons/${id}.png`;
+  const NATIVE = 'download/native';
+  const ICON_MODS = ['shift', 'alt', 'cmd', 'ctrl'];
+  // jsx = the cross-platform ScriptUI panel; the rest ship a native .plugin/.aex
+  // (crisp vector icons) that scans an external ivg-scripts folder beside it.
+  const PLATFORMS = {
+    jsx:           { label: 'ScriptUI bundle (.zip)',        file: 'build-a-bar-scriptui.zip' },
+    'mac-silicon': { label: 'Mac · Apple Silicon (.zip)',    file: 'build-a-bar-mac-arm64.zip', bin: 'mac-silicon.zip', kind: 'mac', os: 'macOS Apple Silicon' },
+    'mac-intel':   { label: 'Mac · Intel (.zip)',            file: 'build-a-bar-mac-intel.zip', bin: 'mac-intel.zip',   kind: 'mac', os: 'macOS Intel' },
+    windows:       { label: 'Windows · x64 (.zip)',          file: 'build-a-bar-win-x64.zip',   bin: 'windows-x64.aex', kind: 'win', os: 'Windows x64' },
+  };
   // Extra files some scripts need beside them in the bundle (dest -> source URL).
   const BUNDLE_EXTRAS = {
     'sync-o-tron': [{ dest: 'ivg-scripts/projects/Sync-o-tron.aep', src: 'scripts/projects/Sync-o-tron.aep' }],
@@ -152,14 +163,14 @@
   $('#selNone') && $('#selNone').addEventListener('click', () => { selected.clear(); renderBuilder(); });
 
   function bundleReadme(list) {
-    return `IVGD Command Bar bundle — ${list.length} script${list.length === 1 ? '' : 's'} (MIT)
+    return `Build-a-Bar bundle — ${list.length} script${list.length === 1 ? '' : 's'} (MIT)
 =========================================================
 
 INSTALL
-  1. Copy "IVGD Command Bar.jsx" AND the whole "ivg-scripts" folder into:
+  1. Copy "Build-a-Bar.jsx" AND the whole "ivg-scripts" folder into:
        After Effects > Scripts > ScriptUI Panels
   2. Restart After Effects (or File > Scripts > Rescan Script Folder).
-  3. Open Window > IVGD Command Bar.jsx — a dockable, resizable toolbar
+  3. Open Window > Build-a-Bar.jsx — a dockable, resizable toolbar
      with one icon button per script. Buttons reflow when you dock it
      vertical, horizontal, or as a grid.
 
@@ -176,40 +187,157 @@ Docs & updates: ${REPO}
 `;
   }
 
+  // ---- platform picker (WAI-ARIA radiogroup: roving tabindex + arrow keys) ----
+  function setPlatform(p, focus) {
+    if (!PLATFORMS[p]) return;
+    platform = p;
+    $$('#builderPlat .plat-btn').forEach(b => {
+      const on = b.dataset.plat === p;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-checked', on ? 'true' : 'false');
+      b.tabIndex = on ? 0 : -1;            // only the checked radio is a tab stop
+      if (on && focus) b.focus();
+    });
+    const lbl = $('#buildBtnLabel');
+    if (lbl) lbl.textContent = `Download ${PLATFORMS[p].label}`;
+    const note = $('#builderNote');
+    if (note) note.textContent = p === 'jsx'
+      ? 'ScriptUI panel — drop the .jsx + ivg-scripts into Scripts › ScriptUI Panels. Any AE, no install.'
+      : 'Native plugin — drop the IVGD folder into AE’s Plug-ins folder (INSTALL.txt inside). Crisp vector icons at any size.';
+  }
+  const platGroup = $('#builderPlat');
+  if (platGroup) {
+    platGroup.addEventListener('click', e => {
+      const b = e.target.closest('[data-plat]');
+      if (b) setPlatform(b.dataset.plat);
+    });
+    platGroup.addEventListener('keydown', e => {
+      const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+      if (!(e.key in keys)) return;
+      e.preventDefault();
+      const order = Object.keys(PLATFORMS);
+      const next = order[(order.indexOf(platform) + keys[e.key] + order.length) % order.length];
+      setPlatform(next, true);             // arrow moves selection AND focus (radio pattern)
+    });
+  }
+
+  function triggerDownload(blob, name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+  async function fetchText(url, label) {
+    const r = await fetch(url); if (!r.ok) throw new Error(label || url); return r.text();
+  }
+  async function fetchBuf(url, label) {
+    const r = await fetch(url); if (!r.ok) throw new Error(label || url); return r.arrayBuffer();
+  }
+
+  // ScriptUI (.jsx): the cross-platform panel + PNG icons + category subfolders.
+  async function assembleJsx(zip, list) {
+    zip.file('Build-a-Bar.jsx', await fetchText(encodeURI(PANEL_PATH), 'panel'));
+    for (const s of list) {
+      zip.file(`ivg-scripts/${s.category}/${jsxName(s)}`, await fetchText(s.srcPath, s.name));
+      // base (24px) + @2x HiDPI sibling + Shift/Cmd rollover variants (+ their @2x)
+      for (const suffix of ['', '@2x', '.shift', '.shift@2x', '.cmd', '.cmd@2x']) {
+        const r = await fetch(`scripts/toolbar/icons/${s.id}${suffix}.png`);
+        if (r.ok) zip.file(`ivg-scripts/icons/${s.id}${suffix}.png`, await r.arrayBuffer());
+      }
+    }
+    for (const s of list) for (const ex of (BUNDLE_EXTRAS[s.id] || [])) {
+      const xr = await fetch(encodeURI(ex.src));
+      if (xr.ok) zip.file(ex.dest, await xr.arrayBuffer());
+    }
+    zip.file('ivg-scripts/tooltips.txt',
+      list.map(s => `${jsxName(s).replace(/\.jsx$/, '')}|${(s.tagline || '').replace(/\|/g, '/')}`).join('\n'));
+    zip.file('README.txt', bundleReadme(list));
+  }
+
+  // Native: the platform binary + an EXTERNAL ivg-scripts folder (flat jsx + SVG
+  // icons + manifests) — the exact layout the .plugin/.aex scans beside itself.
+  async function assembleNative(zip, list, plat) {
+    const R = 'IVGD';
+    if (plat.kind === 'mac') {                      // unzip the hosted .plugin bundle into IVGD/
+      const inner = await JSZip.loadAsync(await fetchBuf(`${NATIVE}/${plat.bin}`, `${plat.os} plugin`));
+      const paths = [];
+      inner.forEach((path, f) => { if (!f.dir) paths.push(path); });
+      for (const p of paths) zip.file(`${R}/${p}`, await inner.file(p).async('arraybuffer'));
+    } else {                                        // Windows: single .aex file
+      zip.file(`${R}/IvgdBar.aex`, await fetchBuf(`${NATIVE}/${plat.bin}`, `${plat.os} plugin`));
+    }
+    for (const s of list) {
+      zip.file(`${R}/ivg-scripts/${jsxName(s)}`, await fetchText(s.srcPath, s.name));
+      const base = await fetch(`${NATIVE}/icons/${s.id}.svg`);
+      if (base.ok) zip.file(`${R}/ivg-scripts/icons/${s.id}.svg`, await base.text());
+      for (const mod of ICON_MODS) {
+        const v = await fetch(`${NATIVE}/icons/${s.id}.${mod}.svg`);
+        if (v.ok) zip.file(`${R}/ivg-scripts/icons/${s.id}.${mod}.svg`, await v.text());
+      }
+    }
+    for (const s of list) for (const ex of (BUNDLE_EXTRAS[s.id] || [])) {
+      const xr = await fetch(encodeURI(ex.src));
+      if (xr.ok) zip.file(`${R}/${ex.dest}`, await xr.arrayBuffer());
+    }
+    for (const lg of ['logo-landscape.svg', 'logo-portrait.svg']) {   // fixed header logo
+      const r = await fetch(`${NATIVE}/${lg}`);
+      if (r.ok) zip.file(`${R}/ivg-scripts/${lg}`, await r.text());
+    }
+    const man = {}, clean = v => String(v || '').replace(/[\t\r\n]+/g, ' ').trim();
+    for (const s of list) man[s.id] = { name: s.displayName || s.name || s.id, desc: s.tagline || '' };
+    zip.file(`${R}/ivg-scripts/manifest.json`, JSON.stringify(man));
+    zip.file(`${R}/ivg-scripts/manifest.tsv`,
+      list.map(s => `${s.id}\t${clean(man[s.id].name)}\t${clean(man[s.id].desc)}`).join('\n'));
+    zip.file(`${R}/INSTALL.txt`, nativeReadme(list, plat));
+  }
+
+  function nativeReadme(list, plat) {
+    const mac = plat.kind === 'mac';
+    const dest = mac
+      ? '/Applications/Adobe After Effects <version>/Plug-ins/'
+      : 'C:\\Program Files\\Adobe\\Adobe After Effects <version>\\Support Files\\Plug-ins\\';
+    const bin = mac ? 'IvgdBar.plugin' : 'IvgdBar.aex';
+    return `Build-a-Bar — native plugin (${plat.os})
+${'='.repeat(56)}
+
+INSTALL
+  1. Quit After Effects.
+  2. Copy this whole "IVGD" folder into AE's plug-ins folder:
+       ${dest}
+     (it must contain ${bin} AND the ivg-scripts folder, side by side)
+  3. Launch After Effects.
+  4. Window menu -> "Build-a-Bar" opens the dockable panel.
+${mac ? `
+  If macOS blocks it (downloaded + ad-hoc signed), clear quarantine once in Terminal:
+     xattr -dr com.apple.quarantine "<plug-ins path>/IVGD/IvgdBar.plugin"
+` : ''}
+NOTES
+  - Crisp vector icons at any panel size. Hold Shift or Ctrl over an icon for
+    rollover variants (where a script provides them).
+  - The gear (bottom-right) sets icon size + spacing (persisted).
+
+INCLUDED (${list.length})
+${list.map(s => `  - ${s.name} v${s.version || '1.0'}`).join('\n')}
+
+Docs & updates: ${REPO}
+`;
+  }
+
   async function buildBundle() {
     const list = scripts.filter(s => selected.has(s.id));
     if (!list.length) { toast('Pick at least one script first'); return; }
+    const plat = PLATFORMS[platform];
     const btn = $('#buildBundle');
     btn.disabled = true;
-    toast(`Building bundle (${list.length} scripts)…`);
+    toast(`Building ${plat.label} — ${list.length} script${list.length === 1 ? '' : 's'}…`);
     try {
       const zip = new JSZip();
-      const panel = await fetch(encodeURI(PANEL_PATH)).then(r => { if (!r.ok) throw new Error('panel fetch'); return r.text(); });
-      zip.file('IVGD Command Bar.jsx', panel);
-      for (const s of list) {
-        const code = await fetch(s.srcPath).then(r => { if (!r.ok) throw new Error(s.name); return r.text(); });
-        zip.file(`ivg-scripts/${s.category}/${jsxName(s)}`, code);
-        const ir = await fetch(PANEL_ICON(s.id));
-        if (ir.ok) zip.file(`ivg-scripts/icons/${s.id}.png`, await ir.arrayBuffer());
-        const ar = await fetch(`scripts/toolbar/icons/${s.id}.alt.png`);
-        if (ar.ok) zip.file(`ivg-scripts/icons/${s.id}.alt.png`, await ar.arrayBuffer());
-      }
-      for (const s of list) {
-        for (const ex of (BUNDLE_EXTRAS[s.id] || [])) {
-          const xr = await fetch(encodeURI(ex.src));
-          if (xr.ok) zip.file(ex.dest, await xr.arrayBuffer());
-        }
-      }
-      zip.file('ivg-scripts/tooltips.txt',
-        list.map(s => `${jsxName(s).replace(/\.jsx$/, '')}|${(s.tagline || '').replace(/\|/g, '/')}`).join('\n'));
-      zip.file('README.txt', bundleReadme(list));
+      if (platform === 'jsx') await assembleJsx(zip, list);
+      else await assembleNative(zip, list, plat);
       const blob = await zip.generateAsync({ type: 'blob' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'ivgd-command-bar.zip';
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-      toast(`Bundle ready — ${list.length} script${list.length === 1 ? '' : 's'} + command bar`);
+      triggerDownload(blob, plat.file);
+      toast(`Bundle ready — ${plat.label}`);
     } catch (err) {
       toast('Bundle failed: ' + err.message);
     } finally {
@@ -217,6 +345,7 @@ Docs & updates: ${REPO}
     }
   }
   $('#buildBundle') && $('#buildBundle').addEventListener('click', buildBundle);
+  setPlatform('jsx');
 
   // ---------- library ----------
   let activeCat = 'layers';

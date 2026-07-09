@@ -1,7 +1,7 @@
 {
-  "total": 32,
+  "total": 33,
   "categories": {
-    "animation": 3,
+    "animation": 4,
     "composition": 3,
     "effects": 4,
     "keyframes": 4,
@@ -9,5 +9,5 @@
     "paths": 5,
     "utilities": 3
   },
-  "generated": "2026-07-05T03:20:20.670Z"
+  "generated": "2026-07-09T00:43:13.287Z"
 }
