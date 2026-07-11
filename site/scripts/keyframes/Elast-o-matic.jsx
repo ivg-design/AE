@@ -3,7 +3,7 @@
  *
  * @name Elast-o-matic
  * @author IVG Design
- * @version 1.1.0
+ * @version 1.1.1
  * @date 2026-07-11
  * @license MIT
  * @ui HEADLESS
@@ -24,8 +24,8 @@
  * • Inertial variant controls: Amplitude, Frequency, Decay, Duration, Delay (in frames), External Driver (+ Layer / Animated Property)
  * • Bounce variant controls: Elasticity, Gravity, Number of bounces
  * • Inertial variant can follow ANOTHER layer's motion via the External Driver checkbox + layer picker
- * • Select a SUBSET of a property's keyframes (>= 2) to confine the effect to that keyframe span,
- *   leaving the interpolation after the selection untouched; select all (or the property) for the whole timeline
+ * • Select a SUBSET of a property's keyframes (>= 2) to overshoot only off those keys — unselected
+ *   keyframes (and the motion after them) stay native; select all (or the property) for the whole timeline
  * • Hold Cmd/Ctrl at launch to switch from Inertial Bounce to Bounce
  *
  * @usage
@@ -246,24 +246,39 @@
         return fx;
     }
 
-    // If a proper SUBSET of a property's keyframes is selected (>= 2, but not all),
-    // return the time window [firstSelected, lastSelected]; else null (whole timeline).
-    function selectedKeyWindow(prop) {
+    // The times of a property's selected keyframes when a proper SUBSET is selected
+    // (>= 2, but not all); else null (whole timeline). Must be read BEFORE any effect
+    // is added — addProperty() changes the timeline selection and would clobber it.
+    function selectedKeyTimes(prop) {
         var n = prop.numKeys;
         if (!n || n < 2) return null;
         var sel;
-        try { sel = prop.selectedKeys; } catch (eSel) { sel = null; }   // ascending indices
+        try { sel = prop.selectedKeys; } catch (eSel) { sel = null; }
         if (!sel || sel.length < 2) return null;   // 0-1 keys selected -> whole timeline
         if (sel.length >= n) return null;          // all keys selected -> whole timeline
-        return { start: prop.keyTime(sel[0]), end: prop.keyTime(sel[sel.length - 1]) };
+        var times = [];
+        for (var i = 0; i < sel.length; i++) times.push(prop.keyTime(sel[i]));
+        return times;
     }
 
-    // Restrict the expression to the selected keyframe window: outside it, return
-    // the native value so the interpolation after the selection is left untouched.
-    function wrapWindow(core, win) {
-        if (!win) return core;
+    // Confine the effect to the SELECTED keyframes: at any time find the key driving
+    // the value (the last key at/before now); overshoot only when that key is one of
+    // the selected ones, otherwise return the native value so unselected keyframes
+    // (and the interpolation after them) are left untouched. null => whole timeline.
+    function wrapSelected(core, times) {
+        if (!times) return core;
         return [
-            'if (time < ' + win.start + ' || time > ' + win.end + ') {',
+            'var _sel = [' + times.join(',') + '];',
+            'var _dk = (numKeys > 0) ? nearestKey(time).index : 0;',
+            'if (_dk > 0 && key(_dk).time > time) _dk--;',
+            'var _on = false;',
+            'if (_dk > 0) {',
+            '    var _kt = key(_dk).time;',
+            '    for (var _i = 0; _i < _sel.length; _i++) {',
+            '        if (Math.abs(_kt - _sel[_i]) < 0.0005) { _on = true; break; }',
+            '    }',
+            '}',
+            'if (!_on) {',
             '    value;',
             '} else {',
             core,
@@ -294,6 +309,14 @@
             if (valueProps.length === 0) continue;
 
             var effectsProp = lyr.property("ADBE Effect Parade");
+
+            // Capture each property's selected-key times NOW, before adding the
+            // controller — addProperty() reshuffles the timeline selection.
+            var selTimesList = [];
+            for (var c = 0; c < valueProps.length; c++) {
+                selTimesList.push(selectedKeyTimes(valueProps[c]));
+            }
+
             var controller = getOrAddController(effectsProp, data, ctrlName);
 
             for (var v = 0; v < valueProps.length; v++) {
@@ -302,7 +325,7 @@
                     var core = useBounce
                         ? buildBounceExpression(ctrlName)
                         : buildInertialExpression(ctrlName);
-                    prop.expression = wrapWindow(core, selectedKeyWindow(prop));
+                    prop.expression = wrapSelected(core, selTimesList[v]);
                     rigged++;
                 } catch (ePer) {
                     alert("Elast-o-matic: could not rig \"" + valueProps[v].name + "\" on \"" +
