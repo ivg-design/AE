@@ -1,11 +1,13 @@
 # Elast-o-matic
 > Give any keyframed property physical follow-through in one click — springy elastic overshoot by default, or gravity bounces when you hold Cmd/Ctrl at launch.
 
-**Category:** keyframes · **Version:** 1.0.0 · **UI:** HEADLESS (variant chosen by the modifier key held at launch)
+**Category:** keyframes · **Version:** 1.1.0 · **UI:** HEADLESS (variant chosen by the modifier key held at launch)
 
 ## What it does
 
-Elast-o-matic adds automatic follow-through after your keyframes, with no baking and no extra keyframes. Select one or more keyframed properties, run it, and each property gets its own controller effect plus an expression that reacts to the property's existing keys — every keyframe arrival gets the overshoot treatment, not just the last one.
+Elast-o-matic adds automatic follow-through after your keyframes, with no baking and no extra keyframes. Select one or more keyframed properties, run it, and each **layer** with a selection gets one controller effect plus an expression on every selected property that reacts to that property's existing keys — every keyframe arrival gets the overshoot treatment, not just the last one.
+
+It works across a whole selection at once. Select properties on several layers and each layer gets **its own** controller (added once per layer) driving all of that layer's selected properties. And you can scope it in time: select just **some** of a property's keyframes (two or more) and the effect is confined to that span — the interpolation after the selection is left untouched.
 
 There are two variants in one tool. The default **Inertial Bounce** is a decaying spring: motion overshoots and oscillates back like elastic. Hold **Cmd (macOS) / Ctrl (Windows) while launching** — from the IVGD Command Bar the icon swaps to the bounce curve while the key is down — to apply **Bounce** instead: gravity bounces that settle, like a ball hitting the floor. Everything stays editable afterwards from the Effect Controls panel.
 
@@ -13,7 +15,7 @@ The Inertial variant can even follow *another* layer's motion: tick External Dri
 
 ## Controls & options
 
-Each rigged property gets one effect on its own layer, named `<Property> Inertial Bounce` or `<Property> Bounce`.
+Each layer with a selection gets one controller effect, named `Inertial Bounce` or `Bounce`, shared by all the selected properties on that layer (each property still reacts to its own keyframes; they share the tuning below). Re-running reuses a layer's existing controller instead of stacking a new one.
 
 **Inertial Bounce controls**
 
@@ -40,21 +42,23 @@ Each rigged property gets one effect on its own layer, named `<Property> Inertia
 
 1. Animate a property normally (at least one keyframe).
 2. Select the property (or several, across layers) and run Elast-o-matic — hold Cmd/Ctrl for the Bounce variant.
-3. Scrub: motion now overshoots (or bounces) after each keyframe. Tune from Effect Controls.
+3. To confine the effect to part of the timeline, select just the keyframes you want (two or more) before running; select the whole property (or all its keys) to affect the whole timeline.
+4. Scrub: motion now overshoots (or bounces) after each keyframe. Tune from Effect Controls.
 
 ## Notes
 
-- Re-running on the same property adds another controller effect; delete the old one first to avoid same-name confusion.
+- One controller per layer: re-running reuses it, and selecting properties on multiple layers rigs each layer independently (the effect no longer piles onto the first selected layer).
+- Selecting a subset of a property's keyframes confines the effect to `[first selected key … last selected key]`; outside that window the native interpolation is returned unchanged.
 - Remove the expression from the property to un-rig it (the effect can stay or go).
 - The FFX-registration snippet (temp .ffx + throwaway comp) is based on "Apply Pseudo Effect as Animation Preset" © 2017 Tomas Šinkūnas, rendertom.com; the tool itself is IVG Design's.
 
 ## Requirements & edge cases
 
-- Needs an open comp, a selected layer, and at least one selected property — each missing piece alerts and exits cleanly.
+- Needs an open comp and at least one selected keyframeable property — each missing piece alerts and exits cleanly.
 - First run in a project may need "Allow Scripts to Write Files and Access Network" enabled (the controller is registered from a temporary .ffx).
 - The Bounce variant needs real arrival velocity — properties eased to zero velocity at the key won't bounce.
 - Expressions reference the controller by name; renaming it breaks the link.
 
 ## How it works
 
-The script picks its variant from `ScriptUI.environment.keyboardState` at launch (metaKey/ctrlKey → Bounce). For each selected property it ensures the pseudo effect is registered with AE (`canAddProperty` check; if missing, the embedded FFX binary is written to the temp folder and applied once on a throwaway comp), adds the controller via `addProperty(matchName)`, names it after the property, and assigns the expression. The Inertial expression finds the last keyframe before the current time (its own keys, or the External Driver's), measures arrival velocity with `velocityAtTime()`, and adds a decaying sine (`sin(freq·t·2π) / e^(decay·t)`); the Bounce expression converts arrival velocity into a gravity-bounce series, each bounce losing energy by the Elasticity factor, until Number of bounces is exhausted. One undo group wraps the whole run.
+The script picks its variant from `ScriptUI.environment.keyboardState` at launch (metaKey/ctrlKey → Bounce). It walks every layer in the comp, reads `layer.selectedProperties`, and for each layer that has expressible selections it registers the pseudo effect if needed (`canAddProperty` check; if missing, the embedded FFX binary is written to the temp folder and applied once on a throwaway comp), adds or reuses one controller via `addProperty(matchName)`, and assigns each selected property an expression pointing at that controller. When a proper subset of a property's keyframes is selected, the expression is wrapped in a `time < first || time > last` guard so it only overshoots inside the selected span. The Inertial expression finds the last keyframe before the current time (its own keys, or the External Driver's), measures arrival velocity with `velocityAtTime()`, and adds a decaying sine (`sin(freq·t·2π) / e^(decay·t)`); the Bounce expression converts arrival velocity into a gravity-bounce series, each bounce losing energy by the Elasticity factor, until Number of bounces is exhausted. One undo group wraps the whole run.

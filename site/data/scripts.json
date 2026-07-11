@@ -426,16 +426,17 @@
     "name": "Elast-o-matic",
     "displayName": "Elast-o-matic",
     "category": "keyframes",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "ui": "HEADLESS",
     "tagline": "Add elastic overshoot or gravity bounce after any keyframe — hold Cmd/Ctrl at launch to switch variants, tune everything in Effect Controls.",
-    "description": "Select keyframed properties and run it: each gets a controller effect plus an expression that overshoots after every keyframe. Default is a decaying elastic spring (Amplitude/Frequency/Decay); hold Cmd or Ctrl while launching for gravity bounces (Elasticity/Gravity/Number of bounces) — the command-bar icon swaps while the key is down. The inertial variant can even follow another layer's motion via its External Driver controls.",
+    "description": "Select keyframed properties across one or more layers and run it: each layer gets its own controller effect plus an expression that overshoots after every keyframe — one controller per layer, not piled onto the first. Default is a decaying elastic spring (Amplitude/Frequency/Decay); hold Cmd or Ctrl while launching for gravity bounces (Elasticity/Gravity/Number of bounces) — the command-bar icon swaps while the key is down. Select just some of a property's keyframes (two or more) to confine the effect to that span, or follow another layer's motion via the inertial variant's External Driver.",
     "functionality": [
-      "Applies a per-property pseudo-effect controller named \"<Property> Inertial Bounce\" or \"<Property> Bounce\"",
+      "Adds ONE pseudo-effect controller (\"Inertial Bounce\" or \"Bounce\") to each layer that has selected properties, and drives every selected property on that layer from it",
+      "Rigs multiple properties across multiple layers in one run — each layer gets its own controller",
       "Inertial variant controls: Amplitude, Frequency, Decay, Duration, Delay (in frames), External Driver (+ Layer / Animated Property)",
       "Bounce variant controls: Elasticity, Gravity, Number of bounces",
       "Inertial variant can follow ANOTHER layer's motion via the External Driver checkbox + layer picker",
-      "Works on any keyframeable property; multiple selected properties are rigged in one run",
+      "Select a SUBSET of a property's keyframes (>= 2) to confine the effect to that keyframe span, leaving the interpolation after the selection untouched; select all (or the property) for the whole timeline",
       "Hold Cmd/Ctrl at launch to switch from Inertial Bounce to Bounce"
     ],
     "usage": [

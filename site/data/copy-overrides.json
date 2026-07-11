@@ -1,138 +1,138 @@
 {
- "pathmaster": {
-  "tagline": "Animate a layer's Position along any shape-layer path — retime, re-ease, trim, loop or ping-pong it afterwards from a single layer marker.",
-  "description": "Select a Position property, pick a path from any shape layer, and PathMaster writes a self-contained expression that moves the layer along it. All timing lives on a layer marker: slide it to change the start, stretch its duration to retime, and edit its comment — Easing: x1,y1,x2,y2 || Segment 20 - 75% || Loop or Ping-Pong — to reshape the ride without re-running the script. A Reverse Direction checkbox on the layer flips travel at any time."
- },
- "limb-a-tron": {
-  "tagline": "Rig a two-segment IK/FK limb in seconds — drag one null to bend it, tune everything from one Limb Control effect, and bake it when done.",
-  "description": "Creates a shape-layer limb plus a \"<name> CTRL\" null carrying a \"<name> Limb Control\" pseudo-effect with every rig parameter — segment lengths, widths, curvature, Noodle Mode, FK/IK angles, pop prevention. Drag the null for IK, or check Disable IK for manual FK sliders. Run it again on an existing rig to bake the animation into simplified keyframes, strip the unused render mode, and remove the controller."
- },
- "linearizer": {
-  "tagline": "Drive existing keyframed animation from any slider, position, or rotation — scrubbing the driver scrubs the animation.",
-  "description": "Rewires a keyframed property with an expression so a driver property's Min–Max sweep plays back the original keyframe segments. Handles 1D/2D/3D properties and shape paths, batches multiple targets on one shared timing scale, and adds a \"Uniform Interpolation\" checkbox to the driver layer to switch between relative and even segment spacing live in Effect Controls."
- },
- "guiderator": {
-  "tagline": "Drop exact ruler guides by typing a number — or a formula like 1920/2 — into a dockable panel, then click H or V.",
-  "description": "A dockable panel with a calculator field: type 540 or 1920/2 and it evaluates in place. Click H for a horizontal guide or V for a vertical guide at the result, and toggle guide locking with the padlock button without touching the View menu."
- },
- "slidotron-16x9": {
-  "tagline": "Build a horizontal slide-reveal rig in one click — two nested 4K comps, mirrored alpha mattes, and one 0–100 \"CTRL\" slider plays the transition.",
-  "description": "Select a comp and run: it creates \"Sliders 16x9\" and \"Slide 16x9\" (3840×2160, 60 fps), wires mirrored mask panels as alpha mattes, and drops a layer carrying a Slider Control named \"CTRL\" into your comp. Keyframe CTRL from 0 to 100 to reveal whatever you place in \"Slide 16x9\". Expressions bind the \"Sliders 16x9\" layer and \"CTRL\" effect by name — don't rename them. Requires AE 23.0+ (uses setTrackMatte)."
- },
- "slidotron-9x16": {
-  "tagline": "Build a vertical 9:16 slide-reveal rig in one click — two nested 1080×1920 comps, mirrored mattes, and one 0–100 \"CTRL\" slider plays the transition.",
-  "description": "Sized for Stories, TikTok, and Shorts: select a comp and run to create \"Sliders 9x16\" and \"Slide 9x16\" (1080×1920, 60 fps) with mirrored alpha-matte panels and a Slider Control named \"CTRL\" in your comp. Keyframe CTRL from 0 to 100 to reveal your artwork in \"Slide 9x16\". Names are expression-bound — don't rename the layer or effect. Requires AE 23.0+ and exits cleanly on older versions."
- },
- "split-o-matic-9x16": {
-  "tagline": "Inject a ready-made picture-in-picture split-screen rig — mask, shadow, crop bars, on-canvas controllers — into your 9:16 comp.",
-  "description": "Adds ten pre-wired shape layers to the active comp: a rounded PiP mask with a Drop Shadow copy, top/bottom crop rectangles, and hidden controller/anchor layers. Mask size and shadow look are tuned from sliders on the \"PiP MASK PSR\" controller layer. A single prompt asks for a name prefix so multiple rigs can coexist in one comp; the baked-in geometry fits a 1080×1920 frame."
- },
- "burstmate": {
-  "tagline": "Drop a fully rigged radial stroke burst into your comp — every color, length, density, and dash tuned from one StrokeBurst control panel.",
-  "description": "Creates a hidden \"BURST CTRL\" guide layer plus two repeater-driven stroke layers whose every visual property is expression-linked to a \"StrokeBurst\" pseudo-effect. Adjust or keyframe colors, widths, spoke lengths, density, dash patterns, and the rotation offset between the two stroke sets from Effect Controls. The burst-out reveal comes pre-animated with eased Trim Paths keyframes, and the whole rig moves with the control layer."
- },
- "chromablenderizer": {
-  "tagline": "Ramp a color range across selected fills, strokes, and effect colors — pick Start/End, then apply a linear blend or random scatter in one click.",
-  "description": "A modeless palette: set Start and End colors with the bundled color-wheel picker or HSB sliders, select two or more color properties in AE, and click Apply Colors. Color Gamut mode walks hue the shortest way around the wheel with shared saturation; Grayscale interpolates brightness only; Randomize scatters each target within the range. Refresh Count confirms what's targeted before you commit."
- },
- "sfxmaster": {
-  "tagline": "Mix Voice Over, Sound Effects, and Music from three master sliders — audio layers auto-categorized by marker comments and wired in one pass.",
-  "description": "Builds an \"SFX CTRL\" null with Voice Over / Sound Effects / Music sliders and expression-links every audio layer's Stereo Mixer levels to the matching one. Routing reads each layer's first marker comment: \"voice over\" or \"music\" (case-insensitive substring) picks the bucket; everything else lands in Sound Effects. Recurses into precomps so one console controls the whole nested structure."
- },
- "sync-o-tron": {
-  "tagline": "Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio Reactor template.",
-  "description": "Select a property, hit TuneSync, and Sync-o-tron generates the easing dropdown and per-axis Min/Max sliders, wired to the Output Power of an AUDIO REACTOR comp. The Audio Reactor template project ships in the bundle and is imported automatically the first time you launch in a project without one — drop your track in and everything from Opacity to 3D Position can dance to it."
- },
- "keybot": {
-  "tagline": "Batch-edit selected keyframe values with =, +, −, ×, ÷ per axis — timing, easing, and interpolation stay untouched.",
-  "description": "A dockable panel: check X/Y/Z, type an operand, click an operator, and every selected keyframe on every selected property and layer updates in one undo step. Handles 1D, 2D, and 3D numeric properties (1D values ride the X field), preserves keyframe times and ease exactly, and treats division by zero as a safe no-op."
- },
- "keyclonematic": {
-  "tagline": "Repeat a hand-tuned keyframe set down the timeline at a fixed or decaying interval — values, easing, and spatial tangents cloned faithfully.",
-  "description": "Clones your selected keyframes a set number of times — or fills the rest of the comp — spaced by an interval in frames. Optional Temporal Decay shrinks the gap per repetition on a Linear, Ease In, or Ease Out curve so cycles accelerate over time. Every clone keeps its value, interpolation types, temporal ease, spatial tangents, roving, and label color."
- },
- "valuatron": {
-  "tagline": "Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo.",
-  "description": "A headless one-shot: select layers and property rows, run, and each keyframeable property gets a keyframe at the current time holding its current evaluated value. Expression-driven properties capture the expression's output at that instant. No dialog, no options — one undo reverses the whole batch."
- },
- "iteratron": {
-  "tagline": "Spread a property evenly across a layer stack — link a start value and an end value, and every layer in between gets its interpolated step.",
-  "description": "Highlight a property on a start layer and click Link Start Property; do the same on an end layer, then OK — evenly interpolated values are written to every unlocked, visible layer between them. Property-agnostic (Position, Scale, Rotation, colors, effect sliders) and keyframe-aware: properties that already have keys get a value at the playhead instead of being overwritten."
- },
- "nullbot": {
-  "tagline": "Parent a group of layers to one master null at their average position — move, scale, or rotate the whole group from a single handle.",
-  "description": "NullBot creates a single null named \"NullBot\" at the averaged position of the selected layers and parents them all to it, so the group moves, scales, and rotates from one control. The null's in/out points span the whole selection, and it becomes 3D if any selected layer is 3D. It is headless — no dialog, nothing to configure."
- },
- "ordermaster": {
-  "tagline": "Reverse or shuffle the stacking order of a contiguous run of selected layers, or the contiguous shape groups inside one shape layer.",
-  "description": "OrderMaster flips or randomizes the order of a contiguous run of selected layers — or of the contiguous shape groups inside a single shape layer — in place, without dragging each item in the Timeline. A one-checkbox dialog picks Reverse (the default) or Randomize. Both keep every property and animation intact and run as a single undo step."
- },
- "parent-o-bot": {
-  "tagline": "Blend a layer's Position, Scale, Rotation, and Opacity toward up to two parent layers, each with its own 0–100% influence slider.",
-  "description": "Parent-o-bot rigs each selected layer with a \"Multi_Parent\" effect that blends its Position, Rotation, Scale, and Opacity toward one or two chosen parents, without native parenting. Parent 1 / Parent 2 pickers set the parents, per-property checkboxes enable blending, and Position/Scale/Rotation/Opacity Influence sliders (0–100%) set the weights — all animatable in Effect Controls after the fact."
- },
- "rectangulator": {
-  "tagline": "Convert a parametric rectangle into a bezier shape with independent per-corner rounding and a 9-point anchor grid, driven by one effect.",
-  "description": "Rectangulator rebuilds a parametric (Rectangle tool) rectangle as a custom bezier shape with independently roundable corners and a nine-point anchor grid, preserving the original fills, strokes, and transform. A \"Rectangulator Controls\" effect drives it entirely by expression: Rectangle Width/Height sliders, four per-corner rounding sliders, and a nine-item Anchor Point popup, all keyframeable."
- },
- "subtitleforge": {
-  "tagline": "Build a full caption rig in one run — text plus a self-sizing box with stroke and drop shadow, all driven from one Subtitle Setup effect.",
-  "description": "SubtitleForge builds a complete subtitle rig in a single headless run: a SUBTITLE text layer plus an auto-sizing TXTBox background box wired together with expressions. Each caption line is authored by editing layer markers on SUBTITLE (the marker's comment becomes the on-screen text, its time+duration the visibility window), while all styling comes from one Subtitle Setup pseudo-effect grouped into Font (Font Color/Size/Opacity), Box (Offset X/Y, Box Roundness/Box Color/Opacity), Stroke (Stroke/Stroke Width/Stroke Color), and Shadow (Shadow/Shadow Color/Shadow Opacity, Distance, Spread, Size, Angle). A separate Enable Type On checkbox adds an optional per-character typewriter reveal."
- },
- "textmate": {
-  "tagline": "Type a word and highlight every case-sensitive occurrence of it in a text layer, each with its own Range Selector on a new animator.",
-  "description": "TextMate scans a selected text layer's Source Text for every case-sensitive occurrence of a typed string and builds one character-index Range Selector per match inside a single new animator named \"Highlight Animator (<term>)\", with a shared random Fill Color from a 12-color palette. Each occurrence gets its own selector, so you can animate highlights independently. The run is additive and never alters the layer's text or existing animators."
- },
- "timewarp-a-tron": {
-  "tagline": "Drive a layer's Time Remap from a 0–100 slider that scrubs a user-defined in/out frame range, framerate-correct and keyframe-free.",
-  "description": "TimeWarp-a-tron links a time-remapped layer to a controller slider through a two-button red-to-green pick flow. It adds an In/Out Range point control (X=in frame, Y=out frame, default [0,60]) to the source layer and a Slider Control named \"<Source Layer> || Time Control\" (0–100) to the controller, joined by a generated expression that maps the slider into seconds using the comp's frame rate. Drive the slider to scrub the range; one controller can drive multiple layers."
- },
- "centralizer": {
-  "tagline": "Drop center and bounding-box guides around anything — one shape, a multiselected group of shapes, text, footage or a precomp.",
-  "description": "Pick one or MORE shapes from the layer's list (bezier paths and parametric Rectangles/Ellipses/Polystars alike) and Centralizer adds comp-space guides for their combined bounding box, its center, and/or the layer anchor. Text, footage, precomp and solid layers get the same options measured from their rendered bounds. Parenting and layer transforms are respected."
- },
- "distributron": {
-  "tagline": "Spread a comp's layers evenly along a shape path, each auto-rotating to follow the curve, all steered live from one CTRL null.",
-  "description": "Distributron distributes every other layer in a composition along one shape layer's path, evenly spaced and each auto-rotated to follow the curve, all parented to a CTRL null so the whole spread animates from one controller and re-flows live as the path is reshaped. Ongoing control lives on the Distribute Along the Path pseudo-effect on CTRL: Randomize Rotation, Rotation Offset, Start Distribution Offset, End Distribution Offset, and First/Last Layer Index, plus a Distribution Path Layer picker the script sets automatically."
- },
- "originator": {
-  "tagline": "Recenter a shape layer's bezier path origin on (0,0) so it scales and rotates predictably — instantly for one path, via a picker for several.",
-  "description": "Originator computes the bounding-box center of a bezier path's vertices and shifts every vertex (and every keyframe) by that offset, recentering the path on (0,0) without moving the shape on screen — so scaling and rotating it behaves predictably. A single path is centered headlessly; when several exist, a resizable multiselect tree view lets you pick which paths or groups to center. Tangents and existing path animation are preserved."
- },
- "pathduplitron": {
-  "tagline": "Copy the easing and tangent feel of one layer's Position keyframes onto another's, via AE's own keyframe clipboard so tangents stay intact.",
-  "description": "PathDuplitron is a dockable Copy / Paste / Close panel that transfers Position-keyframe character between layers. Copy fires AE's native Edit ▸ Copy on the selected Position keyframes and Paste fires Edit ▸ Paste onto the target, so temporal ease, spatial tangents, and interpolation type all come across intact — including 3D Z. The menu commands are resolved by name to stay version-safe."
- },
- "trace-o-matic": {
-  "tagline": "Convert a layer's masks into a new shape layer with hold-keyframed paths and opacity, all styled at once by five master fill/stroke controls.",
-  "description": "Trace-o-matic rebuilds each mask on the selected layer as a shape group on a new shape layer, copying path and opacity animation as HOLD keyframes for a frame-by-frame look. Five master controls on the new layer — Fill Color, Fill Opacity, Stroke Color, Stroke Opacity, Stroke Width — are expression-linked to every traced shape, so one adjustment restyles them all. The source layer and its masks are left untouched."
- },
- "vertexmaster": {
-  "tagline": "Turn a bezier path's vertices and tangents into null-object handles you can keyframe and parent, or flip to Follow mode to track an animated path.",
-  "description": "VertexMaster rigs a shape layer's bezier path from a tree-view path picker plus Vertex / InTangent / OutTangent checkboxes, generating null objects that drive each vertex and its tangents through a createPath() expression on the Path property. Each vertex null carries a Vertex Control slider (1-based index), a Control/Follow checkbox, and an Open/Closed Path checkbox. In Control mode the null pushes its position into the path; in Follow mode it reads out an already-animated path's vertex instead. Built for organic and character path work where dragging nulls beats hand-editing the Path property."
- },
- "randomatic": {
-  "tagline": "Replace every selected keyframe's value with a fresh uniform-random number inside a per-axis range you type in — timing and easing untouched.",
-  "description": "RandoMatic rewrites the values of already-selected keyframes with independent uniform-random numbers, leaving their time, interpolation, and easing untouched. A dimensionality-aware dialog shows one Start Range / End Range row per axis needed (X, X+Y, or X+Y+Z) across the selection. Every selected keyframe on every selected property is drawn independently, in one undo step."
- },
- "triminator": {
-  "tagline": "Add a Trim Paths effect — pre-keyframed 0→100% for an instant reveal — to a shape layer's contents or to the specific shape groups you select.",
-  "description": "Triminator adds a Trim Paths effect to each selected shape layer's root contents, or, when you have drilled in and selected specific shape Groups, inside each group's own contents. By default it writes a 0%→100% keyframe pair on Start and End (from the layer's in-point to one second later) for an instant grow-in; hold Shift while launching to add the effect only. Non-shape layers in a mixed selection are skipped."
- },
- "elast-o-matic": {
-  "tagline": "Add elastic overshoot or gravity bounce after any keyframe — hold Cmd/Ctrl at launch to switch variants, tune everything in Effect Controls.",
-  "description": "Select keyframed properties and run it: each gets a controller effect plus an expression that overshoots after every keyframe. Default is a decaying elastic spring (Amplitude/Frequency/Decay); hold Cmd or Ctrl while launching for gravity bounces (Elasticity/Gravity/Number of bounces) — the command-bar icon swaps while the key is down. The inertial variant can even follow another layer's motion via its External Driver controls."
- },
- "reseterator": {
-  "tagline": "Zero the transform origin of selected layers — layer anchor to [0,0,0], every nested shape-group anchor and position to [0,0].",
-  "description": "One click cleans layers whose anchors and shape groups carry stray offsets after imports or restructuring. Each selected layer's Anchor Point resets to [0,0,0] and a recursive pass zeroes every shape group's internal Transform anchor/position, however deep. Position, Scale and Rotation are left alone."
- },
- "opac-o-bot": {
-  "tagline": "Parenting for Opacity — selected layers' Opacity follows their parent via expression, the one property AE parenting ignores.",
-  "description": "Parent layers as usual, select the children, run Opac-o-bot: each child's Opacity gets thisComp.layer(\"<parent>\").transform.opacity, so fading the parent fades the whole rig. Links are by parent name; unparented layers are skipped with an alert."
- },
- "controllerizer": {
-  "tagline": "Gather any selected properties from any layers onto one Controller Null as matching expression controls, pre-set to current values.",
-  "description": "Select properties across your comp and run it: a comp-long \"Controller Null\" gains one control per property — Slider, Angle, Point, 3D Point or Color, matched to the value type and named \"<Layer> || <Property>\" — each seeded with the current value and wired back by expression. Re-runs append to the same null, so the whole scene animates from one Effect Controls panel."
- }
+  "pathmaster": {
+    "tagline": "Animate a layer's Position along any shape-layer path — retime, re-ease, trim, loop or ping-pong it afterwards from a single layer marker.",
+    "description": "Select a Position property, pick a path from any shape layer, and PathMaster writes a self-contained expression that moves the layer along it. All timing lives on a layer marker: slide it to change the start, stretch its duration to retime, and edit its comment — Easing: x1,y1,x2,y2 || Segment 20 - 75% || Loop or Ping-Pong — to reshape the ride without re-running the script. A Reverse Direction checkbox on the layer flips travel at any time."
+  },
+  "limb-a-tron": {
+    "tagline": "Rig a two-segment IK/FK limb in seconds — drag one null to bend it, tune everything from one Limb Control effect, and bake it when done.",
+    "description": "Creates a shape-layer limb plus a \"<name> CTRL\" null carrying a \"<name> Limb Control\" pseudo-effect with every rig parameter — segment lengths, widths, curvature, Noodle Mode, FK/IK angles, pop prevention. Drag the null for IK, or check Disable IK for manual FK sliders. Run it again on an existing rig to bake the animation into simplified keyframes, strip the unused render mode, and remove the controller."
+  },
+  "linearizer": {
+    "tagline": "Drive existing keyframed animation from any slider, position, or rotation — scrubbing the driver scrubs the animation.",
+    "description": "Rewires a keyframed property with an expression so a driver property's Min–Max sweep plays back the original keyframe segments. Handles 1D/2D/3D properties and shape paths, batches multiple targets on one shared timing scale, and adds a \"Uniform Interpolation\" checkbox to the driver layer to switch between relative and even segment spacing live in Effect Controls."
+  },
+  "guiderator": {
+    "tagline": "Drop exact ruler guides by typing a number — or a formula like 1920/2 — into a dockable panel, then click H or V.",
+    "description": "A dockable panel with a calculator field: type 540 or 1920/2 and it evaluates in place. Click H for a horizontal guide or V for a vertical guide at the result, and toggle guide locking with the padlock button without touching the View menu."
+  },
+  "slidotron-16x9": {
+    "tagline": "Build a horizontal slide-reveal rig in one click — two nested 4K comps, mirrored alpha mattes, and one 0–100 \"CTRL\" slider plays the transition.",
+    "description": "Select a comp and run: it creates \"Sliders 16x9\" and \"Slide 16x9\" (3840×2160, 60 fps), wires mirrored mask panels as alpha mattes, and drops a layer carrying a Slider Control named \"CTRL\" into your comp. Keyframe CTRL from 0 to 100 to reveal whatever you place in \"Slide 16x9\". Expressions bind the \"Sliders 16x9\" layer and \"CTRL\" effect by name — don't rename them. Requires AE 23.0+ (uses setTrackMatte)."
+  },
+  "slidotron-9x16": {
+    "tagline": "Build a vertical 9:16 slide-reveal rig in one click — two nested 1080×1920 comps, mirrored mattes, and one 0–100 \"CTRL\" slider plays the transition.",
+    "description": "Sized for Stories, TikTok, and Shorts: select a comp and run to create \"Sliders 9x16\" and \"Slide 9x16\" (1080×1920, 60 fps) with mirrored alpha-matte panels and a Slider Control named \"CTRL\" in your comp. Keyframe CTRL from 0 to 100 to reveal your artwork in \"Slide 9x16\". Names are expression-bound — don't rename the layer or effect. Requires AE 23.0+ and exits cleanly on older versions."
+  },
+  "split-o-matic-9x16": {
+    "tagline": "Inject a ready-made picture-in-picture split-screen rig — mask, shadow, crop bars, on-canvas controllers — into your 9:16 comp.",
+    "description": "Adds ten pre-wired shape layers to the active comp: a rounded PiP mask with a Drop Shadow copy, top/bottom crop rectangles, and hidden controller/anchor layers. Mask size and shadow look are tuned from sliders on the \"PiP MASK PSR\" controller layer. A single prompt asks for a name prefix so multiple rigs can coexist in one comp; the baked-in geometry fits a 1080×1920 frame."
+  },
+  "burstmate": {
+    "tagline": "Drop a fully rigged radial stroke burst into your comp — every color, length, density, and dash tuned from one StrokeBurst control panel.",
+    "description": "Creates a hidden \"BURST CTRL\" guide layer plus two repeater-driven stroke layers whose every visual property is expression-linked to a \"StrokeBurst\" pseudo-effect. Adjust or keyframe colors, widths, spoke lengths, density, dash patterns, and the rotation offset between the two stroke sets from Effect Controls. The burst-out reveal comes pre-animated with eased Trim Paths keyframes, and the whole rig moves with the control layer."
+  },
+  "chromablenderizer": {
+    "tagline": "Ramp a color range across selected fills, strokes, and effect colors — pick Start/End, then apply a linear blend or random scatter in one click.",
+    "description": "A modeless palette: set Start and End colors with the bundled color-wheel picker or HSB sliders, select two or more color properties in AE, and click Apply Colors. Color Gamut mode walks hue the shortest way around the wheel with shared saturation; Grayscale interpolates brightness only; Randomize scatters each target within the range. Refresh Count confirms what's targeted before you commit."
+  },
+  "sfxmaster": {
+    "tagline": "Mix Voice Over, Sound Effects, and Music from three master sliders — audio layers auto-categorized by marker comments and wired in one pass.",
+    "description": "Builds an \"SFX CTRL\" null with Voice Over / Sound Effects / Music sliders and expression-links every audio layer's Stereo Mixer levels to the matching one. Routing reads each layer's first marker comment: \"voice over\" or \"music\" (case-insensitive substring) picks the bucket; everything else lands in Sound Effects. Recurses into precomps so one console controls the whole nested structure."
+  },
+  "sync-o-tron": {
+    "tagline": "Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio Reactor template.",
+    "description": "Select a property, hit TuneSync, and Sync-o-tron generates the easing dropdown and per-axis Min/Max sliders, wired to the Output Power of an AUDIO REACTOR comp. The Audio Reactor template project ships in the bundle and is imported automatically the first time you launch in a project without one — drop your track in and everything from Opacity to 3D Position can dance to it."
+  },
+  "keybot": {
+    "tagline": "Batch-edit selected keyframe values with =, +, −, ×, ÷ per axis — timing, easing, and interpolation stay untouched.",
+    "description": "A dockable panel: check X/Y/Z, type an operand, click an operator, and every selected keyframe on every selected property and layer updates in one undo step. Handles 1D, 2D, and 3D numeric properties (1D values ride the X field), preserves keyframe times and ease exactly, and treats division by zero as a safe no-op."
+  },
+  "keyclonematic": {
+    "tagline": "Repeat a hand-tuned keyframe set down the timeline at a fixed or decaying interval — values, easing, and spatial tangents cloned faithfully.",
+    "description": "Clones your selected keyframes a set number of times — or fills the rest of the comp — spaced by an interval in frames. Optional Temporal Decay shrinks the gap per repetition on a Linear, Ease In, or Ease Out curve so cycles accelerate over time. Every clone keeps its value, interpolation types, temporal ease, spatial tangents, roving, and label color."
+  },
+  "valuatron": {
+    "tagline": "Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo.",
+    "description": "A headless one-shot: select layers and property rows, run, and each keyframeable property gets a keyframe at the current time holding its current evaluated value. Expression-driven properties capture the expression's output at that instant. No dialog, no options — one undo reverses the whole batch."
+  },
+  "iteratron": {
+    "tagline": "Spread a property evenly across a layer stack — link a start value and an end value, and every layer in between gets its interpolated step.",
+    "description": "Highlight a property on a start layer and click Link Start Property; do the same on an end layer, then OK — evenly interpolated values are written to every unlocked, visible layer between them. Property-agnostic (Position, Scale, Rotation, colors, effect sliders) and keyframe-aware: properties that already have keys get a value at the playhead instead of being overwritten."
+  },
+  "nullbot": {
+    "tagline": "Parent a group of layers to one master null at their average position — move, scale, or rotate the whole group from a single handle.",
+    "description": "NullBot creates a single null named \"NullBot\" at the averaged position of the selected layers and parents them all to it, so the group moves, scales, and rotates from one control. The null's in/out points span the whole selection, and it becomes 3D if any selected layer is 3D. It is headless — no dialog, nothing to configure."
+  },
+  "ordermaster": {
+    "tagline": "Reverse or shuffle the stacking order of a contiguous run of selected layers, or the contiguous shape groups inside one shape layer.",
+    "description": "OrderMaster flips or randomizes the order of a contiguous run of selected layers — or of the contiguous shape groups inside a single shape layer — in place, without dragging each item in the Timeline. A one-checkbox dialog picks Reverse (the default) or Randomize. Both keep every property and animation intact and run as a single undo step."
+  },
+  "parent-o-bot": {
+    "tagline": "Blend a layer's Position, Scale, Rotation, and Opacity toward up to two parent layers, each with its own 0–100% influence slider.",
+    "description": "Parent-o-bot rigs each selected layer with a \"Multi_Parent\" effect that blends its Position, Rotation, Scale, and Opacity toward one or two chosen parents, without native parenting. Parent 1 / Parent 2 pickers set the parents, per-property checkboxes enable blending, and Position/Scale/Rotation/Opacity Influence sliders (0–100%) set the weights — all animatable in Effect Controls after the fact."
+  },
+  "rectangulator": {
+    "tagline": "Convert a parametric rectangle into a bezier shape with independent per-corner rounding and a 9-point anchor grid, driven by one effect.",
+    "description": "Rectangulator rebuilds a parametric (Rectangle tool) rectangle as a custom bezier shape with independently roundable corners and a nine-point anchor grid, preserving the original fills, strokes, and transform. A \"Rectangulator Controls\" effect drives it entirely by expression: Rectangle Width/Height sliders, four per-corner rounding sliders, and a nine-item Anchor Point popup, all keyframeable."
+  },
+  "subtitleforge": {
+    "tagline": "Build a full caption rig in one run — text plus a self-sizing box with stroke and drop shadow, all driven from one Subtitle Setup effect.",
+    "description": "SubtitleForge builds a complete subtitle rig in a single headless run: a SUBTITLE text layer plus an auto-sizing TXTBox background box wired together with expressions. Each caption line is authored by editing layer markers on SUBTITLE (the marker's comment becomes the on-screen text, its time+duration the visibility window), while all styling comes from one Subtitle Setup pseudo-effect grouped into Font (Font Color/Size/Opacity), Box (Offset X/Y, Box Roundness/Box Color/Opacity), Stroke (Stroke/Stroke Width/Stroke Color), and Shadow (Shadow/Shadow Color/Shadow Opacity, Distance, Spread, Size, Angle). A separate Enable Type On checkbox adds an optional per-character typewriter reveal."
+  },
+  "textmate": {
+    "tagline": "Type a word and highlight every case-sensitive occurrence of it in a text layer, each with its own Range Selector on a new animator.",
+    "description": "TextMate scans a selected text layer's Source Text for every case-sensitive occurrence of a typed string and builds one character-index Range Selector per match inside a single new animator named \"Highlight Animator (<term>)\", with a shared random Fill Color from a 12-color palette. Each occurrence gets its own selector, so you can animate highlights independently. The run is additive and never alters the layer's text or existing animators."
+  },
+  "timewarp-a-tron": {
+    "tagline": "Drive a layer's Time Remap from a 0–100 slider that scrubs a user-defined in/out frame range, framerate-correct and keyframe-free.",
+    "description": "TimeWarp-a-tron links a time-remapped layer to a controller slider through a two-button red-to-green pick flow. It adds an In/Out Range point control (X=in frame, Y=out frame, default [0,60]) to the source layer and a Slider Control named \"<Source Layer> || Time Control\" (0–100) to the controller, joined by a generated expression that maps the slider into seconds using the comp's frame rate. Drive the slider to scrub the range; one controller can drive multiple layers."
+  },
+  "centralizer": {
+    "tagline": "Drop center and bounding-box guides around anything — one shape, a multiselected group of shapes, text, footage or a precomp.",
+    "description": "Pick one or MORE shapes from the layer's list (bezier paths and parametric Rectangles/Ellipses/Polystars alike) and Centralizer adds comp-space guides for their combined bounding box, its center, and/or the layer anchor. Text, footage, precomp and solid layers get the same options measured from their rendered bounds. Parenting and layer transforms are respected."
+  },
+  "distributron": {
+    "tagline": "Spread a comp's layers evenly along a shape path, each auto-rotating to follow the curve, all steered live from one CTRL null.",
+    "description": "Distributron distributes every other layer in a composition along one shape layer's path, evenly spaced and each auto-rotated to follow the curve, all parented to a CTRL null so the whole spread animates from one controller and re-flows live as the path is reshaped. Ongoing control lives on the Distribute Along the Path pseudo-effect on CTRL: Randomize Rotation, Rotation Offset, Start Distribution Offset, End Distribution Offset, and First/Last Layer Index, plus a Distribution Path Layer picker the script sets automatically."
+  },
+  "originator": {
+    "tagline": "Recenter a shape layer's bezier path origin on (0,0) so it scales and rotates predictably — instantly for one path, via a picker for several.",
+    "description": "Originator computes the bounding-box center of a bezier path's vertices and shifts every vertex (and every keyframe) by that offset, recentering the path on (0,0) without moving the shape on screen — so scaling and rotating it behaves predictably. A single path is centered headlessly; when several exist, a resizable multiselect tree view lets you pick which paths or groups to center. Tangents and existing path animation are preserved."
+  },
+  "pathduplitron": {
+    "tagline": "Copy the easing and tangent feel of one layer's Position keyframes onto another's, via AE's own keyframe clipboard so tangents stay intact.",
+    "description": "PathDuplitron is a dockable Copy / Paste / Close panel that transfers Position-keyframe character between layers. Copy fires AE's native Edit ▸ Copy on the selected Position keyframes and Paste fires Edit ▸ Paste onto the target, so temporal ease, spatial tangents, and interpolation type all come across intact — including 3D Z. The menu commands are resolved by name to stay version-safe."
+  },
+  "trace-o-matic": {
+    "tagline": "Convert a layer's masks into a new shape layer with hold-keyframed paths and opacity, all styled at once by five master fill/stroke controls.",
+    "description": "Trace-o-matic rebuilds each mask on the selected layer as a shape group on a new shape layer, copying path and opacity animation as HOLD keyframes for a frame-by-frame look. Five master controls on the new layer — Fill Color, Fill Opacity, Stroke Color, Stroke Opacity, Stroke Width — are expression-linked to every traced shape, so one adjustment restyles them all. The source layer and its masks are left untouched."
+  },
+  "vertexmaster": {
+    "tagline": "Turn a bezier path's vertices and tangents into null-object handles you can keyframe and parent, or flip to Follow mode to track an animated path.",
+    "description": "VertexMaster rigs a shape layer's bezier path from a tree-view path picker plus Vertex / InTangent / OutTangent checkboxes, generating null objects that drive each vertex and its tangents through a createPath() expression on the Path property. Each vertex null carries a Vertex Control slider (1-based index), a Control/Follow checkbox, and an Open/Closed Path checkbox. In Control mode the null pushes its position into the path; in Follow mode it reads out an already-animated path's vertex instead. Built for organic and character path work where dragging nulls beats hand-editing the Path property."
+  },
+  "randomatic": {
+    "tagline": "Replace every selected keyframe's value with a fresh uniform-random number inside a per-axis range you type in — timing and easing untouched.",
+    "description": "RandoMatic rewrites the values of already-selected keyframes with independent uniform-random numbers, leaving their time, interpolation, and easing untouched. A dimensionality-aware dialog shows one Start Range / End Range row per axis needed (X, X+Y, or X+Y+Z) across the selection. Every selected keyframe on every selected property is drawn independently, in one undo step."
+  },
+  "triminator": {
+    "tagline": "Add a Trim Paths effect — pre-keyframed 0→100% for an instant reveal — to a shape layer's contents or to the specific shape groups you select.",
+    "description": "Triminator adds a Trim Paths effect to each selected shape layer's root contents, or, when you have drilled in and selected specific shape Groups, inside each group's own contents. By default it writes a 0%→100% keyframe pair on Start and End (from the layer's in-point to one second later) for an instant grow-in; hold Shift while launching to add the effect only. Non-shape layers in a mixed selection are skipped."
+  },
+  "elast-o-matic": {
+    "tagline": "Add elastic overshoot or gravity bounce after any keyframe — hold Cmd/Ctrl at launch to switch variants, tune everything in Effect Controls.",
+    "description": "Select keyframed properties across one or more layers and run it: each layer gets its own controller effect plus an expression that overshoots after every keyframe — one controller per layer, not piled onto the first. Default is a decaying elastic spring (Amplitude/Frequency/Decay); hold Cmd or Ctrl while launching for gravity bounces (Elasticity/Gravity/Number of bounces) — the command-bar icon swaps while the key is down. Select just some of a property's keyframes (two or more) to confine the effect to that span, or follow another layer's motion via the inertial variant's External Driver."
+  },
+  "reseterator": {
+    "tagline": "Zero the transform origin of selected layers — layer anchor to [0,0,0], every nested shape-group anchor and position to [0,0].",
+    "description": "One click cleans layers whose anchors and shape groups carry stray offsets after imports or restructuring. Each selected layer's Anchor Point resets to [0,0,0] and a recursive pass zeroes every shape group's internal Transform anchor/position, however deep. Position, Scale and Rotation are left alone."
+  },
+  "opac-o-bot": {
+    "tagline": "Parenting for Opacity — selected layers' Opacity follows their parent via expression, the one property AE parenting ignores.",
+    "description": "Parent layers as usual, select the children, run Opac-o-bot: each child's Opacity gets thisComp.layer(\"<parent>\").transform.opacity, so fading the parent fades the whole rig. Links are by parent name; unparented layers are skipped with an alert."
+  },
+  "controllerizer": {
+    "tagline": "Gather any selected properties from any layers onto one Controller Null as matching expression controls, pre-set to current values.",
+    "description": "Select properties across your comp and run it: a comp-long \"Controller Null\" gains one control per property — Slider, Angle, Point, 3D Point or Color, matched to the value type and named \"<Layer> || <Property>\" — each seeded with the current value and wired back by expression. Re-runs append to the same null, so the whole scene animates from one Effect Controls panel."
+  }
 }

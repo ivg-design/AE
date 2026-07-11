@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2026-07-11]
+
+### Changed
+- `Elast-o-matic` `1.0.0` → `1.1.0`:
+  - Rigs each selected layer independently — one controller per layer driving all of that layer's selected properties, instead of piling every property's controller onto the first selected layer (which also left the expressions on other layers pointing at a controller that wasn't there).
+  - Selecting a subset of a property's keyframes (two or more) now confines the effect to that keyframe span, leaving the interpolation after the selection untouched; selecting the whole property (or all its keys) still affects the whole timeline.
+- Bumped workspace + `@jsx-workspace/ae-scripts` package versions to `1.1.0`.
+
 ## [2026-07-04]
 
 ### Added

@@ -3,8 +3,8 @@
  *
  * @name Elast-o-matic
  * @author IVG Design
- * @version 1.0.0
- * @date 2026-07-04
+ * @version 1.1.0
+ * @date 2026-07-11
  * @license MIT
  * @ui HEADLESS
  *
@@ -18,11 +18,14 @@
  * the Effect Controls panel after the fact - no baked keyframes.
  *
  * @functionality
- * • Applies a per-property pseudo-effect controller named "<Property> Inertial Bounce" or "<Property> Bounce"
+ * • Adds ONE pseudo-effect controller ("Inertial Bounce" or "Bounce") to each layer that has
+ *   selected properties, and drives every selected property on that layer from it
+ * • Rigs multiple properties across multiple layers in one run — each layer gets its own controller
  * • Inertial variant controls: Amplitude, Frequency, Decay, Duration, Delay (in frames), External Driver (+ Layer / Animated Property)
  * • Bounce variant controls: Elasticity, Gravity, Number of bounces
  * • Inertial variant can follow ANOTHER layer's motion via the External Driver checkbox + layer picker
- * • Works on any keyframeable property; multiple selected properties are rigged in one run
+ * • Select a SUBSET of a property's keyframes (>= 2) to confine the effect to that keyframe span,
+ *   leaving the interpolation after the selection untouched; select all (or the property) for the whole timeline
  * • Hold Cmd/Ctrl at launch to switch from Inertial Bounce to Bounce
  *
  * @usage
@@ -72,12 +75,6 @@
     var composition = app.project.activeItem;
     if (!composition || !(composition instanceof CompItem)) {
         alert("Please select a composition first.");
-        return;
-    }
-
-    var layer = composition.selectedLayers[0];
-    if (!layer) {
-        alert("Please select a layer.");
         return;
     }
 
@@ -234,26 +231,89 @@
         ].join('\n');
     }
 
+    // One controller per layer: reuse an existing controller of this variant if
+    // the layer already has one, otherwise register + add it once.
+    function getOrAddController(effectsProp, variant, ctrlName) {
+        for (var e = 1; e <= effectsProp.numProperties; e++) {
+            var ex = effectsProp.property(e);
+            try {
+                if (ex && ex.name === ctrlName && ex.matchName === variant.matchName) return ex;
+            } catch (xReuse) { }
+        }
+        ensurePseudoRegistered(effectsProp, variant);
+        var fx = effectsProp.addProperty(variant.matchName);
+        fx.name = ctrlName;
+        return fx;
+    }
+
+    // If a proper SUBSET of a property's keyframes is selected (>= 2, but not all),
+    // return the time window [firstSelected, lastSelected]; else null (whole timeline).
+    function selectedKeyWindow(prop) {
+        var n = prop.numKeys;
+        if (!n || n < 2) return null;
+        var sel;
+        try { sel = prop.selectedKeys; } catch (eSel) { sel = null; }   // ascending indices
+        if (!sel || sel.length < 2) return null;   // 0-1 keys selected -> whole timeline
+        if (sel.length >= n) return null;          // all keys selected -> whole timeline
+        return { start: prop.keyTime(sel[0]), end: prop.keyTime(sel[sel.length - 1]) };
+    }
+
+    // Restrict the expression to the selected keyframe window: outside it, return
+    // the native value so the interpolation after the selection is left untouched.
+    function wrapWindow(core, win) {
+        if (!win) return core;
+        return [
+            'if (time < ' + win.start + ' || time > ' + win.end + ') {',
+            '    value;',
+            '} else {',
+            core,
+            '}'
+        ].join('\n');
+    }
+
     /****************** MAIN ******************/
 
     app.beginUndoGroup("Elast-o-matic (" + data.label + ")");
     try {
-        var effectsProp = layer.property("ADBE Effect Parade");
+        var ctrlName = data.label;   // one controller per layer, named after the variant
+        var rigged = 0;
 
-        for (var i = 0; i < props.length; i++) {
-            try {
-                var ctrlName = props[i].name.toString() + data.effectSuffix;
+        // Rig each layer independently so a copy of the controller lands on every
+        // layer that has selected properties — once per layer — instead of piling
+        // every property's controller onto the first selected layer.
+        for (var L = 1; L <= composition.numLayers; L++) {
+            var lyr = composition.layer(L);
+            var sel = lyr.selectedProperties;
+            if (!sel || sel.length === 0) continue;
 
-                ensurePseudoRegistered(effectsProp, data);
-                var pseudoEffect = effectsProp.addProperty(data.matchName);
-                pseudoEffect.name = ctrlName;
-
-                props[i].expression = useBounce
-                    ? buildBounceExpression(ctrlName)
-                    : buildInertialExpression(ctrlName);
-            } catch (ePer) {
-                alert("Elast-o-matic: could not rig \"" + props[i].name + "\":\n" + ePer.toString());
+            // Only leaf properties that can hold an expression (skip groups like Transform).
+            var valueProps = [];
+            for (var s = 0; s < sel.length; s++) {
+                if (sel[s] && sel[s].canSetExpression) valueProps.push(sel[s]);
             }
+            if (valueProps.length === 0) continue;
+
+            var effectsProp = lyr.property("ADBE Effect Parade");
+            var controller = getOrAddController(effectsProp, data, ctrlName);
+
+            for (var v = 0; v < valueProps.length; v++) {
+                try {
+                    var prop = valueProps[v];
+                    var core = useBounce
+                        ? buildBounceExpression(ctrlName)
+                        : buildInertialExpression(ctrlName);
+                    prop.expression = wrapWindow(core, selectedKeyWindow(prop));
+                    rigged++;
+                } catch (ePer) {
+                    alert("Elast-o-matic: could not rig \"" + valueProps[v].name + "\" on \"" +
+                        lyr.name + "\":\n" + ePer.toString());
+                }
+            }
+        }
+
+        if (rigged === 0) {
+            alert("Elast-o-matic: no keyframeable properties were selected.\n" +
+                "Select the property/properties (or some of their keyframes) and run again.");
         }
     } catch (err) {
         alert("Elast-o-matic error: " + err.toString() +

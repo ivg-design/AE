@@ -1,6 +1,6 @@
 {
   "name": "@jsx-workspace/ae-scripts",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Adobe After Effects automation scripts collection",
   "license": "MIT",
   "main": "dist/index.js",
