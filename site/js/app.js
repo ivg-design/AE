@@ -55,12 +55,30 @@
     try { await navigator.clipboard.writeText(text); toast(label || 'Copied to clipboard'); }
     catch { toast('Copy failed — clipboard unavailable'); }
   }
-  function downloadScript(s) {
-    const a = document.createElement('a');
-    a.href = srcUrl(s);
-    a.download = jsxName(s);
-    document.body.appendChild(a); a.click(); a.remove();
-    toast(`Downloading ${jsxName(s)}`);
+  async function downloadScript(s) {
+    const extras = BUNDLE_EXTRAS[s.id];
+    if (!extras || !extras.length) {
+      const a = document.createElement('a');
+      a.href = srcUrl(s);
+      a.download = jsxName(s);
+      document.body.appendChild(a); a.click(); a.remove();
+      toast(`Downloading ${jsxName(s)}`);
+      return;
+    }
+    // Ships companion assets (e.g. Sync-o-tron's Audio Reactor .aep) — zip them
+    // WITH the script so it finds the template right beside it (candidate #1).
+    try {
+      const zip = new JSZip();
+      zip.file(jsxName(s), await fetchText(s.srcPath, s.name));
+      for (const ex of extras) {
+        const r = await fetch(encodeURI(ex.src));
+        if (r.ok) zip.file(ex.flat, await r.arrayBuffer());
+      }
+      triggerDownload(await zip.generateAsync({ type: 'blob' }), `${s.id}.zip`);
+      toast(`Downloading ${s.name} + template (.zip)`);
+    } catch (e) {
+      toast(`Download failed — ${e.message || e}`);
+    }
   }
 
   // ---------- bundle builder (02 — THE COMMAND BAR) ----------
@@ -78,9 +96,16 @@
     'mac-intel':   { label: 'Mac · Intel (.zip)',            file: 'build-a-bar-mac-intel.zip', bin: 'mac-intel.zip',   kind: 'mac', os: 'macOS Intel' },
     windows:       { label: 'Windows · x64 (.zip)',          file: 'build-a-bar-win-x64.zip',   bin: 'windows-x64.aex', kind: 'win', os: 'Windows x64' },
   };
-  // Extra files some scripts need beside them in the bundle (dest -> source URL).
+  // Extra files some scripts ship beside them so the script finds them at launch.
+  //  src  – source URL on the site
+  //  dest – path in the ScriptUI bundle (scripts live in ivg-scripts/<category>/, so
+  //         its ../projects/ sibling resolves)
+  //  flat – basename to drop right next to a FLAT script (native plugin bundle +
+  //         single-.jsx download), where the script's own folder is candidate #1
   const BUNDLE_EXTRAS = {
-    'sync-o-tron': [{ dest: 'ivg-scripts/projects/Sync-o-tron.aep', src: 'scripts/projects/Sync-o-tron.aep' }],
+    'sync-o-tron': [{ src: 'scripts/projects/Sync-o-tron.aep',
+                      dest: 'ivg-scripts/projects/Sync-o-tron.aep',
+                      flat: 'Sync-o-tron.aep' }],
   };
 
   function renderBuilder() {
@@ -276,9 +301,12 @@ Docs & updates: ${REPO}
         if (v.ok) zip.file(`${R}/ivg-scripts/icons/${s.id}.${mod}.svg`, await v.text());
       }
     }
+    // Native plugin lays scripts FLAT in ivg-scripts/, so the template goes right
+    // beside the script (its candidate #1) — not ../projects/, which a flat script
+    // can't reach.
     for (const s of list) for (const ex of (BUNDLE_EXTRAS[s.id] || [])) {
       const xr = await fetch(encodeURI(ex.src));
-      if (xr.ok) zip.file(`${R}/${ex.dest}`, await xr.arrayBuffer());
+      if (xr.ok) zip.file(`${R}/ivg-scripts/${ex.flat}`, await xr.arrayBuffer());
     }
     for (const lg of ['logo-landscape.svg', 'logo-portrait.svg']) {   // fixed header logo
       const r = await fetch(`${NATIVE}/${lg}`);
