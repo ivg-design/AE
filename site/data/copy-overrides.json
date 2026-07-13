@@ -134,5 +134,9 @@
   "controllerizer": {
     "tagline": "Gather any selected properties from any layers onto one Controller Null as matching expression controls, pre-set to current values.",
     "description": "Select properties across your comp and run it: a comp-long \"Controller Null\" gains one control per property — Slider, Angle, Point, 3D Point or Color, matched to the value type and named \"<Layer> || <Property>\" — each seeded with the current value and wired back by expression. Re-runs append to the same null, so the whole scene animates from one Effect Controls panel."
+  },
+  "cambot": {
+    "tagline": "Build a fully-rigged 3D camera you steer from one panel — dial from free-fly to locked tracking, blend multiple targets, and play 26 procedural moves off a single slider.",
+    "description": "CamBot creates a camera plus a control-host shape and drives every camera channel by expression, so you animate controls, never the camera. One Look-At-Influence dial crossfades from a genuine one-node free/FPS camera to a two-node tracking cam with no mode switch and nothing breaking in the transition; point several CamBot Target controllers at different layers and animate their influence to blend the aim through the midpoint. On top sit focal length in millimetres, smart auto-focus depth of field, handheld shake, follow smoothing, dolly and orbit, and a Moves engine of 26 procedural camera moves — push, dolly-zoom, orbit, helix, fly-through, swoop, reveal and more — that you perform by keyframing one Progress slider and resize with the Move Shaping controls."
   }
 }

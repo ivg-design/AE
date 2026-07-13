@@ -3,8 +3,8 @@
  *
  * @name Elast-o-matic
  * @author IVG Design
- * @version 1.1.1
- * @date 2026-07-11
+ * @version 1.1.2
+ * @date 2026-07-12
  * @license MIT
  * @ui HEADLESS
  *
@@ -46,6 +46,9 @@
  *   www.rendertom.com. The script itself is IVG Design's.
  * • The Inertial expression reads the last keyframe before the current time, so it
  *   activates after every keyframe, not just the final one.
+ * • The overshoot is velocity-continuous (1.1.2): amplitude is scaled by the angular
+ *   frequency so the oscillation starts moving at the keyframe's own velocity instead
+ *   of jumping — no kink at the handoff between the native motion and the overshoot.
  * • Deleting the generated effect disables the expression (it will error politely);
  *   remove the expression from the property to fully undo by hand.
  */
@@ -123,6 +126,12 @@
         tempComp.remove();
     }
 
+    // The overshoot is normalised by (freq * 2π) so it LAUNCHES at the property's
+    // real arrival velocity — that makes the join at the keyframe velocity-continuous
+    // (no dip/stagger where the eased approach hands off to the spring). Amplitude 20
+    // (the FFX default) is the neutral point: exactly arrival velocity; higher =
+    // snappier/bigger launch, lower = softer/smaller. Dividing by freq keeps that
+    // true at any Frequency.
     function buildInertialExpression(ctrlName) {
         return [
             'var freq = effect("' + ctrlName + '")("Frequency");',
@@ -163,7 +172,7 @@
             '    }',
             '    if (n > 0 && t < decayDuration) {',
             '        var v = externalLayer.velocityAtTime(externalLayer.key(n).time - framesToTime(delay) - thisComp.frameDuration / 10);',
-            '        value + v * (amp / 100) * Math.sin(freq * t * 2 * Math.PI) / Math.exp(decay * t);',
+            '        value + v * (amp / 20) * Math.sin(freq * t * 2 * Math.PI) / Math.exp(decay * t) / (freq * 2 * Math.PI);',
             '    } else {',
             '        value;',
             '    }',
@@ -181,7 +190,7 @@
             '    }',
             '    if (n > 0 && t < decayDuration) {',
             '        var v = velocityAtTime(key(n).time - thisComp.frameDuration / 10);',
-            '        value + v * (amp / 100) * Math.sin(freq * t * 2 * Math.PI) / Math.exp(decay * t);',
+            '        value + v * (amp / 20) * Math.sin(freq * t * 2 * Math.PI) / Math.exp(decay * t) / (freq * 2 * Math.PI);',
             '    } else {',
             '        value;',
             '    }',

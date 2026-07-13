@@ -119,8 +119,13 @@ function stripBulletMarker(line, bucket) {
  * Returns the inner text (between /** and the matching closing *\/), or null.
  */
 function extractFrontmatterBlock(source) {
-  const match = source.match(/\/\*\*([\s\S]*?)\*\//);
-  return match ? match[1] : null;
+  const blocks = source.match(/\/\*\*[\s\S]*?\*\//g);
+  if (!blocks) return null;
+  // Prefer the JSDoc header (carries @name/@version/@ui) over any decorative
+  // banner comment that may precede it, so a script can open with ASCII-art
+  // branding and still be parsed. Falls back to the first block otherwise.
+  const chosen = blocks.find((b) => /@(name|version|ui)\b/.test(b)) || blocks[0];
+  return chosen.replace(/^\/\*\*/, "").replace(/\*\/$/, "");
 }
 
 /**

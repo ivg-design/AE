@@ -5,6 +5,7 @@ One reference document per catalog script, generated 2026-07-04 from a full read
 These files are also rendered by the landing site (`site/docs.html?s=<slug>`).
 
 ## Animation & Rigging
+- [CamBot](CamBot.md) — one-node ↔ two-node camera rig with multi-target blending and 26 procedural moves
 - [Limb-a-tron](Limb-a-tron.md) — IK/FK limb rig with regular/noodle body modes
 - [Linearizer](Linearizer.md) — link any property to a driver via linear() expressions
 - [PathMaster](PathMaster.md) — animate layers along mask paths

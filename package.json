@@ -1,6 +1,6 @@
 {
   "name": "jsx-workspace",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "private": true,
   "license": "MIT",
   "workspaces": [
@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "yarn workspace @jsx-workspace/frame-navigator dev",
     "build": "yarn workspaces run build",
+    "build:catalog": "node site/tools/build-data.mjs && node site/tools/build-bundle.mjs && node site/tools/build-data.mjs",
     "clean": "yarn workspaces run clean",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2026-07-12]
+
+### Added
+- **New script — `CamBot` `3.15.1`** (animation): a fully-rigged 3D camera driven entirely from one effect panel.
+  - Creates a camera plus a `CamBot N Target` control-host shape; every camera channel (position, orientation, roll, zoom, focus, aperture, blur) is expression-driven, so you animate controls, never the camera.
+  - **One-node ↔ two-node dial** (`Look-At-Influence`): 0 = genuine free/FPS camera, 100 = locked two-node tracking — a smooth crossfade with no mode switch, because all rotation channels are rig-owned (orientation-driven aim; X/Y rotation locked, Z = roll).
+  - **Multi-target blending** via duplicable `CamBot Target` controllers — aim at the weighted average of several layers and animate their influence to hand off between subjects.
+  - **Moves engine** — 26 procedural camera moves (push, dolly-zoom, orbit, spiral, helix, fly-by/through, swoop, reveal, establish, whip pan, parallax, drift…) performed by keyframing one `Progress` slider, plus **Move Shaping** controls (Radius/Depth/Height/Turns/Spin, in absolute units, auto-filled per move) to resize them.
+  - Focal length in millimetres, smart auto-focus depth of field, handheld shake, follow smoothing, `Realistic Limits` clamp.
+- Website: CamBot doc (`docs/scripts/CamBot.md`), curated card copy, and web icon; bundle rebuild now sources icons from the committed slug-named SVG set (`site/download/native/icons/`) so `build-bundle.mjs` no longer requires the private `native/` repo.
+
+### Changed
+- `Elast-o-matic` `1.1.1` → `1.1.2`: the overshoot is now **velocity-continuous** — amplitude is scaled by the angular frequency so the oscillation leaves the keyframe at the native motion's own velocity instead of jumping, removing the kink at the handoff.
+- Bumped workspace + `@jsx-workspace/ae-scripts` package versions to `1.2.0`.
+
+### Removed
+- `One-Node-Cam-Rig.jsx` — superseded by `CamBot` (never distributed).
+
 ## [2026-07-11]
 
 ### Changed

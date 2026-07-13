@@ -37,6 +37,46 @@
     "srcPath": "scripts/animation/2-3_IK_Rigger.jsx"
   },
   {
+    "id": "cambot",
+    "name": "CamBot",
+    "displayName": "CamBot",
+    "category": "animation",
+    "version": "3.15.1",
+    "ui": "HEADLESS",
+    "tagline": "Build a fully-rigged 3D camera you steer from one panel — dial from free-fly to locked tracking, blend multiple targets, and play 26 procedural moves off a single slider.",
+    "description": "CamBot creates a camera plus a control-host shape and drives every camera channel by expression, so you animate controls, never the camera. One Look-At-Influence dial crossfades from a genuine one-node free/FPS camera to a two-node tracking cam with no mode switch and nothing breaking in the transition; point several CamBot Target controllers at different layers and animate their influence to blend the aim through the midpoint. On top sit focal length in millimetres, smart auto-focus depth of field, handheld shake, follow smoothing, dolly and orbit, and a Moves engine of 26 procedural camera moves — push, dolly-zoom, orbit, helix, fly-through, swoop, reveal and more — that you perform by keyframing one Progress slider and resize with the Move Shaping controls.",
+    "functionality": [
+      "Creates a camera + control-host shape layer; wires all camera channels via expressions",
+      "Look-At-Influence dial: one-node free camera (0) <-> two-node tracking (100), smooth crossfade",
+      "Orientation-driven aim (auto-orient off): X/Y Rotation locked to 0, Z Rotation = Roll — all rotation channels rig-owned so mode changes leave no stray values",
+      "Multi-target blending: duplicate the CamBot Target controller, point each at a layer, animate Target Influence to hand off the aim through the weighted midpoint",
+      "Lens in millimetres (Focal Length + Film Width -> Zoom), smart auto-focus DOF, F-Stop, near/far blur, focus-area width; Realistic Limits clamp for physically plausible values",
+      "Handheld shake (position + aim), follow smoothing, Dolly, Orbit / Orbit Elevation",
+      "Moves engine: 26 procedural moves driven by a Progress slider, resized by Move Shaping controls (Radius/Depth/Height in px, Turns count, Spin degrees) that auto-fill per move"
+    ],
+    "usage": [
+      "Open a composition and run CamBot — it builds \"CamBot N Target\" (shape) and \"CamBot N Cam\"",
+      "Direct the camera from the CamBot effect on the target shape; move the shape to re-aim",
+      "For tracking, raise Look-At-Influence and point a CamBot Target controller at a layer",
+      "For a move, pick one from Move and keyframe Progress 0->100",
+      "Open or select a comp.  2. Run CamBot -> \"CamBot Cam N\" + \"CamBot Target N\" (shape).",
+      "Direct from the shape's CamBot effect; move the shape to aim; add \"CamBot Target\" effects to blend more subjects. Keyframe Progress to play a Move."
+    ],
+    "requirements": [
+      "Adobe After Effects CC or later",
+      "An active composition",
+      "\"Allow Scripts to Write Files and Access Network\" enabled (first run registers the pseudo effects from temporary .ffx files)"
+    ],
+    "notes": [
+      "The target graphic is applied from CamBotTarget_shape.ffx (referenced by path for now).",
+      "Smoothing is temporarily inert (topology change); to be re-implemented."
+    ],
+    "icon": "assets/icons/cambot.webp",
+    "lucide": "square-code",
+    "docPath": "docs/CamBot.md",
+    "srcPath": "scripts/animation/CamBot.jsx"
+  },
+  {
     "id": "limb-a-tron",
     "name": "Limb-a-tron",
     "displayName": "Limb-a-tron",
@@ -426,7 +466,7 @@
     "name": "Elast-o-matic",
     "displayName": "Elast-o-matic",
     "category": "keyframes",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "ui": "HEADLESS",
     "tagline": "Add elastic overshoot or gravity bounce after any keyframe — hold Cmd/Ctrl at launch to switch variants, tune everything in Effect Controls.",
     "description": "Select keyframed properties across one or more layers and run it: each layer gets its own controller effect plus an expression that overshoots after every keyframe — one controller per layer, not piled onto the first. Default is a decaying elastic spring (Amplitude/Frequency/Decay); hold Cmd or Ctrl while launching for gravity bounces (Elasticity/Gravity/Number of bounces) — the command-bar icon swaps while the key is down. Select just some of a property's keyframes (two or more) to confine the effect to that span, or follow another layer's motion via the inertial variant's External Driver.",
@@ -452,6 +492,7 @@
     "notes": [
       "The FFX-registration snippet inside ensurePseudoRegistered() (writing the controller binary to a temp .ffx and applying it on a throwaway comp) is based on \"Apply Pseudo Effect as Animation Preset\" (c) 2017 Tomas Šinkūnas, www.rendertom.com. The script itself is IVG Design's.",
       "The Inertial expression reads the last keyframe before the current time, so it activates after every keyframe, not just the final one.",
+      "The overshoot is velocity-continuous (1.1.2): amplitude is scaled by the angular frequency so the oscillation starts moving at the keyframe's own velocity instead of jumping — no kink at the handoff between the native motion and the overshoot.",
       "Deleting the generated effect disables the expression (it will error politely); remove the expression from the property to fully undo by hand."
     ],
     "icon": "assets/icons/elast-o-matic.webp",

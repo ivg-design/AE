@@ -26,7 +26,25 @@ const SVG_DIRS = [path.join(REPO_ROOT, 'assets', 'icons', 'icon update'),
 const findSvg = (n) => { for (const d of SVG_DIRS) { const p = path.join(d, n); if (fs.existsSync(p)) return p; } return null; };
 
 const scripts = JSON.parse(fs.readFileSync(path.join(SITE, 'data', 'scripts.json'), 'utf8'));
-const iconMap = JSON.parse(fs.readFileSync(path.join(AE, 'native', 'ivgd-command-bar', 'tools', 'icon-map.json'), 'utf8'));
+// Icon source. Prefer the private native icon-map (maps slug -> curated
+// assets/icons filenames) when that repo is checked out alongside; otherwise
+// fall back to the committed slug-named SVG set so THIS repo can rebuild the
+// bundle on its own. To add a new script's icon: drop <slug>.svg (and optional
+// <slug>.cmd.svg / <slug>.shift.svg rollovers) into site/download/native/icons/.
+const NATIVE_MAP = path.join(AE, 'native', 'ivgd-command-bar', 'tools', 'icon-map.json');
+const ICON_SVG_DIR = path.join(SITE, 'download', 'native', 'icons');
+const iconMap = fs.existsSync(NATIVE_MAP) ? JSON.parse(fs.readFileSync(NATIVE_MAP, 'utf8')) : null;
+const slugSvg = (n) => { const p = path.join(ICON_SVG_DIR, n); return fs.existsSync(p) ? p : null; };
+const resolveIcons = (id) => {
+  if (iconMap) {
+    const m = iconMap[id] || {};
+    return { base: (m.base && findSvg(m.base)) || null,
+             variants: { shift: (m.variants && m.variants.shift && findSvg(m.variants.shift)) || null,
+                         cmd: (m.variants && m.variants.cmd && findSvg(m.variants.cmd)) || null } };
+  }
+  return { base: slugSvg(`${id}.svg`),
+           variants: { shift: slugSvg(`${id}.shift.svg`), cmd: slugSvg(`${id}.cmd.svg`) } };
+};
 const jsxName = (s) => s.srcPath.split('/').pop();
 const EXTRAS = { 'sync-o-tron': [{ dest: 'ivg-scripts/projects/Sync-o-tron.aep', src: path.join(REPO_ROOT, 'assets', 'projects', 'Sync-o-tron.aep') }] };
 
@@ -45,16 +63,14 @@ const raster = (svg, outName, size) => {
 };
 let png = 0, alt = 0;
 for (const s of scripts) {
-  const map = iconMap[s.id] || {};
-  const svg = map.base && findSvg(map.base);
+  const { base: svg, variants } = resolveIcons(s.id);
   if (!svg) continue;
   raster(svg, `${s.id}`, 24);
   raster(svg, `${s.id}@2x`, 48);
   // rollover variants: <slug>.shift.png (Shift) + <slug>.cmd.png (Cmd/Ctrl) —
   // matching the native bar's two rollover states. Each with a 48px @2x sibling.
-  const variants = map.variants || {};
   for (const mod of ['shift', 'cmd']) {
-    const vSvg = variants[mod] && findSvg(variants[mod]);
+    const vSvg = variants[mod];
     if (vSvg) { raster(vSvg, `${s.id}.${mod}`, 24); raster(vSvg, `${s.id}.${mod}@2x`, 48); alt++; }
   }
   png++;
