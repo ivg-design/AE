@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 499.93599 499.57747">
+  <g id="Layer_2-2" data-name="Layer 2">
+    <g id="Verticalizer">
+      <rect x="6" y="40" width="214" height="142" rx="28" ry="28" fill="#cc4097"/>
+      <rect x="28" y="62" width="170" height="98" rx="12" ry="12" fill="#03d1ed"/>
+      <rect x="6" y="318" width="214" height="142" rx="28" ry="28" fill="#cc4097"/>
+      <rect x="28" y="340" width="170" height="98" rx="12" ry="12" fill="#f6871f"/>
+      <rect x="286" y="10" width="212" height="480" rx="38" ry="38" fill="#cc4097"/>
+      <rect x="310" y="34" width="164" height="196" rx="13" ry="13" fill="#03d1ed"/>
+      <rect x="310" y="270" width="164" height="196" rx="13" ry="13" fill="#f6871f"/>
+      <rect x="322" y="236" width="140" height="28" rx="14" ry="14" fill="#fff200"/>
+      <polygon points="240 198 306 250 240 302 240 274 110 274 110 226 240 226" fill="#fff200"/>
+      <rect id="sizer" width="499.93599" height="499.57747" fill="none"/>
+    </g>
+  </g>
+</svg>

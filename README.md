@@ -1,8 +1,8 @@
 # IVG Toolkit — After Effects Scripts
 
-![IVG Toolkit — 33 free After Effects scripts](banner.png)
+![IVG Toolkit — 35 free After Effects scripts](banner.png)
 
-A catalog of **33 production-ready Adobe After Effects scripts**, a dockable **Build-a-Bar** command bar — as both a ScriptUI panel *and* a native AEGP plugin — a client-side bundle generator, and a full **test harness**, organized as a monorepo.
+A catalog of **35 production-ready Adobe After Effects scripts**, a dockable **Build-a-Bar** command bar — as both a ScriptUI panel *and* a native AEGP plugin — a client-side bundle generator, and a full **test harness**, organized as a monorepo.
 
 **Live catalog & docs:** https://forge.mograph.life/apps/ae
 
@@ -31,7 +31,7 @@ cd tools/ae-test-harness && yarn test
 ae/
 ├── packages/
 │   ├── ae-scripts/
-│   │   ├── src/                  # 36 source scripts (33 distributed)
+│   │   ├── src/                  # 38 source scripts (35 distributed)
 │   │   │   ├── animation/        # Motion and rigging tools
 │   │   │   ├── composition/      # Comp layout and slider templates
 │   │   │   ├── effects/          # Visual effects, audio sync, color
@@ -64,7 +64,7 @@ ae/
 
 > The **native Build-a-Bar plugin source** (cross-platform C++/Obj-C++ AEGP, macOS + Windows) is maintained in a separate private repository; only its prebuilt binaries are distributed here, under `site/download/native/`.
 
-## Script Catalog (33)
+## Script Catalog (35)
 
 Three scripts remain in `src/` but are **excluded from distribution** (the bundle, the Command Bar, and the website): `Onionizer`, `PathDuplitron`, and `Split-o-matic_9x16`.
 
@@ -77,13 +77,14 @@ Three scripts remain in `src/` but are **excluded from distribution** (the bundl
 | **[Linearizer](packages/ae-scripts/src/animation/Linearizer.jsx)** | Drive existing keyframed animation from any slider, position, or rotation value. |
 | **[Limb-a-tron](packages/ae-scripts/src/animation/Limb-a-tron.jsx)** | Two-segment IK/FK limb rig — drag one null to bend it, tune everything from one controller. |
 
-### Composition (3)
+### Composition (4)
 
 | Script | Description |
 |--------|-------------|
 | **[Guiderator](packages/ae-scripts/src/composition/Guiderator.jsx)** | Drop exact ruler guides by typing a number — or a formula like `1920/2` — into a dockable panel. |
 | **[Slidotron_16x9](packages/ae-scripts/src/composition/Slidotron_16x9.jsx)** | One-click horizontal 4K slide-reveal rig — two nested comps with mirrored alpha mattes. |
 | **[Slidotron_9x16](packages/ae-scripts/src/composition/Slidotron_9x16.jsx)** | One-click vertical 1080×1920 slide-reveal rig with mirrored mattes. |
+| **[Verticalizer](packages/ae-scripts/src/composition/Verticalizer.jsx)** | Turn a landscape source into a rigged 1080×1920 split-screen portrait comp in one click — drag-handle framing plus a full styling panel. |
 
 ### Effects (4)
 

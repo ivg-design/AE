@@ -32,11 +32,12 @@
 - [Linearizer](../packages/ae-scripts/src/animation/Linearizer.jsx) - Property linking system
 - [Limb-a-tron](../packages/ae-scripts/src/animation/Limb-a-tron.jsx) - IK/FK limb rig with regular/noodle body modes
 
-### Composition (4 scripts)
+### Composition (5 scripts)
 - [Guiderator](../packages/ae-scripts/src/composition/Guiderator.jsx) - Guide placement with calculator
 - [Slidotron_16x9](../packages/ae-scripts/src/composition/Slidotron_16x9.jsx) - Horizontal slider compositions
 - [Slidotron_9x16](../packages/ae-scripts/src/composition/Slidotron_9x16.jsx) - Vertical slider compositions
 - [Split-o-matic_9x16](../packages/ae-scripts/src/composition/Split-o-matic_9x16.jsx) - Split-screen templates
+- [Verticalizer](../packages/ae-scripts/src/composition/Verticalizer.jsx) - Landscape-to-portrait split-screen rig builder
 
 ### Effects (4 scripts)
 - [ChromaBlenderizer](../packages/ae-scripts/src/effects/ChromaBlenderizer.jsx) - Modeless color interpolation palette
