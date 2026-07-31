@@ -73,7 +73,24 @@
     const closeList = () => { if (listType) { out.push(`</${listType}>`); listType = null; } };
     const flushTable = () => {
       if (!tableBuf.length) return;
-      const rows = tableBuf.map(r => r.split('|').slice(1, -1).map(c => c.trim()));
+      // A cell may legitimately contain a pipe (a popup's item list, a name with
+      // "||" in it), so the row is walked rather than split: "\|" is an escaped
+      // literal, every other "|" is a cell boundary. A plain split('|') turned
+      // one escaped pipe into an extra column, which pushed the row past the
+      // header's column count and blew the table out over the page.
+      const splitRow = (r) => {
+        const cells = [];
+        let cur = '';
+        for (let i = 0; i < r.length; i++) {
+          const ch = r[i];
+          if (ch === '\\' && r[i + 1] === '|') { cur += '|'; i++; continue; }
+          if (ch === '|') { cells.push(cur); cur = ''; continue; }
+          cur += ch;
+        }
+        cells.push(cur);
+        return cells.slice(1, -1).map(c => c.trim());
+      };
+      const rows = tableBuf.map(splitRow);
       tableBuf = [];
       if (rows.length < 2) return;
       const head = rows[0], body = rows.slice(2);

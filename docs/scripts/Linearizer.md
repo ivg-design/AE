@@ -21,7 +21,7 @@ After applying, a **"Uniform Interpolation"** checkbox appears on the driver lay
 | Min Value / Max Value | Palette text fields | The driver-value range that maps end-to-end across the target's keyframes. Replace the placeholder text with numbers |
 | Apply Linear Expression | Palette | Creates the checkbox controller and writes the expression(s), all in one undo group |
 | Cancel | Palette | Closes with no changes |
-| "Uniform Interpolation …" checkbox | Effect Controls on the **driver layer** (created by Apply) | Toggles all linked properties between relative and even segment spacing. Named `Uniform Interpolation ||<layer>><property>` for a single target, `Uniform Interpolation || Multiple Properties` for a batch |
+| "Uniform Interpolation …" checkbox | Effect Controls on the **driver layer** (created by Apply) | Toggles all linked properties between relative and even segment spacing. Named `Uniform Interpolation \|\|<layer>><property>` for a single target, `Uniform Interpolation \|\| Multiple Properties` for a batch |
 
 ## Usage
 

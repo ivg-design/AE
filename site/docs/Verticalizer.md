@@ -121,9 +121,9 @@ Match name `Pseudo/IVGD Verticalizer9` (bumped again in 1.8.0 — see the versio
 | Control | Type | Range | Default | Purpose |
 |---|---|---|---|---|
 | Gap | Slider | 0–400 px | 12 px | Seam spacing between the top and bottom windows **when Seam Mode is Gap** — centred on the split line and unaffected by either card's Inset. Ignored entirely when Seam Mode is Inset. |
-| Seam Mode | Popup, 2 items | Gap \| Inset | Gap | Chooses what governs the middle seam. **Gap** holds it at exactly the Gap value no matter what either card's Inset is (Inset only ever shrinks that card's comp-facing edges). **Inset** instead pins each card's seam edge at that card's own Inset × Seam Inset % from the split line and ignores Gap — this is the mode to use when you want the middle spacing to visually match the outer framing. |
+| Seam Mode | Popup, 2 items | Gap · Inset | Gap | Chooses what governs the middle seam. **Gap** holds it at exactly the Gap value no matter what either card's Inset is (Inset only ever shrinks that card's comp-facing edges). **Inset** instead pins each card's seam edge at that card's own Inset × Seam Inset % from the split line and ignores Gap — this is the mode to use when you want the middle spacing to visually match the outer framing. |
 | Seam Inset % | Slider | 0–100% | 50% | Only takes effect when Seam Mode is Inset. Percentage of a card's own Inset applied to its seam-facing edge. 50% means the two cards' half-insets add up to one full inset of seam width — e.g. two 30 px Insets at 50% put each card 15 px off the split line, a 30 px seam matching a 30 px outer Inset. |
-| Audio Source | Popup, 3 items | Top Video \| Bottom Video \| Muted | Top Video | Exclusive audio routing: the selected window plays at 0 dB, the other is forced to -192 dB. `BG <name>` never carries audio regardless of this setting. |
+| Audio Source | Popup, 3 items | Top Video · Bottom Video · Muted | Top Video | Exclusive audio routing: the selected window plays at 0 dB, the other is forced to -192 dB. `BG <name>` never carries audio regardless of this setting. |
 
 ### ▸ PIP
 
@@ -131,7 +131,7 @@ New in 1.5.0. Blends the whole rig, keyframably, between the ordinary split layo
 
 | Control | Type | Range | Default | Purpose |
 |---|---|---|---|---|
-| PiP Panel | Popup, 2 items | Top \| Bottom | Top | Which window floats as the PiP card as `PiP Transition` rises; the other window is the background card and grows to fill the comp minus its own Inset. |
+| PiP Panel | Popup, 2 items | Top · Bottom | Top | Which window floats as the PiP card as `PiP Transition` rises; the other window is the background card and grows to fill the comp minus its own Inset. |
 | PiP Transition | Slider | 0–100% | 0% | Keyframeable blend factor between the split layout (0) and the full PiP layout (100). Every window quantity — matte, footage, card, pan clamp, the `Z TOP` / `Z BOT` nulls — is the straight lerp between its split value and its PiP value at this fraction, so `0` reproduces the split geometry exactly and any value in between is a straight interpolation. |
 | PiP Scale | Slider | 10–100% (typeable to 5–200%) | 40% | The floating card's width as a percentage of comp width; its height follows that card's own Aspect control. Centred on the draggable orange `PIP Handle`. |
 
@@ -139,10 +139,10 @@ New in 1.5.0. Blends the whole rig, keyframably, between the ordinary split layo
 
 | Control | Type | Range | Default | Purpose |
 |---|---|---|---|---|
-| Top Aspect | Popup, 6 items | Cover \| 1:1 \| 16:9 \| 9:16 \| Fit Height \| Fit Width | Cover | Shapes the top window box within its section. Cover fills the full inset box (footage still auto-fills/crops per Zoom). The fixed-ratio items (1:1, 16:9, 9:16) center a box of that ratio inside the inset box. Fit Height / Fit Width use the SOURCE's own aspect ratio: Fit Height pins the box to the full section height (cropping sides if the source is too wide for the width available); Fit Width pins to the full section width (letterboxing/cropping vertically). Hold-keyframeable — see "Keyable aspect" below. |
+| Top Aspect | Popup, 6 items | Cover · 1:1 · 16:9 · 9:16 · Fit Height · Fit Width | Cover | Shapes the top window box within its section. Cover fills the full inset box (footage still auto-fills/crops per Zoom). The fixed-ratio items (1:1, 16:9, 9:16) center a box of that ratio inside the inset box. Fit Height / Fit Width use the SOURCE's own aspect ratio: Fit Height pins the box to the full section height (cropping sides if the source is too wide for the width available); Fit Width pins to the full section width (letterboxing/cropping vertically). Hold-keyframeable — see "Keyable aspect" below. |
 | Top Aspect Ease | Slider (integer) | 0–120 frames | 15 | New in 1.8.0. For this many frames after a `Top Aspect` keyframe, the top window's geometry (split fit and PiP floating-box aspect alike) eases linearly from the previous key's aspect to the new one instead of cutting on the keyframe's frame. `0`, or an Aspect with no keyframes, is the pre-1.8.0 instant-cut behavior. |
 | Top Inset | Slider | 0–200 px | 0 px | Pixel margin applied to the top section's comp-facing edges (top, left, right) before the Aspect box is resolved inside it — as of 1.3.0 the seam-facing (bottom) edge is governed separately by Layout's Seam Mode / Seam Inset %, not by this control. |
-| Top Scale Mode | Popup, 2 items | Fill Window \| Fixed | Fill Window | New in 1.4.0. Chooses what `Top Zoom` is a percentage *of*. **Fill Window** (the pre-1.4.0 behavior) takes the baseline from the resolved window (`max(winW / sw, winH / sh)`), so anything that moves the window — SPLIT, Gap, Seam Mode, Seam Inset %, Top Inset, Top Aspect — also rescales the footage. **Fixed** takes the baseline from the comp instead (`max(CW / sw, CH / sh)`), which nothing in the window resolver can touch, so dragging the split only re-crops the matte and the footage holds exactly the size Top Zoom gives it (100% = covers the whole comp). In Fixed mode the footage can end up smaller than its window if Top Zoom is below that window's own fill percentage — the pan clamp then centres it and matte void shows at the edges, which is the mode doing what it was asked to do. |
+| Top Scale Mode | Popup, 2 items | Fill Window · Fixed | Fill Window | New in 1.4.0. Chooses what `Top Zoom` is a percentage *of*. **Fill Window** (the pre-1.4.0 behavior) takes the baseline from the resolved window (`max(winW / sw, winH / sh)`), so anything that moves the window — SPLIT, Gap, Seam Mode, Seam Inset %, Top Inset, Top Aspect — also rescales the footage. **Fixed** takes the baseline from the comp instead (`max(CW / sw, CH / sh)`), which nothing in the window resolver can touch, so dragging the split only re-crops the matte and the footage holds exactly the size Top Zoom gives it (100% = covers the whole comp). In Fixed mode the footage can end up smaller than its window if Top Zoom is below that window's own fill percentage — the pan clamp then centres it and matte void shows at the edges, which is the mode doing what it was asked to do. |
 | Top Zoom | Slider | 10–1000% | 100% | Multiplier on the Scale Mode baseline — 100% exactly covers the top window box (Fill Window) or the whole comp (Fixed). |
 | Top Clamp Pan | Checkbox | — | On | Clamps the *effective* pan offset read by the top window's position expression so the source can't expose empty space at the edge. |
 
@@ -179,10 +179,10 @@ New in 1.5.0. Blends the whole rig, keyframably, between the ordinary split layo
 
 | Control | Type | Range | Default | Purpose |
 |---|---|---|---|---|
-| Bottom Aspect | Popup, 6 items | Cover \| 1:1 \| 16:9 \| 9:16 \| Fit Height \| Fit Width | Cover | Same as Top Aspect, for the bottom window. Hold-keyframeable — see "Keyable aspect" below. |
+| Bottom Aspect | Popup, 6 items | Cover · 1:1 · 16:9 · 9:16 · Fit Height · Fit Width | Cover | Same as Top Aspect, for the bottom window. Hold-keyframeable — see "Keyable aspect" below. |
 | Bottom Aspect Ease | Slider (integer) | 0–120 frames | 15 | New in 1.8.0. Same as Top Aspect Ease, for the bottom window. |
 | Bottom Inset | Slider | 0–200 px | 0 px | Same as Top Inset, for the bottom window (comp-facing edges are bottom/left/right; the seam-facing top edge is governed by Seam Mode / Seam Inset %). |
-| Bottom Scale Mode | Popup, 2 items | Fill Window \| Fixed | Fill Window | Same as Top Scale Mode, for the bottom window. |
+| Bottom Scale Mode | Popup, 2 items | Fill Window · Fixed | Fill Window | Same as Top Scale Mode, for the bottom window. |
 | Bottom Zoom | Slider | 10–1000% | 100% | Same as Top Zoom, for the bottom window. |
 | Bottom Clamp Pan | Checkbox | — | On | Same as Top Clamp Pan. |
 
@@ -227,7 +227,7 @@ New in 1.5.0. Blends the whole rig, keyframably, between the ordinary split layo
 
 | Control | Type | Range | Default | Purpose |
 |---|---|---|---|---|
-| BG Mode | Popup, 4 items | Blurred Video \| Solid \| Gradient \| Transparent | Blurred Video | Which background layer is visible: `BG <name>` opacity is 100 only in mode 1; `BG Fill`'s Gradient Ramp is opaque only in modes 2 and 3 (mode 2 collapses both ramp stops to Color A). |
+| BG Mode | Popup, 4 items | Blurred Video · Solid · Gradient · Transparent | Blurred Video | Which background layer is visible: `BG <name>` opacity is 100 only in mode 1; `BG Fill`'s Gradient Ramp is opaque only in modes 2 and 3 (mode 2 collapses both ramp stops to Color A). |
 | BG Blur | Slider | 0–500 px | 120 px | Box blur applied to `BG <name>`. |
 | BG Darken | Slider | 0–100% | 30% | Opacity of the dedicated `BG Darken` black solid layered above `BG <name>` (forced to 0 in Transparent mode). |
 | BG Color A | Color | — | #101014 | Solid color, and the gradient's first stop. |
@@ -240,7 +240,7 @@ This group styles **only the first caption** (`Caption Text` / `Caption Box`, dr
 | Control | Type | Range | Default | Purpose |
 |---|---|---|---|---|
 | Show Captions | Checkbox | — | On | Shows/hides the caption text and its background box (drives both layers' opacity, and the shared `CAPTION Handle`'s own opacity from 1.6.0). |
-| Caption Source | Popup, 2 items | Manual \| Markers | Manual | New in 1.7.0. **Manual** types text directly into the caption's text layer (the pre-1.7.0 behavior, untouched). **Markers** turns the caption into a subtitle track driven by the markers on this caption's own TEXT layer (falling back to the comp's markers if the text layer has none): the text becomes the active marker's comment for its segment, and nothing in the gaps. See "Marker-driven captions" below. |
+| Caption Source | Popup, 2 items | Manual · Markers | Manual | New in 1.7.0. **Manual** types text directly into the caption's text layer (the pre-1.7.0 behavior, untouched). **Markers** turns the caption into a subtitle track driven by the markers on this caption's own TEXT layer (falling back to the comp's markers if the text layer has none): the text becomes the active marker's comment for its segment, and nothing in the gaps. See "Marker-driven captions" below. |
 | Caption Fade | Checkbox | — | Off | New in 1.7.0. Fades the caption text and its box together (outline included) over `Fade Frames`. In Markers mode the fade lives strictly inside the marker segment; in Manual mode it runs against the text layer's own in/out points. Off produces a fade factor of exactly 1 — bit-for-bit the 1.6.1 rig. |
 | Fade Frames | Slider (integer) | 0–120 frames (typeable to 999) | 0 | New in 1.7.0. Frame count for `Caption Fade`'s in/out ramp. A segment (or trim) shorter than two fades caps its peak below full opacity instead of overshooting. |
 | Captions Size | Slider | 10–300 px | 64 px | Caption font size (fed into `text.sourceText.style.setFontSize()`, rounded). |
@@ -259,7 +259,7 @@ This group styles **only the first caption** (`Caption Text` / `Caption Box`, dr
 |---|---|---|---|---|
 | Show Safe Zones | Checkbox | — | On | Toggles the red safe-zone overlay bands and the green safe-rect outline. |
 | Safe Zone Opacity | Slider | 0–100% | 40% | Opacity of the whole `Safe Zones` layer (bands and outline together). |
-| Platform | Popup, 4 items | All (conservative) \| TikTok \| Reels \| Shorts | All (conservative) | Selects which platform's UI-clearance numbers the overlay shows. |
+| Platform | Popup, 4 items | All (conservative) · TikTok · Reels · Shorts | All (conservative) | Selects which platform's UI-clearance numbers the overlay shows. |
 
 ## The `Verticalizer Caption` effect (1.6.0, marker source + fade added 1.7.0)
 
@@ -268,7 +268,7 @@ A second, standalone embedded pseudo effect, applied once per caption added via 
 | Control | Type | Range | Default | Purpose |
 |---|---|---|---|---|
 | Show Captions | Checkbox | — | On | Shows/hides *this* caption's text and box, and hides `Caption NN Handle` itself when off (Show Handles still wins). |
-| Caption Source | Popup, 2 items | Manual \| Markers | Manual | New in 1.7.0. **Markers** reads the markers on this caption's *own* `Caption NN Text` layer (falling back to the comp's markers if the text layer has none), so any number of standalone captions can each run their own subtitle track without colliding. See "Marker-driven captions" below. |
+| Caption Source | Popup, 2 items | Manual · Markers | Manual | New in 1.7.0. **Markers** reads the markers on this caption's *own* `Caption NN Text` layer (falling back to the comp's markers if the text layer has none), so any number of standalone captions can each run their own subtitle track without colliding. See "Marker-driven captions" below. |
 | Caption Fade | Checkbox | — | Off | New in 1.7.0. Fades this caption's text and box together over `Fade Frames`, same semantics as the built-in caption's `Caption Fade`. |
 | Fade Frames | Slider (integer) | 0–120 frames (typeable to 999) | 0 | New in 1.7.0. Frame count for this caption's fade ramp. |
 | Captions Size | Slider | 10–300 px | 64 px | Font size for this caption only. |
