@@ -13,6 +13,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { renderLibraryFallback } from "./render-library-fallback.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..", "..", ".."); // .../ae-script-catalog (site now lives in ae/site)
@@ -477,13 +478,18 @@ function main() {
     const re = new RegExp(`${START}[\\s\\S]*?${END}`);
     if (re.test(html)) html = html.replace(re, block);
     else console.warn(`  ! index.html missing INLINE_SCRIPTS_DATA markers — inline skipped`);
-    // 2) keep the visible + SEO script counts in lock-step with the catalog
+    // 2) render crawlable guide links inside the existing tool browser. The
+    //    app progressively enhances these anchors into filters, modal details,
+    //    downloads, and grid view; without JS, every guide remains navigable.
+    html = renderLibraryFallback(html, entries);
+
+    // 3) keep the visible + SEO script counts in lock-step with the catalog
     html = html
       .replace(/\b\d+ scripts that delete/g, `${N} scripts that delete`)
       .replace(/Search \d+ scripts/g, `Search ${N} scripts`)
       .replace(/\b\d+ (free )?After Effects scripts/g, (m, f) => `${N} ${f || ""}After Effects scripts`)
       .replace(/\b\d+ production-ready/g, `${N} production-ready`);
-    // 3) regenerate the JSON-LD graph from the current catalog (never stale)
+    // 4) regenerate the JSON-LD graph from the current catalog (never stale)
     const desc = `${N} production-ready After Effects scripts for rigging, keyframes, paths, effects and audio — plus a dockable command bar. Free under MIT.`;
     const ld = { "@context": "https://schema.org", "@graph": [
       { "@type": "WebSite", "@id": BASE + "#website", url: BASE, name: "IVG Toolkit", description: desc,
