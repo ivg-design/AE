@@ -46,6 +46,7 @@ if (stage && canvas && window.WebGLRenderingContext) {
     loader.load(
       'assets/logo-3d.glb',
       (gltf) => {
+        stage.classList.remove('logo3d--fallback');
         const model = gltf.scene;
         model.traverse((o) => {
           if (!o.isMesh || !o.material) return;

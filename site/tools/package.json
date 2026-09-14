@@ -1,0 +1,11 @@
+{
+  "name": "ivg-toolkit-site-assets",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:images": "node build-images.mjs"
+  },
+  "devDependencies": {
+    "sharp": "0.35.3"
+  }
+}
