@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VertexMaster — After Effects script documentation</title>
+  <meta name="description" content="VertexMaster for After Effects: Turn a bezier path's vertices and tangents into null-object handles you can keyframe and parent, or flip to Follow mode to track…" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/apps/ae/assets/favicon-32.png?v=11" />
+  <link rel="icon" type="image/png" sizes="256x256" href="/apps/ae/assets/ae-toolkit.png?v=11" />
+  <link rel="apple-touch-icon" href="/apps/ae/assets/apple-touch-icon.png?v=11" />
+  <link rel="stylesheet" href="/apps/ae/css/fonts.css?v=1" />
+  <link rel="stylesheet" href="/apps/ae/css/site.css?v=11" />
+  <style>
+    [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: var(--bg-alt); padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .doc-nav .l { display: flex; align-items: center; gap: 11px; }
+    .doc-nav .mark {
+      width: 28px; height: 28px; border-radius: 8px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .doc-nav .mark .lucide { width: 15px; height: 15px; color: #fff; }
+    .doc-nav .brand { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+    .doc-nav .ver {
+      font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 3px 7px;
+    }
+    .doc-nav .r { display: flex; align-items: center; gap: 26px; }
+    .doc-nav .r a { font-size: 14px; color: var(--text-secondary); }
+    .doc-nav .r a.on { color: var(--text-primary); font-weight: 600; }
+    .doc-nav .r a:hover { color: var(--text-primary); }
+    .doc-nav .dl-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff !important;
+      border-radius: 9px; padding: 9px 16px; font-size: 13.5px; font-weight: 600;
+    }
+    .doc-nav .dl-btn .lucide { width: 15px; height: 15px; }
+
+    .doc-shell { display: flex; min-height: calc(100vh - 66px); }
+    .doc-side {
+      width: 262px; flex: none;
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 26px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+    }
+    /* styled scrollbar for the left script panel + right TOC (unstyled default stood out) */
+    .doc-side, .doc-toc { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.16) transparent; }
+    .doc-side::-webkit-scrollbar, .doc-toc::-webkit-scrollbar { width: 8px; }
+    .doc-side::-webkit-scrollbar-track, .doc-toc::-webkit-scrollbar-track { background: transparent; }
+    .doc-side::-webkit-scrollbar-thumb, .doc-toc::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+    }
+    .doc-side:hover::-webkit-scrollbar-thumb, .doc-toc:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,.26); background-clip: padding-box; }
+    .doc-side .search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 11px; margin-bottom: 14px;
+    }
+    .doc-side .search .lucide { width: 13px; height: 13px; color: var(--text-muted); }
+    .doc-side .search input {
+      border: none; background: none; outline: none; width: 100%;
+      font-family: var(--font-body); font-size: 13px; color: var(--text-primary);
+    }
+    .doc-side .search input::placeholder { color: var(--text-muted); }
+    .doc-side .grp {
+      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted);
+      padding: 14px 0 6px 2px;
+    }
+    .doc-side a {
+      display: flex; align-items: center; gap: 9px;
+      border-radius: 7px; padding: 8px 11px;
+      font-size: 13.5px; color: var(--text-secondary);
+    }
+    .doc-side a:hover { background: #ffffff08; }
+    .doc-side a.on { background: var(--accent-soft); color: var(--text-primary); font-weight: 600; }
+    .doc-side a img { width: 32px; height: 32px; object-fit: contain; }
+    .doc-side a .lucide { width: 30px; height: 30px; color: var(--text-muted); }
+
+    .doc-article { flex: 1; min-width: 0; padding: 44px 64px; max-width: 900px; }
+    .doc-bc {
+      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .doc-bc b { color: var(--accent-text); font-weight: 400; }
+    .doc-article h1 {
+      font-family: var(--font-display); font-size: 42px; font-weight: 600; letter-spacing: -1px;
+      margin: 0 0 14px;
+    }
+    .doc-badges { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .md > p:first-of-type { font-size: 17px; line-height: 1.6; }
+    .md h2 {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);
+      margin: 40px 0 14px; padding-top: 26px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .md h3 {
+      font-family: var(--font-display); font-size: 16.5px; font-weight: 600; color: var(--text-primary);
+      margin: 26px 0 10px;
+    }
+    .md p { margin: 0 0 14px; }
+    .md ul, .md ol { margin: 0 0 16px; padding-left: 22px; display: flex; flex-direction: column; gap: 7px; }
+    .md li::marker { color: var(--accent-text); }
+    .md code {
+      font-family: var(--font-mono); font-size: .86em; color: var(--accent-text);
+      background: var(--term-bg); border: 1px solid var(--border-soft);
+      border-radius: 5px; padding: 1.5px 6px;
+    }
+    .md pre {
+      background: var(--term-bg); border: 1px solid var(--border-soft); border-radius: 10px;
+      padding: 14px 16px; overflow-x: auto; margin: 0 0 16px;
+    }
+    .md pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.6; }
+    .md blockquote {
+      border-left: 3px solid var(--accent); border-radius: 2px;
+      padding: 2px 0 2px 16px; margin: 0 0 16px;
+      color: var(--text-secondary); font-size: 16px;
+    }
+    .md table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 13.5px; }
+    .md th {
+      text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: .8px;
+      color: var(--text-muted); font-weight: 500; text-transform: uppercase;
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    .md td { padding: 9px 12px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+    .md td:first-child { color: var(--text-primary); white-space: nowrap; }
+    .md strong { color: var(--text-primary); font-weight: 600; }
+    .md hr { border: none; border-top: 1px solid var(--border-soft); margin: 24px 0; }
+
+    .doc-dl {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px; margin-top: 36px;
+    }
+    .doc-dl .t { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .doc-dl .s { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+    .doc-dl .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .doc-dl .a1 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff; border-radius: 9px; padding: 10px 16px;
+      font-size: 13.5px; font-weight: 600;
+    }
+    .doc-dl .a2 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
+    }
+    .doc-dl .lucide { width: 15px; height: 15px; }
+
+    .doc-toc {
+      width: 222px; flex: none;
+      border-left: 1px solid var(--border);
+      padding: 44px 24px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+      display: flex; flex-direction: column; gap: 13px;
+    }
+    .doc-toc .h { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted); }
+    .doc-toc a { font-size: 13px; color: var(--text-muted); }
+    .doc-toc a:hover { color: var(--text-secondary); }
+    .doc-toc a.on { color: var(--accent-text); }
+
+    @media (max-width: 1100px) { .doc-toc { display: none; } }
+    @media (max-width: 860px) {
+      .doc-side { display: none; }
+      .doc-article { padding: 32px 24px; }
+      [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav { padding: 14px 20px; }
+      .doc-nav .r a:not(.dl-btn) { display: none; }
+    }
+  </style>
+  <link rel="canonical" href="https://forge.mograph.life/apps/ae/docs/vertexmaster.html" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="IVG Toolkit" />
+  <meta property="og:title" content="VertexMaster — After Effects script documentation" /><meta property="og:description" content="VertexMaster for After Effects: Turn a bezier path's vertices and tangents into null-object handles you can keyframe and parent, or flip to Follow mode to track…" />
+  <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs/vertexmaster.html" /><meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="VertexMaster — After Effects script documentation" />
+  <meta name="twitter:description" content="VertexMaster for After Effects: Turn a bezier path's vertices and tangents into null-object handles you can keyframe and parent, or flip to Follow mode to track…" /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/vertexmaster.html#page","url":"https://forge.mograph.life/apps/ae/docs/vertexmaster.html","headline":"VertexMaster — After Effects script documentation","name":"VertexMaster — After Effects script documentation","description":"VertexMaster for After Effects: Turn a bezier path's vertices and tangents into null-object handles you can keyframe and parent, or flip to Follow mode to track…","inLanguage":"en","author":{"@type":"Person","name":"Ilya Gusinski","url":"https://www.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"VertexMaster","item":"https://forge.mograph.life/apps/ae/docs/vertexmaster.html"}]}]}</script>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a class="l" href="/apps/ae/">
+      <span class="mark"><i data-lucide="zap"></i></span>
+      <span class="brand">IVG Toolkit</span>
+      <span class="ver">Open source</span>
+    </a>
+    <div class="r">
+      <a href="/apps/ae/#library">Library</a>
+      <a href="/apps/ae/docs.html" class="on">Docs</a>
+      <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository">GitHub</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download data-forge-action="download_intent"><i data-lucide="download"></i>Download</a>
+    </div>
+  </nav>
+
+  <div class="doc-shell">
+    <aside class="doc-side" id="docSide">
+      <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" aria-label="Filter script documentation" placeholder="Filter scripts…" /></label>
+<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster">PathMaster</a>
+<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer">Verticalizer</a>
+<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron">Sync-o-tron</a>
+<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron">Valuatron</a>
+<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron">TimeWarp-a-tron</a>
+<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster" class="on" aria-current="page">VertexMaster</a>
+<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator">Triminator</a>
+    </aside>
+    <main class="doc-article" id="docArticle">
+      <nav class="doc-bc" id="docBc" aria-label="Breadcrumb"><a href="/">IVG Design Forge</a> <span>/</span> <a href="/apps/ae/">IVG Toolkit</a> <span>/</span> <a href="/apps/ae/docs.html">Documentation</a> <span>/</span> <a href="/apps/ae/docs/vertexmaster.html">VertexMaster</a></nav>
+      <h1 id="docH1">VertexMaster</h1>
+      <div class="doc-badges" id="docBadges"><span class="chip">Paths &amp; Shapes</span><span class="chip">v2.0.2</span><span class="chip">DIALOG</span></div>
+      <div class="md" id="docMd"><blockquote>Turn a bezier path's vertices and tangents into draggable null-object handles you can keyframe, parent, and expression-link — or flip a null to Follow mode to read out an already-animated path.</blockquote>
+<p><strong>Category:</strong> paths · <strong>Version:</strong> 2.0.2 · <strong>UI:</strong> DIALOG (tree-view path picker + Vertex / InTangent / OutTangent checkboxes)</p>
+<h2 id="what-it-does">What it does</h2>
+<p>VertexMaster rigs a shape layer's bezier path so you can reshape it by dragging null objects — keyframing, parenting, and expression-linking each vertex the way you would any other layer, instead of hand-editing points on the Path property.</p>
+<p>Run it with a single shape layer selected and a dialog opens with a tree of that layer's shape content (its groups and paths) and three checkboxes: <strong>Vertex</strong>, <strong>InTangent</strong>, <strong>OutTangent</strong>. Pick a path, choose which handles you want, and click <strong>Create</strong>. The script adds one or more null layers — a vertex control null, plus optional in/out tangent nulls parented to it — and writes a fresh expression onto the shape's actual Path property that rebuilds the whole path with <code>createPath()</code>, substituting in whichever nulls you've activated. Any vertex you leave inactive is passed through untouched, so the original path animation keeps playing.</p>
+<p>Each vertex null carries a <strong>Control/Follow</strong> checkbox. In Control mode (the default) the null pushes its position into the path. Flip it to Follow and the null instead reads the path's current vertex location and sits on it — so the same handle becomes a live read-out of an already-animated path rather than a driver of it. A third <strong>Open/Closed Path</strong> checkbox on the vertex null toggles whether the path's first and last vertices are joined.</p>
+<p>This is built for organic and character path work — tentacles, limbs, hand-drawn silhouettes — where you want the tactile feel of null-based control over a bezier path.</p>
+<h2 id="controls-options">Controls &amp; options</h2>
+<h3>The dialog</h3>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default</th><th>Meaning</th></tr></thead><tbody><tr><td>Path tree</td><td>Tree view</td><td>—</td><td>Every group and path inside the selected shape layer's Contents. Click the <strong>Path</strong> leaf you want to rig (not a group node).</td></tr><tr><td>Vertex</td><td>Checkbox</td><td>on</td><td>Create a vertex control null for one path vertex.</td></tr><tr><td>InTangent</td><td>Checkbox</td><td>off</td><td>Create an incoming-tangent handle, parented to the vertex null.</td></tr><tr><td>OutTangent</td><td>Checkbox</td><td>off</td><td>Create an outgoing-tangent handle, parented to the vertex null.</td></tr><tr><td>Create</td><td>Button</td><td>—</td><td>Build the nulls and write the Path expression.</td></tr><tr><td>Cancel</td><td>Button</td><td>—</td><td>Close with no changes.</td></tr></tbody></table>
+<h3>The nulls it creates</h3>
+<p>Nulls are named after the selected path's parent group. For a group named <strong>Ellipse 1</strong>, checking all three boxes produces:</p>
+<pre><code>Ellipse 1 Vertex 1                    ← vertex control null
+Ellipse 1 inTangent for Vertex 1      ← parented to the vertex null
+Ellipse 1 outTangent for Vertex 1     ← parented to the vertex null</code></pre>
+<p>The vertex null carries three effects that drive the rig:</p>
+<table><thead><tr><th>Effect on the vertex null</th><th>Type</th><th>Default</th><th>Meaning</th></tr></thead><tbody><tr><td>Vertex Control</td><td>Slider</td><td>0</td><td>1-based index of the path vertex this null drives or tracks. <code>0</code> = inactive: that null is ignored and the path is left untouched.</td></tr><tr><td>Control/Follow</td><td>Checkbox</td><td>0</td><td><code>0</code> = Control (the null's position is pushed into the path); <code>1</code> = Follow (the null reads and displays the path's current vertex location).</td></tr><tr><td>Open/Closed Path</td><td>Checkbox</td><td>0</td><td>Toggles the path's closed/open topology (whether the first and last vertices are joined).</td></tr></tbody></table>
+<p>The tangent nulls carry no effects of their own — they are bare handles you keyframe by hand, and the Path expression reads their world position back as the tangent offset.</p>
+<h2 id="usage">Usage</h2>
+<ol>
+<li>Select a single shape layer that contains at least one bezier path, with a comp active.</li>
+<li>Run VertexMaster. Expand the tree and click the specific <strong>Path</strong> leaf you want to control.</li>
+<li>Leave <strong>Vertex</strong> checked; optionally check <strong>InTangent</strong> and/or <strong>OutTangent</strong>. Click <strong>Create</strong>.</li>
+<li>On the new vertex null, set <strong>Vertex Control</strong> to the 1-based index of the vertex you want to drive.</li>
+<li>Move the null (and its tangent children, if created) to reshape the path. Keyframe, parent, or expression-link it like any layer.</li>
+<li>To make a handle track the path instead of driving it, set <strong>Control/Follow</strong> to <code>1</code>.</li>
+<li>To open or close the path, toggle <strong>Open/Closed Path</strong>.</li>
+<li>For more vertices, duplicate the vertex null together with its tangent children — see Notes.</li>
+</ol>
+<h2 id="notes">Notes</h2>
+<ul>
+<li><strong>Snap the null to its vertex before driving it.</strong> A freshly created vertex null appears at the composition center (After Effects' default null position), not on the path. In Control mode the null's starting position is what gets pushed onto the path, so position the null over the target vertex first — or briefly set <strong>Control/Follow</strong> to <code>1</code> with the right index to snap it there, then switch back to Control — so the vertex doesn't jump.</li>
+<li><strong>Controlling more than one vertex.</strong> Duplicate the vertex null together with its parented tangent children. After Effects' auto-numbering advances the trailing token (<code>Vertex 1</code> → <code>Vertex 2</code>) on both the null and its tangents, and the Path expression pairs each tangent to its vertex by that trailing token, so duplicated sets stay wired correctly. Give each duplicate its own <strong>Vertex Control</strong> index.</li>
+<li><strong>Follow mode</strong> is per-null: any null with <strong>Control/Follow</strong> on becomes a passive read-out of the live path rather than a control, which is handy for tracking a vertex on an already-animated path.</li>
+<li>The Path expression rebuilds the entire path with <code>createPath()</code> on every frame and finds the nulls by matching their names, so keep the created nulls named as generated.</li>
+</ul>
+<h2 id="requirements-edge-cases">Requirements &amp; edge cases</h2>
+<ul>
+<li>Needs an active composition and exactly one selected shape layer; otherwise the script alerts and exits before the dialog opens.</li>
+<li>Works on shape-layer paths only. Layer <strong>masks</strong> are not surfaced in the tree — only paths inside the shape layer's Contents appear.</li>
+<li>Select a <strong>Path</strong> leaf, not a group node. Selecting a group is rejected with &quot;Please select a Path from the tree view.&quot;</li>
+<li>The path must sit <strong>exactly one shape group</strong> below the layer's Contents. A path at the top level of Contents, or nested two or more groups deep, is rejected with an alert — the vertex/tangent coordinate math is built around that one-group depth.</li>
+<li><strong>Vertex</strong> must be checked to add tangent handles, since the tangent nulls are parented to the vertex null. Checking InTangent/OutTangent alone is rejected with &quot;Tangent controls must be attached to a Vertex control.&quot;</li>
+<li>Cancel aborts with no changes.</li>
+</ul>
+<h2 id="how-it-works">How it works</h2>
+<p>The whole tool runs in <code>main()</code>. It first checks for an active <code>CompItem</code> and exactly one selected <code>ADBE Vector Layer</code>, then <code>extractGroups()</code> recursively walks the layer's <code>Contents</code>, recording <code>ADBE Vector Group</code> folders and <code>ADBE Vector Shape - Group</code> path leaves into a plain-object tree. <code>createTreeView()</code> mirrors that into the ScriptUI dialog — groups become expandable nodes, paths become selectable items.</p>
+<p>When you click <strong>Create</strong>, it validates the selection by its ScriptUI item type (leaf item vs group node) and counts the selection's ancestor depth to enforce the one-group-deep rule, then calls <code>getAEPathAndObject()</code> to turn the tree selection into both a live Path property reference and a <code>(&quot;Contents&quot;)(&quot;…&quot;)(&quot;Path&quot;)</code> string for the expression. <code>createControls()</code> adds the nulls via <code>comp.layers.addNull()</code>, wires the Vertex Control slider and the Control/Follow and Open/Closed Path checkboxes onto the vertex null, and parents any tangent nulls to it.</p>
+<p><code>createExpression()</code> writes the string assigned to the shape's Path property. Each frame it reads the path's current <code>points()</code>, <code>inTangents()</code>, and <code>outTangents()</code>, scans the comp's layers for the vertex and tangent nulls by name prefix, and — for any vertex null in Control mode with a non-zero index — converts the null's world position into shape-local space (<code>toWorld</code>/<code>fromWorld</code>, offset by the enclosing group's Position minus Anchor Point via <code>propertyGroup(3)</code>), overwriting that vertex and its paired tangents. Finally it calls <code>createPath(points, inTangents, outTangents, isOpenPath)</code> to rebuild the path.</p></div>
+      <div class="doc-dl" id="docDl">
+        <div>
+          <div class="t" id="dlT">Get VertexMaster</div>
+          <div class="s" id="dlS">v2.0.2 · DIALOG · MIT</div>
+        </div>
+        <div class="actions">
+          <a class="a1" id="dlBtn" href="/apps/ae/scripts/paths/VertexMaster.jsx" download data-forge-action="download_intent"><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository"><i data-lucide="github"></i>View source</a>
+        </div>
+      </div>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design" data-forge-action="service_outbound">Work with Ilya</a> · <a href="/services/">Creative services</a></footer></main>
+    <aside class="doc-toc" id="docToc">
+      <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#controls-options">Controls &amp; options</a><a href="#usage">Usage</a><a href="#notes">Notes</a><a href="#requirements-edge-cases">Requirements &amp; edge cases</a><a href="#how-it-works">How it works</a>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/apps/ae/vendor/lucide.min.js"></script>
+  <script src="/apps/ae/js/docs.js?v=14"></script>
+  <script src="/shared/js/growth-events.js" defer></script>
+</body>
+</html>

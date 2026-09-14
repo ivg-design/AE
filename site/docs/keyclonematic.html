@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KeyCloneMatic — After Effects script documentation</title>
+  <meta name="description" content="KeyCloneMatic for After Effects: Repeat a hand-tuned keyframe set down the timeline at a fixed or decaying interval — values, easing, and spatial tangents cloned…" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/apps/ae/assets/favicon-32.png?v=11" />
+  <link rel="icon" type="image/png" sizes="256x256" href="/apps/ae/assets/ae-toolkit.png?v=11" />
+  <link rel="apple-touch-icon" href="/apps/ae/assets/apple-touch-icon.png?v=11" />
+  <link rel="stylesheet" href="/apps/ae/css/fonts.css?v=1" />
+  <link rel="stylesheet" href="/apps/ae/css/site.css?v=11" />
+  <style>
+    [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: var(--bg-alt); padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .doc-nav .l { display: flex; align-items: center; gap: 11px; }
+    .doc-nav .mark {
+      width: 28px; height: 28px; border-radius: 8px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .doc-nav .mark .lucide { width: 15px; height: 15px; color: #fff; }
+    .doc-nav .brand { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+    .doc-nav .ver {
+      font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 3px 7px;
+    }
+    .doc-nav .r { display: flex; align-items: center; gap: 26px; }
+    .doc-nav .r a { font-size: 14px; color: var(--text-secondary); }
+    .doc-nav .r a.on { color: var(--text-primary); font-weight: 600; }
+    .doc-nav .r a:hover { color: var(--text-primary); }
+    .doc-nav .dl-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff !important;
+      border-radius: 9px; padding: 9px 16px; font-size: 13.5px; font-weight: 600;
+    }
+    .doc-nav .dl-btn .lucide { width: 15px; height: 15px; }
+
+    .doc-shell { display: flex; min-height: calc(100vh - 66px); }
+    .doc-side {
+      width: 262px; flex: none;
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 26px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+    }
+    /* styled scrollbar for the left script panel + right TOC (unstyled default stood out) */
+    .doc-side, .doc-toc { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.16) transparent; }
+    .doc-side::-webkit-scrollbar, .doc-toc::-webkit-scrollbar { width: 8px; }
+    .doc-side::-webkit-scrollbar-track, .doc-toc::-webkit-scrollbar-track { background: transparent; }
+    .doc-side::-webkit-scrollbar-thumb, .doc-toc::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+    }
+    .doc-side:hover::-webkit-scrollbar-thumb, .doc-toc:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,.26); background-clip: padding-box; }
+    .doc-side .search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 11px; margin-bottom: 14px;
+    }
+    .doc-side .search .lucide { width: 13px; height: 13px; color: var(--text-muted); }
+    .doc-side .search input {
+      border: none; background: none; outline: none; width: 100%;
+      font-family: var(--font-body); font-size: 13px; color: var(--text-primary);
+    }
+    .doc-side .search input::placeholder { color: var(--text-muted); }
+    .doc-side .grp {
+      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted);
+      padding: 14px 0 6px 2px;
+    }
+    .doc-side a {
+      display: flex; align-items: center; gap: 9px;
+      border-radius: 7px; padding: 8px 11px;
+      font-size: 13.5px; color: var(--text-secondary);
+    }
+    .doc-side a:hover { background: #ffffff08; }
+    .doc-side a.on { background: var(--accent-soft); color: var(--text-primary); font-weight: 600; }
+    .doc-side a img { width: 32px; height: 32px; object-fit: contain; }
+    .doc-side a .lucide { width: 30px; height: 30px; color: var(--text-muted); }
+
+    .doc-article { flex: 1; min-width: 0; padding: 44px 64px; max-width: 900px; }
+    .doc-bc {
+      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .doc-bc b { color: var(--accent-text); font-weight: 400; }
+    .doc-article h1 {
+      font-family: var(--font-display); font-size: 42px; font-weight: 600; letter-spacing: -1px;
+      margin: 0 0 14px;
+    }
+    .doc-badges { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .md > p:first-of-type { font-size: 17px; line-height: 1.6; }
+    .md h2 {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);
+      margin: 40px 0 14px; padding-top: 26px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .md h3 {
+      font-family: var(--font-display); font-size: 16.5px; font-weight: 600; color: var(--text-primary);
+      margin: 26px 0 10px;
+    }
+    .md p { margin: 0 0 14px; }
+    .md ul, .md ol { margin: 0 0 16px; padding-left: 22px; display: flex; flex-direction: column; gap: 7px; }
+    .md li::marker { color: var(--accent-text); }
+    .md code {
+      font-family: var(--font-mono); font-size: .86em; color: var(--accent-text);
+      background: var(--term-bg); border: 1px solid var(--border-soft);
+      border-radius: 5px; padding: 1.5px 6px;
+    }
+    .md pre {
+      background: var(--term-bg); border: 1px solid var(--border-soft); border-radius: 10px;
+      padding: 14px 16px; overflow-x: auto; margin: 0 0 16px;
+    }
+    .md pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.6; }
+    .md blockquote {
+      border-left: 3px solid var(--accent); border-radius: 2px;
+      padding: 2px 0 2px 16px; margin: 0 0 16px;
+      color: var(--text-secondary); font-size: 16px;
+    }
+    .md table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 13.5px; }
+    .md th {
+      text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: .8px;
+      color: var(--text-muted); font-weight: 500; text-transform: uppercase;
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    .md td { padding: 9px 12px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+    .md td:first-child { color: var(--text-primary); white-space: nowrap; }
+    .md strong { color: var(--text-primary); font-weight: 600; }
+    .md hr { border: none; border-top: 1px solid var(--border-soft); margin: 24px 0; }
+
+    .doc-dl {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px; margin-top: 36px;
+    }
+    .doc-dl .t { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .doc-dl .s { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+    .doc-dl .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .doc-dl .a1 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff; border-radius: 9px; padding: 10px 16px;
+      font-size: 13.5px; font-weight: 600;
+    }
+    .doc-dl .a2 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
+    }
+    .doc-dl .lucide { width: 15px; height: 15px; }
+
+    .doc-toc {
+      width: 222px; flex: none;
+      border-left: 1px solid var(--border);
+      padding: 44px 24px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+      display: flex; flex-direction: column; gap: 13px;
+    }
+    .doc-toc .h { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted); }
+    .doc-toc a { font-size: 13px; color: var(--text-muted); }
+    .doc-toc a:hover { color: var(--text-secondary); }
+    .doc-toc a.on { color: var(--accent-text); }
+
+    @media (max-width: 1100px) { .doc-toc { display: none; } }
+    @media (max-width: 860px) {
+      .doc-side { display: none; }
+      .doc-article { padding: 32px 24px; }
+      [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav { padding: 14px 20px; }
+      .doc-nav .r a:not(.dl-btn) { display: none; }
+    }
+  </style>
+  <link rel="canonical" href="https://forge.mograph.life/apps/ae/docs/keyclonematic.html" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="IVG Toolkit" />
+  <meta property="og:title" content="KeyCloneMatic — After Effects script documentation" /><meta property="og:description" content="KeyCloneMatic for After Effects: Repeat a hand-tuned keyframe set down the timeline at a fixed or decaying interval — values, easing, and spatial tangents cloned…" />
+  <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs/keyclonematic.html" /><meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="KeyCloneMatic — After Effects script documentation" />
+  <meta name="twitter:description" content="KeyCloneMatic for After Effects: Repeat a hand-tuned keyframe set down the timeline at a fixed or decaying interval — values, easing, and spatial tangents cloned…" /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/keyclonematic.html#page","url":"https://forge.mograph.life/apps/ae/docs/keyclonematic.html","headline":"KeyCloneMatic — After Effects script documentation","name":"KeyCloneMatic — After Effects script documentation","description":"KeyCloneMatic for After Effects: Repeat a hand-tuned keyframe set down the timeline at a fixed or decaying interval — values, easing, and spatial tangents cloned…","inLanguage":"en","author":{"@type":"Person","name":"Ilya Gusinski","url":"https://www.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"KeyCloneMatic","item":"https://forge.mograph.life/apps/ae/docs/keyclonematic.html"}]}]}</script>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a class="l" href="/apps/ae/">
+      <span class="mark"><i data-lucide="zap"></i></span>
+      <span class="brand">IVG Toolkit</span>
+      <span class="ver">Open source</span>
+    </a>
+    <div class="r">
+      <a href="/apps/ae/#library">Library</a>
+      <a href="/apps/ae/docs.html" class="on">Docs</a>
+      <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository">GitHub</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download data-forge-action="download_intent"><i data-lucide="download"></i>Download</a>
+    </div>
+  </nav>
+
+  <div class="doc-shell">
+    <aside class="doc-side" id="docSide">
+      <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" aria-label="Filter script documentation" placeholder="Filter scripts…" /></label>
+<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster">PathMaster</a>
+<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer">Verticalizer</a>
+<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron">Sync-o-tron</a>
+<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic" class="on" aria-current="page">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron">Valuatron</a>
+<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron">TimeWarp-a-tron</a>
+<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster">VertexMaster</a>
+<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator">Triminator</a>
+    </aside>
+    <main class="doc-article" id="docArticle">
+      <nav class="doc-bc" id="docBc" aria-label="Breadcrumb"><a href="/">IVG Design Forge</a> <span>/</span> <a href="/apps/ae/">IVG Toolkit</a> <span>/</span> <a href="/apps/ae/docs.html">Documentation</a> <span>/</span> <a href="/apps/ae/docs/keyclonematic.html">KeyCloneMatic</a></nav>
+      <h1 id="docH1">KeyCloneMatic</h1>
+      <div class="doc-badges" id="docBadges"><span class="chip">Keyframes</span><span class="chip">v2.0.1</span><span class="chip">DIALOG</span></div>
+      <div class="md" id="docMd"><blockquote>Repeat a hand-tuned set of keyframes down the timeline at a fixed or decaying interval — values, easing, and spatial tangents cloned faithfully.</blockquote>
+<p><strong>Category:</strong> keyframes · <strong>Version:</strong> 2.0.1 · <strong>UI:</strong> DIALOG</p>
+<h2 id="what-it-does">What it does</h2>
+<p>KeyCloneMatic clones whatever keyframes you've selected — on one property or many, one layer or many — and stamps repeated copies of that whole set later in time, spaced by an interval you choose. Animate one cycle of a bounce, blink, or gesture by hand, then repeat it N more times (or fill the rest of the comp) without copy/pasting.</p>
+<p>A small dialog collects the spacing in frames, the repetition count (or a &quot;Comp Duration&quot; auto-fill), and an optional <strong>Temporal Decay</strong> that progressively shrinks the gap between repeats — so cycles accelerate over time like a ball settling — shaped by a Linear, Ease In, or Ease Out curve over a decay window you set.</p>
+<p>Each cloned keyframe carries over its value, in/out interpolation types, temporal ease, spatial tangents and continuity, roving, and label color — a faithful copy, not a simplified one. The script only touches keyframes you selected; it never creates layers, effects, or expressions, and the whole run is one &quot;KeyCloneMatic&quot; undo step.</p>
+<h2 id="controls-options">Controls &amp; options</h2>
+<table><thead><tr><th>Control</th><th>Default</th><th>Meaning</th></tr></thead><tbody><tr><td>Interval Duration (frames)</td><td>100</td><td>Frame gap between the end of one repeated set and the start of the next</td></tr><tr><td>No. of Repetitions</td><td>5</td><td>How many copies to stamp out. Ignored when Comp Duration is checked</td></tr><tr><td>Comp Duration</td><td>unchecked</td><td>Auto-computes the repetition count to fill the remaining comp duration</td></tr><tr><td>Temporal Decay</td><td>unchecked</td><td>Shrinks the interval per repetition instead of keeping it constant</td></tr><tr><td>Decay Duration (frames)</td><td>1200</td><td>Window over which the decay completes — larger values decay more slowly. Only used when Temporal Decay is checked</td></tr><tr><td>Decay Type</td><td>Linear</td><td>Curve for the shrink: <strong>Linear</strong> (steady), <strong>Ease In</strong> (holds near full, then decays faster), <strong>Ease Out</strong> (decays fast at first, then eases toward zero)</td></tr><tr><td>Cancel / Proceed</td><td>—</td><td>Proceed validates the numbers, closes the dialog, and runs the duplication</td></tr></tbody></table>
+<p>With decay enabled, the gap shrinks from the full interval toward zero as repetitions progress — repeats bunch closer and closer together.</p>
+<h2 id="usage">Usage</h2>
+<ol>
+<li>In the Timeline, select the layer(s), the property/properties, and then the specific keyframes that make up the cycle you want repeated.</li>
+<li>Run KeyCloneMatic.</li>
+<li>Set the interval (frames) between repeats.</li>
+<li>Type a repetition count, or check <strong>Comp Duration</strong> to fill the rest of the comp.</li>
+<li>Optionally check <strong>Temporal Decay</strong>, set a decay duration, and pick a curve.</li>
+<li>Click <strong>Proceed</strong>. Copies appear down the timeline; one undo reverses everything.</li>
+</ol>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>The selected keyframes' overall span defines the pattern: each repetition places the whole pattern, then advances by the pattern length plus the (possibly decayed) interval — repeats stay evenly spaced.</li>
+<li>Auto Bezier keyframes are cloned as ordinary Bezier keyframes with the ease frozen at clone time — the clones won't re-adjust themselves the way Auto Bezier keys do.</li>
+<li>Clones that would land past the end of the comp are silently dropped.</li>
+<li>New keyframes come in selected, so you can immediately nudge or re-run on the result.</li>
+</ul>
+<h2 id="requirements-edge-cases">Requirements &amp; edge cases</h2>
+<ul>
+<li>After Effects CS6 or later.</li>
+<li>Needs an active composition — otherwise &quot;No active composition selected.&quot;</li>
+<li>Needs at least one selected keyframe on a selected property — otherwise &quot;No keyframes selected.&quot;</li>
+<li>With <strong>Comp Duration</strong> checked and a single selected keyframe (or keys all at one time), the interval must be greater than 0 — the script alerts and stops rather than computing infinite repetitions.</li>
+<li>Non-numeric input in any required field is rejected with an alert before anything runs (decay duration is only required when Temporal Decay is checked; repetitions only when Comp Duration is unchecked).</li>
+</ul>
+<h2 id="how-it-works">How it works</h2>
+<p>The script opens its undo group, builds the <code>Window('dialog')</code>, and blocks on <code>dialog.show()</code>; Proceed parses and validates the fields, closes the dialog, and calls <code>duplicateKeyframesAcrossLayers()</code>. The undo group closes after the dialog returns, so both alert paths stay balanced.</p>
+<p>A local <code>Keyframe(property, keyIndex)</code> helper snapshots everything about one key — time, value, in/out interpolation, temporal ease and continuity, label, roving, and (for spatial properties) tangents and continuity — and its <code>.clone(newTime)</code> re-creates the key elsewhere via <code>addKey</code> + <code>setValueAtKey</code> + the matching <code>set…AtKey</code> calls.</p>
+<p>The main routine sweeps <code>selectedLayers</code> → <code>selectedProperties</code> → <code>keySelected</code> keys into a pattern array while tracking the earliest/latest selected times. <code>durationPerSet</code> is the pattern's span; in Comp Duration mode the repetition count is derived from the remaining comp length divided by (span + interval). A decay-factor table is precomputed per repetition — progress <code>t = i·interval / decayDuration</code>, clamped to 1, shaped as <code>1−t</code>, <code>1−t²</code>, or <code>(1−t)²</code>. Each pass then clones the original pattern at <code>duplicateTime + (keyTime − patternStart)</code> and advances <code>duplicateTime</code> by span plus the decayed interval, so drift can't accumulate across passes.</p></div>
+      <div class="doc-dl" id="docDl">
+        <div>
+          <div class="t" id="dlT">Get KeyCloneMatic</div>
+          <div class="s" id="dlS">v2.0.1 · DIALOG · MIT</div>
+        </div>
+        <div class="actions">
+          <a class="a1" id="dlBtn" href="/apps/ae/scripts/keyframes/KeyCloneMatic.jsx" download data-forge-action="download_intent"><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository"><i data-lucide="github"></i>View source</a>
+        </div>
+      </div>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design" data-forge-action="service_outbound">Work with Ilya</a> · <a href="/services/">Creative services</a></footer></main>
+    <aside class="doc-toc" id="docToc">
+      <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#controls-options">Controls &amp; options</a><a href="#usage">Usage</a><a href="#notes">Notes</a><a href="#requirements-edge-cases">Requirements &amp; edge cases</a><a href="#how-it-works">How it works</a>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/apps/ae/vendor/lucide.min.js"></script>
+  <script src="/apps/ae/js/docs.js?v=14"></script>
+  <script src="/shared/js/growth-events.js" defer></script>
+</body>
+</html>

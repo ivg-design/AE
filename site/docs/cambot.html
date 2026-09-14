@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CamBot — After Effects script documentation</title>
+  <meta name="description" content="CamBot for After Effects: Build a fully-rigged 3D camera you steer from one panel — dial from free-fly to locked tracking, blend multiple targets, and play 26…" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/apps/ae/assets/favicon-32.png?v=11" />
+  <link rel="icon" type="image/png" sizes="256x256" href="/apps/ae/assets/ae-toolkit.png?v=11" />
+  <link rel="apple-touch-icon" href="/apps/ae/assets/apple-touch-icon.png?v=11" />
+  <link rel="stylesheet" href="/apps/ae/css/fonts.css?v=1" />
+  <link rel="stylesheet" href="/apps/ae/css/site.css?v=11" />
+  <style>
+    [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: var(--bg-alt); padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .doc-nav .l { display: flex; align-items: center; gap: 11px; }
+    .doc-nav .mark {
+      width: 28px; height: 28px; border-radius: 8px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .doc-nav .mark .lucide { width: 15px; height: 15px; color: #fff; }
+    .doc-nav .brand { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+    .doc-nav .ver {
+      font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 3px 7px;
+    }
+    .doc-nav .r { display: flex; align-items: center; gap: 26px; }
+    .doc-nav .r a { font-size: 14px; color: var(--text-secondary); }
+    .doc-nav .r a.on { color: var(--text-primary); font-weight: 600; }
+    .doc-nav .r a:hover { color: var(--text-primary); }
+    .doc-nav .dl-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff !important;
+      border-radius: 9px; padding: 9px 16px; font-size: 13.5px; font-weight: 600;
+    }
+    .doc-nav .dl-btn .lucide { width: 15px; height: 15px; }
+
+    .doc-shell { display: flex; min-height: calc(100vh - 66px); }
+    .doc-side {
+      width: 262px; flex: none;
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 26px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+    }
+    /* styled scrollbar for the left script panel + right TOC (unstyled default stood out) */
+    .doc-side, .doc-toc { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.16) transparent; }
+    .doc-side::-webkit-scrollbar, .doc-toc::-webkit-scrollbar { width: 8px; }
+    .doc-side::-webkit-scrollbar-track, .doc-toc::-webkit-scrollbar-track { background: transparent; }
+    .doc-side::-webkit-scrollbar-thumb, .doc-toc::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+    }
+    .doc-side:hover::-webkit-scrollbar-thumb, .doc-toc:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,.26); background-clip: padding-box; }
+    .doc-side .search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 11px; margin-bottom: 14px;
+    }
+    .doc-side .search .lucide { width: 13px; height: 13px; color: var(--text-muted); }
+    .doc-side .search input {
+      border: none; background: none; outline: none; width: 100%;
+      font-family: var(--font-body); font-size: 13px; color: var(--text-primary);
+    }
+    .doc-side .search input::placeholder { color: var(--text-muted); }
+    .doc-side .grp {
+      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted);
+      padding: 14px 0 6px 2px;
+    }
+    .doc-side a {
+      display: flex; align-items: center; gap: 9px;
+      border-radius: 7px; padding: 8px 11px;
+      font-size: 13.5px; color: var(--text-secondary);
+    }
+    .doc-side a:hover { background: #ffffff08; }
+    .doc-side a.on { background: var(--accent-soft); color: var(--text-primary); font-weight: 600; }
+    .doc-side a img { width: 32px; height: 32px; object-fit: contain; }
+    .doc-side a .lucide { width: 30px; height: 30px; color: var(--text-muted); }
+
+    .doc-article { flex: 1; min-width: 0; padding: 44px 64px; max-width: 900px; }
+    .doc-bc {
+      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .doc-bc b { color: var(--accent-text); font-weight: 400; }
+    .doc-article h1 {
+      font-family: var(--font-display); font-size: 42px; font-weight: 600; letter-spacing: -1px;
+      margin: 0 0 14px;
+    }
+    .doc-badges { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .md > p:first-of-type { font-size: 17px; line-height: 1.6; }
+    .md h2 {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);
+      margin: 40px 0 14px; padding-top: 26px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .md h3 {
+      font-family: var(--font-display); font-size: 16.5px; font-weight: 600; color: var(--text-primary);
+      margin: 26px 0 10px;
+    }
+    .md p { margin: 0 0 14px; }
+    .md ul, .md ol { margin: 0 0 16px; padding-left: 22px; display: flex; flex-direction: column; gap: 7px; }
+    .md li::marker { color: var(--accent-text); }
+    .md code {
+      font-family: var(--font-mono); font-size: .86em; color: var(--accent-text);
+      background: var(--term-bg); border: 1px solid var(--border-soft);
+      border-radius: 5px; padding: 1.5px 6px;
+    }
+    .md pre {
+      background: var(--term-bg); border: 1px solid var(--border-soft); border-radius: 10px;
+      padding: 14px 16px; overflow-x: auto; margin: 0 0 16px;
+    }
+    .md pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.6; }
+    .md blockquote {
+      border-left: 3px solid var(--accent); border-radius: 2px;
+      padding: 2px 0 2px 16px; margin: 0 0 16px;
+      color: var(--text-secondary); font-size: 16px;
+    }
+    .md table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 13.5px; }
+    .md th {
+      text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: .8px;
+      color: var(--text-muted); font-weight: 500; text-transform: uppercase;
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    .md td { padding: 9px 12px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+    .md td:first-child { color: var(--text-primary); white-space: nowrap; }
+    .md strong { color: var(--text-primary); font-weight: 600; }
+    .md hr { border: none; border-top: 1px solid var(--border-soft); margin: 24px 0; }
+
+    .doc-dl {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px; margin-top: 36px;
+    }
+    .doc-dl .t { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .doc-dl .s { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+    .doc-dl .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .doc-dl .a1 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff; border-radius: 9px; padding: 10px 16px;
+      font-size: 13.5px; font-weight: 600;
+    }
+    .doc-dl .a2 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
+    }
+    .doc-dl .lucide { width: 15px; height: 15px; }
+
+    .doc-toc {
+      width: 222px; flex: none;
+      border-left: 1px solid var(--border);
+      padding: 44px 24px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+      display: flex; flex-direction: column; gap: 13px;
+    }
+    .doc-toc .h { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted); }
+    .doc-toc a { font-size: 13px; color: var(--text-muted); }
+    .doc-toc a:hover { color: var(--text-secondary); }
+    .doc-toc a.on { color: var(--accent-text); }
+
+    @media (max-width: 1100px) { .doc-toc { display: none; } }
+    @media (max-width: 860px) {
+      .doc-side { display: none; }
+      .doc-article { padding: 32px 24px; }
+      [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav { padding: 14px 20px; }
+      .doc-nav .r a:not(.dl-btn) { display: none; }
+    }
+  </style>
+  <link rel="canonical" href="https://forge.mograph.life/apps/ae/docs/cambot.html" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="IVG Toolkit" />
+  <meta property="og:title" content="CamBot — After Effects script documentation" /><meta property="og:description" content="CamBot for After Effects: Build a fully-rigged 3D camera you steer from one panel — dial from free-fly to locked tracking, blend multiple targets, and play 26…" />
+  <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs/cambot.html" /><meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="CamBot — After Effects script documentation" />
+  <meta name="twitter:description" content="CamBot for After Effects: Build a fully-rigged 3D camera you steer from one panel — dial from free-fly to locked tracking, blend multiple targets, and play 26…" /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/cambot.html#page","url":"https://forge.mograph.life/apps/ae/docs/cambot.html","headline":"CamBot — After Effects script documentation","name":"CamBot — After Effects script documentation","description":"CamBot for After Effects: Build a fully-rigged 3D camera you steer from one panel — dial from free-fly to locked tracking, blend multiple targets, and play 26…","inLanguage":"en","author":{"@type":"Person","name":"Ilya Gusinski","url":"https://www.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"CamBot","item":"https://forge.mograph.life/apps/ae/docs/cambot.html"}]}]}</script>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a class="l" href="/apps/ae/">
+      <span class="mark"><i data-lucide="zap"></i></span>
+      <span class="brand">IVG Toolkit</span>
+      <span class="ver">Open source</span>
+    </a>
+    <div class="r">
+      <a href="/apps/ae/#library">Library</a>
+      <a href="/apps/ae/docs.html" class="on">Docs</a>
+      <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository">GitHub</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download data-forge-action="download_intent"><i data-lucide="download"></i>Download</a>
+    </div>
+  </nav>
+
+  <div class="doc-shell">
+    <aside class="doc-side" id="docSide">
+      <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" aria-label="Filter script documentation" placeholder="Filter scripts…" /></label>
+<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot" class="on" aria-current="page">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster">PathMaster</a>
+<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer">Verticalizer</a>
+<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron">Sync-o-tron</a>
+<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron">Valuatron</a>
+<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron">TimeWarp-a-tron</a>
+<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster">VertexMaster</a>
+<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator">Triminator</a>
+    </aside>
+    <main class="doc-article" id="docArticle">
+      <nav class="doc-bc" id="docBc" aria-label="Breadcrumb"><a href="/">IVG Design Forge</a> <span>/</span> <a href="/apps/ae/">IVG Toolkit</a> <span>/</span> <a href="/apps/ae/docs.html">Documentation</a> <span>/</span> <a href="/apps/ae/docs/cambot.html">CamBot</a></nav>
+      <h1 id="docH1">CamBot</h1>
+      <div class="doc-badges" id="docBadges"><span class="chip">Animation &amp; Rigging</span><span class="chip">v3.15.1</span><span class="chip">HEADLESS</span></div>
+      <div class="md" id="docMd"><blockquote>A one‑node camera you direct from a single control panel — free‑fly it like an FPS cam, dial in a target to smoothly become a two‑node tracking cam, blend between multiple subjects, and play 26 procedural camera moves by keyframing one slider.</blockquote>
+<p><strong>Category:</strong> animation · <strong>Version:</strong> 3.15.1 · <strong>UI:</strong> HEADLESS (run to build a rig; no dialog)</p>
+<h2 id="what-it-does">What it does</h2>
+<p>CamBot builds a complete, fully‑rigged 3D camera that you control entirely from one effect panel — no hand‑animating rotation, no wrestling with After Effects' two‑node camera quirks. Run it on an open comp and it creates two layers:</p>
+<ul>
+<li><strong><code>CamBot N Target</code></strong> — a shape layer with a crosshair graphic. This is both the <strong>control host</strong> (it carries the <code>CamBot</code> effect with every rig parameter) <strong>and</strong> the camera's default aim target. Move it to reposition where the camera looks.</li>
+<li><strong><code>CamBot N Cam</code></strong> — the camera itself. Every one of its channels (position, orientation, roll, zoom, focus, aperture, blur) is driven by expressions that read the control host, so you never touch the camera directly.</li>
+</ul>
+<p>The heart of CamBot is a single continuous dial between <strong>one‑node</strong> and <strong>two‑node</strong> behaviour. At <strong><code>Look‑At‑Influence</code> 0</strong> the camera is a genuine free/FPS camera — you aim it with <code>Pan</code> / <code>Tilt</code> / <code>Roll</code> and it depends on no target at all. Raise <code>Look‑At‑Influence</code> and the aim <strong>smoothly crossfades</strong> to face a target; at 100 it's a locked two‑node tracking cam. There's no mode switch to flip and nothing breaks in the transition, because every rotation channel is owned by the rig (there are no stray manual rotation values to fight the aim).</p>
+<p>On top of that sit the features you'd expect from a proper camera rig: <strong>Dolly</strong> and <strong>Orbit</strong>, intuitive <strong>Focal Length in millimetres</strong>, <strong>smart depth of field</strong> (auto‑focus that locks to the subject, F‑Stop, near/far blur, focus‑area width), <strong>handheld shake</strong> and follow <strong>smoothing</strong>, a <strong>Realistic Limits</strong> clamp that keeps lens/focus values physically plausible (or off, for stylized work), <strong>multi‑target blending</strong> (point at several layers and crossfade the look‑at between them), and a <strong>procedural Moves engine</strong> — 26 ready‑made camera moves you perform by keyframing a single <code>Progress</code> slider.</p>
+<h2 id="how-it-works">How it works</h2>
+<ul>
+<li><strong>Two layers, everything expression‑driven.</strong> The camera reads all of its behaviour from the <code>CamBot</code> effect on the <code>CamBot N Target</code> shape. You animate the <em>controls</em>, never the camera.</li>
+<li><strong>Orientation‑driven aim (true one‑node).</strong> Auto‑orient is turned off. The camera's <strong>Orientation</strong> is an expression that blends a <em>free direction</em> (from <code>Pan</code>/<code>Tilt</code>) with a <em>target direction</em> (toward the resolved target) by the <strong>effective look‑at</strong>. <code>X</code>/<code>Y Rotation</code> are locked to 0 and <code>Z Rotation</code> carries <strong>Roll</strong> — so all four rotation channels are owned by the rig and mode changes can never leave stray values behind.</li>
+<li><strong>Effective look‑at = <code>Look‑At‑Influence</code> × total target influence.</strong> This is the master signal. If nothing is targeted (all target influences 0), the camera is one‑node even at Look‑At‑Influence 100. If Look‑At‑Influence is 0, it's one‑node regardless. Everything in between is a smooth blend, and target‑dependent features (auto‑focus, target aiming, tracking moves) fade in on the same signal.</li>
+<li><strong>The target is the crosshair.</strong> <code>CamBot Target 1</code> (a small controller effect on the shape) defaults to targeting the shape itself at 100% — so out of the box, raising Look‑At‑Influence looks at the crosshair. Move the crosshair to aim.</li>
+<li><strong>Sensible defaults on build.</strong> Focal 50 mm, Film 36 mm, F‑Stop 5.6, Blur 100, Realistic Limits + Auto‑Focus on, DOF off, Manual Focus 1500, Shake Rotation 0 / Speed 2.</li>
+</ul>
+<h2 id="the-control-panel-cambot-effect-on-cambot-n-target">The control panel — <code>CamBot</code> effect (on <code>CamBot N Target</code>)</h2>
+<h3>▸ MOVES — the procedural move engine</h3>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td>Move</td><td>Dropdown</td><td>None</td><td>Pick a camera move (see the catalog below)</td></tr><tr><td>Progress</td><td>Slider</td><td>0</td><td>The move's playhead, 0→100. <strong>Keyframe this to perform the move.</strong></td></tr><tr><td>Intensity</td><td>Slider</td><td>100</td><td>Scales the move's distance / angle</td></tr><tr><td>Reverse</td><td>Checkbox</td><td>Off</td><td>Flip the move's direction / spin</td></tr></tbody></table>
+<p>Moves are <strong>additive on top of your manual controls</strong> — at Progress 0 nothing changes; keyframe Progress 0→100 and the bot performs the move relative to the current position and target.</p>
+<h3>▸ MOVE SHAPING — resize the selected move</h3>
+<p>Every move ships with sensible default dimensions (scaled to your comp). When you pick a move these controls <strong>auto‑fill with that move's defaults</strong> (via an expression) yet stay fully scrubbable — drag to resize the move, or keyframe them for a move that grows/shrinks as it plays. All units are absolute.</p>
+<table><thead><tr><th>Control</th><th>Type</th><th>Units</th><th>Purpose</th></tr></thead><tbody><tr><td>Radius</td><td>Slider</td><td>px</td><td>Arc width for orbit / spiral / helix / swoop moves</td></tr><tr><td>Depth</td><td>Slider</td><td>px</td><td>Travel distance along the view axis (push / fly / helix advance)</td></tr><tr><td>Height</td><td>Slider</td><td>px</td><td>Vertical rise or drop (crane, swoop, pedestal‑style moves)</td></tr><tr><td>Turns</td><td>Slider</td><td>count (0–50)</td><td>Revolutions an orbit / spiral / helix makes</td></tr><tr><td>Spin</td><td>Angle</td><td>°</td><td>Extra longitudinal roll added over the whole move (barrel‑roll a fly‑through)</td></tr></tbody></table>
+<p>Only the dimensions a given move actually uses have any effect (<code>Turns</code> drives Helix, not Push In). Leave them at their auto‑filled defaults for the stock look.</p>
+<h3>▸ FRAMING — aim &amp; roll</h3>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td>Pan</td><td>Angle</td><td>0°</td><td>Yaw — aim left/right (free‑aim direction)</td></tr><tr><td>Tilt</td><td>Angle</td><td>0°</td><td>Pitch — aim up/down (free‑aim direction)</td></tr><tr><td>Roll</td><td>Angle</td><td>0°</td><td>Camera roll / Dutch angle (drives Z Rotation)</td></tr><tr><td>Level Horizon</td><td>Checkbox</td><td>Off</td><td>Force Roll to 0 to keep the horizon flat</td></tr></tbody></table>
+<p><code>Pan</code>/<code>Tilt</code> define where a free camera looks. As <code>Look‑At‑Influence</code> rises, the aim crossfades from this free direction toward the target, so at full look‑at the target dominates and <code>Pan</code>/<code>Tilt</code> become fine offsets.</p>
+<h3>▸ POSITION</h3>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td>Camera Position</td><td>3D Point</td><td>0,0,0</td><td>Additive rig offset — the camera stays draggable, this adds on top</td></tr><tr><td>Separate Position Controls</td><td>Checkbox</td><td>Off</td><td>Use the individual X/Y/Z sliders instead of the 3D point (for <strong>per‑axis easing</strong>)</td></tr><tr><td>X / Y / Z Position</td><td>Sliders</td><td>0</td><td>Per‑axis offsets — keyframe each with independent easing</td></tr><tr><td>Dolly</td><td>Slider</td><td>0</td><td>Move along the view axis toward/away from the target — <strong>without changing zoom</strong></td></tr><tr><td>Orbit</td><td>Angle</td><td>0°</td><td>Swing around the target, horizontally</td></tr><tr><td>Orbit Elevation</td><td>Angle</td><td>0°</td><td>Swing around the target, vertically</td></tr></tbody></table>
+<p><strong>Why Separate Position?</strong> A single 3D Position gives you an authorable motion path but one shared temporal ease. The <code>X/Y/Z Position</code> sliders trade the path for <strong>independent easing per axis</strong> — useful when one axis should snap while another glides. (Author a spatial path by moving the camera/target directly; use these offsets when you need per‑axis timing.)</p>
+<h3>▸ LENS</h3>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td>Focal Length</td><td>Slider</td><td>50</td><td>Lens length in <strong>millimetres</strong> — drives the camera Zoom</td></tr><tr><td>Film Width</td><td>Slider</td><td>36</td><td>Sensor back in mm (36 = full frame). Change to match a format: Super35 ≈ 24.9, APS‑C ≈ 23.6, 16mm ≈ 12.5</td></tr><tr><td>Realistic Limits Lock</td><td>Checkbox</td><td>On</td><td>Clamp lens/focus/aperture/blur to real‑camera ranges. Turn <strong>off</strong> for stylized/extreme values</td></tr></tbody></table>
+<p><code>Zoom = Focal Length × (comp width / Film Width)</code>. Think in real lenses; the rig does the pixel maths.</p>
+<h3>▸ FOCUS — look‑at, target appearance &amp; depth of field</h3>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><strong>Look‑At‑Influence</strong></td><td>Slider</td><td>0</td><td><strong>The one‑node ↔ two‑node dial.</strong> 0 = free camera; 100 = locked on the target</td></tr><tr><td>Target Scale</td><td>Slider</td><td>100</td><td>Scales the crosshair graphic</td></tr><tr><td>Target Opacity</td><td>Slider</td><td>100</td><td>Crosshair opacity</td></tr><tr><td>Target Hide</td><td>Checkbox</td><td>Off</td><td>Force crosshair opacity to 0 — the target still works, just no visible marker</td></tr><tr><td>DOF</td><td>Checkbox</td><td>Off</td><td>Enable depth‑of‑field blur</td></tr><tr><td>Auto‑Focus Lock</td><td>Checkbox</td><td>On</td><td>Lock focus to the target's distance (fades to Manual when not looking at a target)</td></tr><tr><td>Focus Offset</td><td>Slider</td><td>0</td><td>Pull focus in front of / behind the subject</td></tr><tr><td>Manual Focus Distance</td><td>Slider</td><td>1500</td><td>Focus distance when Auto‑Focus is off / one‑node</td></tr><tr><td>Focus Area Width</td><td>Slider</td><td>0</td><td>Depth of the sharp zone around the focus plane</td></tr><tr><td>F‑Stop (Aperture)</td><td>Slider</td><td>5.6</td><td>Lower = shallower depth of field, more blur</td></tr><tr><td>Blur Level</td><td>Slider</td><td>100</td><td>Master DOF blur — scales Near + Far together</td></tr><tr><td>Near Blur</td><td>Slider</td><td>100</td><td>Foreground blur strength (base for the master)</td></tr><tr><td>Far Blur</td><td>Slider</td><td>100</td><td>Background blur strength (base for the master)</td></tr></tbody></table>
+<p><strong>Smart focus:</strong> Auto‑Focus fades from <strong>Manual → auto by the effective look‑at</strong>, so in one‑node mode (no target) it focuses at the Manual distance, and the DOF focus plane always agrees with where the camera is aiming.</p>
+<p><strong>Blur mapping:</strong> the camera's Near/Far Blur = <code>[Near Blur × Blur Level%, Far Blur × Blur Level%]</code> — set a Near/Far ratio, then animate the single <code>Blur Level</code> to scale both proportionally (like a locked pair).</p>
+<h3>▸ FEEL</h3>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td>Shake Position</td><td>Slider</td><td>0</td><td>Positional handheld amount (px)</td></tr><tr><td>Shake Rotation</td><td>Slider</td><td>0</td><td>Rotational handheld — jitters the <strong>aim</strong>, so it reads whether free or tracking</td></tr><tr><td>Shake Speed</td><td>Slider</td><td>2</td><td>Shake frequency</td></tr><tr><td>Shake Seed</td><td>Slider</td><td>0</td><td>Change for a different shake pattern</td></tr><tr><td>Smoothing</td><td>Slider</td><td>0</td><td>Follow‑lag — the camera eases up to ~0.6 s behind the target's motion</td></tr></tbody></table>
+<h2 id="targets-multi-target-blending-the-cambot-target-controller">Targets &amp; multi‑target blending — the <code>CamBot Target</code> controller</h2>
+<p>Aiming is handled by one or more small <strong><code>CamBot Target</code></strong> controller effects that live on the <code>CamBot N Target</code> shape. Each one has:</p>
+<table><thead><tr><th>Control</th><th>Type</th><th>Purpose</th></tr></thead><tbody><tr><td>Target Layer</td><td>Layer Control</td><td>Which layer the camera should look at</td></tr><tr><td>Target Influence</td><td>Slider (0–100)</td><td>How strongly this target pulls the aim</td></tr></tbody></table>
+<p>The camera aims at the <strong>weighted average</strong> of all <code>CamBot Target</code> layers (equal influences → the midpoint of the two). The resolved target also becomes the pivot for <code>Orbit</code>/<code>Dolly</code> and the reference for Auto‑Focus.</p>
+<ul>
+<li><strong>Add a target:</strong> select the <code>CamBot Target 1</code> effect on the shape and <strong>duplicate it</strong> (⌘/Ctrl‑D). After Effects auto‑numbers the copy <code>CamBot Target 2</code>, <code>3</code>… — CamBot iterates them automatically. (The effect itself contains a note reminding you to duplicate.)</li>
+<li><strong>Blend / hand off:</strong> point each copy's <code>Target Layer</code> at a different subject and <strong>animate their <code>Target Influence</code> sliders</strong>. Raising one 0→100 while lowering another 100→0 crossfades the aim smoothly through the midpoint.</li>
+<li><strong>Two subjects at 100% each:</strong> the camera splits the difference and looks at their midpoint.</li>
+</ul>
+<h2 id="the-move-catalog-26-moves">The Move catalog (26 moves)</h2>
+<p>Keyframe <code>Progress</code> 0→100 to perform. <code>Intensity</code> scales the amount; <code>Reverse</code> flips direction/spin; the <strong>Move Shaping</strong> controls resize each move.</p>
+<blockquote><strong>Departure vs arrival.</strong> Most moves <em>depart</em> from your framed shot: Progress 0 = current view, 100 = the destination. A few <em>arrive</em> at it — <strong>Reveal</strong>, <strong>Establish</strong>, <strong>Pull‑Back Reveal</strong> and <strong>Swoop High/Low</strong> begin offset (Progress 0) and settle into the framed shot at Progress 100. <code>Reverse</code> flips either direction.</blockquote>
+<table><thead><tr><th>Move</th><th>What the bot does</th></tr></thead><tbody><tr><td><strong>Push In / Pull Out</strong></td><td>Dolly toward / away from the target</td></tr><tr><td><strong>Dolly Zoom In / Out</strong></td><td>Dolly + counter‑zoom (Vertigo): subject stays the same size, background warps</td></tr><tr><td><strong>Truck Left / Right</strong></td><td>Slide the rig sideways</td></tr><tr><td><strong>Pedestal Up / Down</strong></td><td>Raise / lower the whole rig</td></tr><tr><td><strong>Orbit</strong></td><td>Arc ~120° around the target · <strong>Orbit 360</strong> — a full lap</td></tr><tr><td><strong>Spiral In / Out</strong></td><td>Orbit while the radius shrinks / grows (flat spiral)</td></tr><tr><td><strong>Helix In / Out</strong></td><td>Corkscrew <em>around the view axis</em> toward / away from the target — wide→narrow (In) or narrow→wide (Out)</td></tr><tr><td><strong>Fly‑By</strong></td><td>Travel a straight path past the target</td></tr><tr><td><strong>Fly‑Through</strong></td><td>Travel forward through and beyond the target</td></tr><tr><td><strong>Swoop High / Low</strong></td><td><em>Arrival</em> — start offset and high (High, clears floors) or low (Low), then swoop in along a curved arc to settle on the framed shot, with a roll bank</td></tr><tr><td><strong>Crane Up / Down</strong></td><td>Vertical boom</td></tr><tr><td><strong>Reveal</strong></td><td>Start tilted down, rise to the aim</td></tr><tr><td><strong>Establish</strong></td><td>High &amp; wide → descend/push to the subject</td></tr><tr><td><strong>Pull‑Back Reveal</strong></td><td>Big pull‑back + slight rise + focal widen</td></tr><tr><td><strong>Whip Pan</strong></td><td>Fast whip that lands the aim on the target</td></tr><tr><td><strong>Parallax</strong></td><td>Sideways truck locked on the target for strong parallax</td></tr><tr><td><strong>Drift (Handheld)</strong></td><td>Continuous organic float using the shake feel</td></tr></tbody></table>
+<blockquote>Some moves are inherently target‑centric (Orbit, Fly‑By tracking, Whip Pan, Parallax). Raise <code>Look‑At‑Influence</code> so the camera is actually looking at the target for those to read; the free moves (Push/Pull, Truck, Pedestal, Drift…) work in one‑node mode too.</blockquote>
+<h2 id="usage">Usage</h2>
+<p><strong>Build a rig</strong></p>
+<ol>
+<li>Open or select a composition.</li>
+<li>Run <strong>CamBot</strong>. You get <code>CamBot N Target</code> (the crosshair + control panel) and <code>CamBot N Cam</code>.</li>
+<li>Everything is driven from the <code>CamBot</code> effect on <code>CamBot N Target</code>. Open its Effect Controls.</li>
+</ol>
+<p><strong>One‑node (free) camera</strong></p>
+<ol>
+<li>Leave <code>Look‑At‑Influence</code> at 0.</li>
+<li>Aim with <code>Pan</code> / <code>Tilt</code> / <code>Roll</code>. Move it with <code>Camera Position</code> / <code>Dolly</code>, dial a lens with <code>Focal Length</code>.</li>
+<li>It depends on no target — a pure free/FPS camera.</li>
+</ol>
+<p><strong>Two‑node (tracking) camera</strong></p>
+<ol>
+<li>Move the <code>CamBot N Target</code> crosshair onto your subject (or point <code>CamBot Target 1</code>'s <code>Target Layer</code> at an existing layer).</li>
+<li>Raise <code>Look‑At‑Influence</code> toward 100 — the camera smoothly turns to face it. Keyframe the influence to &quot;find&quot; and lock a subject.</li>
+<li>Turn on <strong>Auto‑Focus Lock</strong> and <strong>DOF</strong> for rack‑focus that follows the subject.</li>
+</ol>
+<p><strong>Blend between subjects</strong></p>
+<ol>
+<li>Duplicate the <code>CamBot Target 1</code> effect (⌘/Ctrl‑D) → <code>CamBot Target 2</code>.</li>
+<li>Point each at a different layer.</li>
+<li>Keyframe their <code>Target Influence</code> sliders to crossfade / hand off the aim.</li>
+</ol>
+<p><strong>Play a move</strong></p>
+<ol>
+<li>Frame your shot, pick a <strong>Move</strong> from the dropdown.</li>
+<li>Keyframe <strong>Progress</strong> 0→100 across the range you want. Ease the Progress keyframes to taste.</li>
+<li>Tune with <code>Intensity</code> and <code>Reverse</code>.</li>
+</ol>
+<h2 id="key-concepts-tips">Key concepts &amp; tips</h2>
+<ul>
+<li><strong>The dial is everything.</strong> <code>Look‑At‑Influence</code> × total target influence = how &quot;two‑node&quot; you are. 0 = free, 1 = locked. Continuous — animate it.</li>
+<li><strong>Never keyframe the camera's own Rotation/Orientation.</strong> The rig owns all four rotation channels by expression. Steer with <code>Pan</code>/<code>Tilt</code>/<code>Roll</code> — hand‑rotating an expression‑driven camera fights the rig.</li>
+<li><strong>Dolly ≠ Zoom.</strong> <code>Dolly</code> moves the camera (parallax/perspective changes); <code>Focal Length</code> changes the lens. Dolly Zoom uses both against each other.</li>
+<li><strong>Realistic Limits.</strong> On = physically plausible focal/F‑Stop/focus/blur. Off = anything AE allows, for stylized FOVs and extreme DOF.</li>
+<li><strong>Multiple rigs</strong> coexist — each run makes <code>CamBot 2 Target</code> / <code>CamBot 2 Cam</code>, etc., fully independent.</li>
+</ul>
+<h2 id="requirements-edge-cases">Requirements &amp; edge cases</h2>
+<ul>
+<li><strong>&quot;Allow Scripts to Write Files and Access Network&quot;</strong> must be enabled (Preferences ▸ Scripting &amp; Expressions) — CamBot registers its control effects from a temporary preset on first use.</li>
+<li><strong>Renaming layers breaks the rig.</strong> The camera references <code>CamBot N Target</code> by name; don't rename the target shape or camera.</li>
+<li><strong>JavaScript expression engine</strong> recommended (CamBot uses <code>lookAt</code>, vector helpers, <code>noise</code>). This is AE's default for modern projects.</li>
+<li><strong>Editing the control effect?</strong> After Effects caches registered pseudo‑effects — if the panel ever looks out of date after an update, restart AE.</li>
+<li>The <strong>crosshair graphic ignores scene lights/shadows</strong> by design (so it stays readable); hide it entirely with <code>Target Hide</code> while keeping the target functional.</li>
+</ul></div>
+      <div class="doc-dl" id="docDl">
+        <div>
+          <div class="t" id="dlT">Get CamBot</div>
+          <div class="s" id="dlS">v3.15.1 · HEADLESS · MIT</div>
+        </div>
+        <div class="actions">
+          <a class="a1" id="dlBtn" href="/apps/ae/scripts/animation/CamBot.jsx" download data-forge-action="download_intent"><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository"><i data-lucide="github"></i>View source</a>
+        </div>
+      </div>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design" data-forge-action="service_outbound">Work with Ilya</a> · <a href="/services/">Creative services</a></footer></main>
+    <aside class="doc-toc" id="docToc">
+      <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#how-it-works">How it works</a><a href="#the-control-panel-cambot-effect-on-cambot-n-target">The control panel — `CamBot` effect (on `CamBot N Target`)</a><a href="#targets-multi-target-blending-the-cambot-target-controller">Targets &amp; multi‑target blending — the `CamBot Target` controller</a><a href="#the-move-catalog-26-moves">The Move catalog (26 moves)</a><a href="#usage">Usage</a><a href="#key-concepts-tips">Key concepts &amp; tips</a><a href="#requirements-edge-cases">Requirements &amp; edge cases</a>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/apps/ae/vendor/lucide.min.js"></script>
+  <script src="/apps/ae/js/docs.js?v=14"></script>
+  <script src="/shared/js/growth-events.js" defer></script>
+</body>
+</html>

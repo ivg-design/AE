@@ -1,0 +1,16 @@
+# Only site/ is served (Vercel project root = site). Keep source, tooling and vendors out of the upload.
+node_modules/
+/packages/
+/tools/
+/vendors/
+/docs/
+banner.png
+banner-mono.png
+/*.md
+commands.txt
+yarn.lock
+package-lock.json
+.git/
+
+# Documentation HTML/Markdown is public; build templates stay in source only.
+/site/tools/

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Limb-a-tron — After Effects script documentation</title>
+  <meta name="description" content="Limb-a-tron for After Effects: Rig a two-segment IK/FK limb in seconds — drag one null to bend it, tune everything from one Limb Control effect, and bake it when…" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/apps/ae/assets/favicon-32.png?v=11" />
+  <link rel="icon" type="image/png" sizes="256x256" href="/apps/ae/assets/ae-toolkit.png?v=11" />
+  <link rel="apple-touch-icon" href="/apps/ae/assets/apple-touch-icon.png?v=11" />
+  <link rel="stylesheet" href="/apps/ae/css/fonts.css?v=1" />
+  <link rel="stylesheet" href="/apps/ae/css/site.css?v=11" />
+  <style>
+    [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: var(--bg-alt); padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .doc-nav .l { display: flex; align-items: center; gap: 11px; }
+    .doc-nav .mark {
+      width: 28px; height: 28px; border-radius: 8px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .doc-nav .mark .lucide { width: 15px; height: 15px; color: #fff; }
+    .doc-nav .brand { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+    .doc-nav .ver {
+      font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 3px 7px;
+    }
+    .doc-nav .r { display: flex; align-items: center; gap: 26px; }
+    .doc-nav .r a { font-size: 14px; color: var(--text-secondary); }
+    .doc-nav .r a.on { color: var(--text-primary); font-weight: 600; }
+    .doc-nav .r a:hover { color: var(--text-primary); }
+    .doc-nav .dl-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff !important;
+      border-radius: 9px; padding: 9px 16px; font-size: 13.5px; font-weight: 600;
+    }
+    .doc-nav .dl-btn .lucide { width: 15px; height: 15px; }
+
+    .doc-shell { display: flex; min-height: calc(100vh - 66px); }
+    .doc-side {
+      width: 262px; flex: none;
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 26px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+    }
+    /* styled scrollbar for the left script panel + right TOC (unstyled default stood out) */
+    .doc-side, .doc-toc { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.16) transparent; }
+    .doc-side::-webkit-scrollbar, .doc-toc::-webkit-scrollbar { width: 8px; }
+    .doc-side::-webkit-scrollbar-track, .doc-toc::-webkit-scrollbar-track { background: transparent; }
+    .doc-side::-webkit-scrollbar-thumb, .doc-toc::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+    }
+    .doc-side:hover::-webkit-scrollbar-thumb, .doc-toc:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,.26); background-clip: padding-box; }
+    .doc-side .search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 11px; margin-bottom: 14px;
+    }
+    .doc-side .search .lucide { width: 13px; height: 13px; color: var(--text-muted); }
+    .doc-side .search input {
+      border: none; background: none; outline: none; width: 100%;
+      font-family: var(--font-body); font-size: 13px; color: var(--text-primary);
+    }
+    .doc-side .search input::placeholder { color: var(--text-muted); }
+    .doc-side .grp {
+      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted);
+      padding: 14px 0 6px 2px;
+    }
+    .doc-side a {
+      display: flex; align-items: center; gap: 9px;
+      border-radius: 7px; padding: 8px 11px;
+      font-size: 13.5px; color: var(--text-secondary);
+    }
+    .doc-side a:hover { background: #ffffff08; }
+    .doc-side a.on { background: var(--accent-soft); color: var(--text-primary); font-weight: 600; }
+    .doc-side a img { width: 32px; height: 32px; object-fit: contain; }
+    .doc-side a .lucide { width: 30px; height: 30px; color: var(--text-muted); }
+
+    .doc-article { flex: 1; min-width: 0; padding: 44px 64px; max-width: 900px; }
+    .doc-bc {
+      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .doc-bc b { color: var(--accent-text); font-weight: 400; }
+    .doc-article h1 {
+      font-family: var(--font-display); font-size: 42px; font-weight: 600; letter-spacing: -1px;
+      margin: 0 0 14px;
+    }
+    .doc-badges { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .md > p:first-of-type { font-size: 17px; line-height: 1.6; }
+    .md h2 {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);
+      margin: 40px 0 14px; padding-top: 26px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .md h3 {
+      font-family: var(--font-display); font-size: 16.5px; font-weight: 600; color: var(--text-primary);
+      margin: 26px 0 10px;
+    }
+    .md p { margin: 0 0 14px; }
+    .md ul, .md ol { margin: 0 0 16px; padding-left: 22px; display: flex; flex-direction: column; gap: 7px; }
+    .md li::marker { color: var(--accent-text); }
+    .md code {
+      font-family: var(--font-mono); font-size: .86em; color: var(--accent-text);
+      background: var(--term-bg); border: 1px solid var(--border-soft);
+      border-radius: 5px; padding: 1.5px 6px;
+    }
+    .md pre {
+      background: var(--term-bg); border: 1px solid var(--border-soft); border-radius: 10px;
+      padding: 14px 16px; overflow-x: auto; margin: 0 0 16px;
+    }
+    .md pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.6; }
+    .md blockquote {
+      border-left: 3px solid var(--accent); border-radius: 2px;
+      padding: 2px 0 2px 16px; margin: 0 0 16px;
+      color: var(--text-secondary); font-size: 16px;
+    }
+    .md table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 13.5px; }
+    .md th {
+      text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: .8px;
+      color: var(--text-muted); font-weight: 500; text-transform: uppercase;
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    .md td { padding: 9px 12px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+    .md td:first-child { color: var(--text-primary); white-space: nowrap; }
+    .md strong { color: var(--text-primary); font-weight: 600; }
+    .md hr { border: none; border-top: 1px solid var(--border-soft); margin: 24px 0; }
+
+    .doc-dl {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px; margin-top: 36px;
+    }
+    .doc-dl .t { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .doc-dl .s { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+    .doc-dl .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .doc-dl .a1 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff; border-radius: 9px; padding: 10px 16px;
+      font-size: 13.5px; font-weight: 600;
+    }
+    .doc-dl .a2 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
+    }
+    .doc-dl .lucide { width: 15px; height: 15px; }
+
+    .doc-toc {
+      width: 222px; flex: none;
+      border-left: 1px solid var(--border);
+      padding: 44px 24px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+      display: flex; flex-direction: column; gap: 13px;
+    }
+    .doc-toc .h { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted); }
+    .doc-toc a { font-size: 13px; color: var(--text-muted); }
+    .doc-toc a:hover { color: var(--text-secondary); }
+    .doc-toc a.on { color: var(--accent-text); }
+
+    @media (max-width: 1100px) { .doc-toc { display: none; } }
+    @media (max-width: 860px) {
+      .doc-side { display: none; }
+      .doc-article { padding: 32px 24px; }
+      [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav { padding: 14px 20px; }
+      .doc-nav .r a:not(.dl-btn) { display: none; }
+    }
+  </style>
+  <link rel="canonical" href="https://forge.mograph.life/apps/ae/docs/limb-a-tron.html" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="IVG Toolkit" />
+  <meta property="og:title" content="Limb-a-tron — After Effects script documentation" /><meta property="og:description" content="Limb-a-tron for After Effects: Rig a two-segment IK/FK limb in seconds — drag one null to bend it, tune everything from one Limb Control effect, and bake it when…" />
+  <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs/limb-a-tron.html" /><meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="Limb-a-tron — After Effects script documentation" />
+  <meta name="twitter:description" content="Limb-a-tron for After Effects: Rig a two-segment IK/FK limb in seconds — drag one null to bend it, tune everything from one Limb Control effect, and bake it when…" /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/limb-a-tron.html#page","url":"https://forge.mograph.life/apps/ae/docs/limb-a-tron.html","headline":"Limb-a-tron — After Effects script documentation","name":"Limb-a-tron — After Effects script documentation","description":"Limb-a-tron for After Effects: Rig a two-segment IK/FK limb in seconds — drag one null to bend it, tune everything from one Limb Control effect, and bake it when…","inLanguage":"en","author":{"@type":"Person","name":"Ilya Gusinski","url":"https://www.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"Limb-a-tron","item":"https://forge.mograph.life/apps/ae/docs/limb-a-tron.html"}]}]}</script>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a class="l" href="/apps/ae/">
+      <span class="mark"><i data-lucide="zap"></i></span>
+      <span class="brand">IVG Toolkit</span>
+      <span class="ver">Open source</span>
+    </a>
+    <div class="r">
+      <a href="/apps/ae/#library">Library</a>
+      <a href="/apps/ae/docs.html" class="on">Docs</a>
+      <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository">GitHub</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download data-forge-action="download_intent"><i data-lucide="download"></i>Download</a>
+    </div>
+  </nav>
+
+  <div class="doc-shell">
+    <aside class="doc-side" id="docSide">
+      <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" aria-label="Filter script documentation" placeholder="Filter scripts…" /></label>
+<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron" class="on" aria-current="page">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster">PathMaster</a>
+<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer">Verticalizer</a>
+<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron">Sync-o-tron</a>
+<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron">Valuatron</a>
+<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron">TimeWarp-a-tron</a>
+<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster">VertexMaster</a>
+<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator">Triminator</a>
+    </aside>
+    <main class="doc-article" id="docArticle">
+      <nav class="doc-bc" id="docBc" aria-label="Breadcrumb"><a href="/">IVG Design Forge</a> <span>/</span> <a href="/apps/ae/">IVG Toolkit</a> <span>/</span> <a href="/apps/ae/docs.html">Documentation</a> <span>/</span> <a href="/apps/ae/docs/limb-a-tron.html">Limb-a-tron</a></nav>
+      <h1 id="docH1">Limb-a-tron</h1>
+      <div class="doc-badges" id="docBadges"><span class="chip">Animation &amp; Rigging</span><span class="chip">v2.7.0</span><span class="chip">DIALOG</span></div>
+      <div class="md" id="docMd"><blockquote>Rig a two-segment IK/FK limb in seconds — drag one null to bend it, tune everything from a single Limb Control effect, and bake the rig into plain keyframes when you're done.</blockquote>
+<p><strong>Category:</strong> animation · <strong>Version:</strong> 2.7.0 · <strong>UI:</strong> DIALOG (&quot;Name the Limb&quot; for creation; a Yes/No confirmation for baking)</p>
+<h2 id="what-it-does">What it does</h2>
+<p>Limb-a-tron builds two-segment limbs (arms, legs, tentacles, tails) without hand-animating a single bone. Run it with nothing selected, type a name (e.g. &quot;Left Arm&quot;), and it creates a shape layer whose limb body is drawn procedurally by expressions, plus a null controller (&quot;Left Arm CTRL&quot;) carrying a &quot;Left Arm Limb Control&quot; pseudo-effect with every rig parameter: segment lengths, joint widths, curvature, IK/FK angles, noodle mode, fill/stroke appearance, pop prevention. Drag the null and the limb bends toward it with inverse kinematics; check &quot;Disable IK&quot; to pose it manually with FK angle sliders instead.</p>
+<p>Two body styles share the same solve and controls: <strong>Regular Limb</strong> renders a classic tapered two-bone shape with a rounded elbow, and <strong>Noodle Limb</strong> (via the &quot;Noodle Mode&quot; checkbox) renders a continuously curved tube for soft, rubbery appendages — switching modes never requires re-rigging. Lightweight linked stroke passes trace whichever body is active, with trim toggles to hide the cap where a limb plugs into a torso.</p>
+<p>The second superpower: Limb-a-tron recognizes its own rigs. Run it again with a limb layer or its controller selected and it switches to <strong>bake mode</strong> — it samples the animated path, simplifies it to a minimal keyframe set, strips out whichever render mode wasn't in use, and removes the controller null. A live procedural rig becomes a lightweight, controller-free animated shape layer, ready for handoff or performance-sensitive comps.</p>
+<h2 id="controls-options">Controls &amp; options</h2>
+<p>All rig tuning lives on the <strong><code>&lt;name&gt; Limb Control</code></strong> pseudo-effect on the <strong><code>&lt;name&gt; CTRL</code></strong> null.</p>
+<p><strong>Dimensions — Upper Limb / Lower Limb</strong> (one group per segment)</p>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default (Upper / Lower)</th><th>Range</th><th>Purpose</th></tr></thead><tbody><tr><td>Limb Length</td><td>Slider</td><td>100 / 100</td><td>0–100</td><td>Segment length</td></tr><tr><td>Top Width</td><td>Slider</td><td>50 / 30</td><td>0–100</td><td>Width at the near (shoulder/elbow) end</td></tr><tr><td>Top Curvature</td><td>Slider</td><td>100 / 100</td><td>0–100</td><td>Roundness of that end</td></tr><tr><td>Bottom Width</td><td>Slider</td><td>30 / 15</td><td>0–100</td><td>Width at the far (elbow/wrist) end</td></tr><tr><td>Bottom Curvature</td><td>Slider</td><td>100 / 0</td><td>0–100</td><td>Roundness of that end</td></tr><tr><td>Enable Side Curvature</td><td>Checkbox</td><td>Off</td><td>—</td><td>Asymmetric bulge/pinch along one side</td></tr><tr><td>Enable Inverse Curvature</td><td>Checkbox</td><td>Off</td><td>—</td><td>Flips the bulge to a pinch</td></tr><tr><td>Side Curvature Center Point</td><td>Slider</td><td>0</td><td>−100–100</td><td>Where the bulge sits along the segment</td></tr><tr><td>Side Curvature Bend</td><td>Slider</td><td>0</td><td>0–100</td><td>Bulge amount</td></tr><tr><td>Left/Right Side Weight</td><td>Slider</td><td>0</td><td>−100–100</td><td>Balances the bulge between edges</td></tr></tbody></table>
+<p><strong>Noodle</strong></p>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td>Noodle Mode</td><td>Checkbox</td><td>Off</td><td>Switch the body from Regular to the sampled-tube Noodle</td></tr><tr><td>Noodle Curvature</td><td>Slider</td><td>100</td><td>How far the tube bulges toward the elbow</td></tr><tr><td>Noodle Tension</td><td>Slider</td><td>100</td><td>Smoothing/tangent tension of the tube</td></tr></tbody></table>
+<p><strong>FK / IK</strong></p>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td>Disable IK</td><td>Checkbox</td><td>Off</td><td>Switch to manual FK angles</td></tr><tr><td>Upper Limb Angle</td><td>Angle</td><td>0°</td><td>Manual shoulder angle (FK)</td></tr><tr><td>Lower Limb Angle</td><td>Angle</td><td>0°</td><td>Manual elbow angle, added to the shoulder (FK)</td></tr><tr><td>IK Direction</td><td>Slider</td><td>−100</td><td>Elbow bend direction / solve blend</td></tr><tr><td>Pop Prevent</td><td>Slider</td><td>0</td><td>Anti-pop softening as the controller nears full reach</td></tr></tbody></table>
+<p><strong>Appearance</strong></p>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td>Arm Fill Color / Opacity</td><td>Color / Slider</td><td>— / 100</td><td>Body fill (both modes)</td></tr><tr><td>Arm Stroke Color / Width</td><td>Color / Slider</td><td>— / 0</td><td>Outline stroke (0 = none)</td></tr><tr><td>Shoulder Stroke / Wrist Stroke</td><td>Checkboxes</td><td>On / On</td><td>Include/exclude the cap nearest the shoulder/wrist in the outline</td></tr></tbody></table>
+<p><strong>Parenting Data</strong> (expression-driven outputs — don't hand-edit): <code>IK Angles</code>, <code>Elbow (comp space)</code>, <code>Elbow (layer space)</code>, <code>Wrist  (comp space)</code>, <code>Wrist  (layer space)</code>, <code>Proximity / Pop Prevent Factor</code>, <code>Adjusted U/L Limb Lengths</code>. Tap these to attach hands, feet, or props to the solved joints. Note the Wrist controls really have <strong>two spaces</strong> before &quot;(comp space)&quot;/&quot;(layer space)&quot; — match that exactly if you reference them in your own expressions.</p>
+<h2 id="usage">Usage</h2>
+<p><strong>Create a limb</strong></p>
+<ol>
+<li>Make the target comp active and make sure <strong>no layers are selected</strong>.</li>
+<li>Run the script, name the limb (e.g. &quot;Arm L&quot;), OK.</li>
+<li>The limb shape layer and its <code>&quot;&lt;name&gt; CTRL&quot;</code> null appear at comp center.</li>
+<li>Drag the null to bend the limb. Open the null's Effect Controls for everything else — lengths, widths, curvature, Noodle Mode, colors, FK, pop prevention.</li>
+<li>Parent hands/props to the shape layer, or wire them to the <code>Wrist  (comp space)</code> / <code>Elbow (comp space)</code> outputs.</li>
+</ol>
+<p><strong>Bake a finished rig</strong></p>
+<ol>
+<li>Select the limb's shape layer <em>or</em> its CTRL null.</li>
+<li>Run the script again and confirm &quot;Bake the animation…&quot;.</li>
+<li>The path animation is sampled and simplified to minimal keyframes, the unused render mode is stripped, and the controller null is removed — leaving a self-contained animated shape layer.</li>
+</ol>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>The rig is entirely name-bound: expressions reference <code>&quot;&lt;name&gt; CTRL&quot;</code>, the limb layer name, and the <code>&quot;&lt;name&gt; Limb Control&quot;</code> effect. Renaming any of them after creation breaks the rig.</li>
+<li>Both body groups always exist; the inactive one collapses to a zero-area path, so mode switching is instant and keyframeable.</li>
+<li>Bake mode also understands rigs built by older Limb-a-tron versions (legacy &quot;Limb Body&quot;/&quot;Upper Limb&quot;/&quot;Lower Limb&quot; groups).</li>
+<li>Bake simplification uses a fixed error threshold (2.25) — it trades tiny path deviations for far fewer keyframes; the threshold isn't user-exposed.</li>
+<li>Appearance/trim properties driven by animated controls get baked to keyframes; ones with static controls collapse to plain static values.</li>
+</ul>
+<h2 id="requirements-edge-cases">Requirements &amp; edge cases</h2>
+<ul>
+<li>Needs an active composition; alerts and exits otherwise.</li>
+<li>Needs <strong>&quot;Allow Scripts to Write Files and Access Network&quot;</strong> enabled — the pseudo-effect is installed by writing a temp <code>.ffx</code> and calling <code>applyPreset()</code>.</li>
+<li>Needs the modern JavaScript expression engine — the path expressions use <code>createPath()</code> and other features the legacy ExtendScript engine lacks.</li>
+<li>Creation requires an empty selection; with anything selected the run is treated as a bake attempt (and alerts if the selection isn't a recognized rig).</li>
+<li>Baking requires at least one keyframe somewhere on the controller or the limb's parent chain; otherwise it alerts and does nothing.</li>
+<li>If the controller null is locked, the bake still completes and reports that the controller couldn't be removed.</li>
+<li>The bake runs in its own undo group that closes on every path, including errors — a failed bake never leaves the undo stack dangling.</li>
+</ul>
+<h2 id="how-it-works">How it works</h2>
+<p>One self-invoking block. The entry guard checks for a comp, then branches: any selected layers route to bake mode; an empty selection opens the &quot;Name the Limb&quot; dialog, whose OK handler runs the whole creation flow inside a &quot;Limb-a-tron&quot; undo group.</p>
+<p>Creation builds the shape layer with two parallel body groups under the root vector group — &quot;Regular Limb&quot; and &quot;Noodle Limb&quot;, each a path whose <code>ADBE Vector Shape</code> carries a fully self-contained procedural expression — plus an &quot;Arm Stroke&quot; group of four linked stroke passes that reference the body paths by <code>content(...).path</code> expression (no duplicated geometry) with per-mode Trim Paths wiring. A null named <code>&quot;&lt;name&gt; CTRL&quot;</code> is added, both layers get cross-referencing <code>.comment</code> tags for later rig discovery, and the ~105 KB embedded FFX preset (matchname <code>Pseudo/LimbControlsV3</code>) is applied via a temp file, then renamed to <code>&quot;&lt;name&gt; Limb Control&quot;</code>. Seven of the effect's own point controls receive expressions so they self-compute (elbow/wrist positions, IK angles, adjusted lengths, pop-prevent factor), and the Noodle Curvature/Tension sliders are bumped to 100 over the preset's zero defaults.</p>
+<p>The IK expression is a standard analytic two-bone solve: law of cosines for the elbow, <code>atan2</code> for the shoulder, sign from IK Direction, with the layer's own rotation and up to four ancestors' rotations subtracted so nesting doesn't skew the solve; &quot;Disable IK&quot; falls back to the FK angle sliders. Pop prevention smoothly shortens effective segment lengths as the controller approaches full reach. The Regular body samples a tapered outline with rounded caps and a filleted elbow; the Noodle body samples a curved centerline into two side rails, repairs self-intersections in tight folds, and switches to a radial-sweep envelope for extreme fold angles.</p>
+<p>Bake mode (<code>intelligentBakeLimb</code>, in its own try/finally-guarded undo group) collects every keyframe time across the controller and parent chain, snaps to whole frames, identifies the active render mode, samples the active body path(s) at each frame, simplifies with a recursive Ramer–Douglas–Peucker-style pass over vertices and tangents, writes linear keyframes back, deletes or freezes the inactive groups, bakes or collapses the driven appearance properties, and finally removes the controller null (best-effort), reporting the results in an alert.</p></div>
+      <div class="doc-dl" id="docDl">
+        <div>
+          <div class="t" id="dlT">Get Limb-a-tron</div>
+          <div class="s" id="dlS">v2.7.0 · DIALOG · MIT</div>
+        </div>
+        <div class="actions">
+          <a class="a1" id="dlBtn" href="/apps/ae/scripts/animation/Limb-a-tron.jsx" download data-forge-action="download_intent"><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository"><i data-lucide="github"></i>View source</a>
+        </div>
+      </div>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design" data-forge-action="service_outbound">Work with Ilya</a> · <a href="/services/">Creative services</a></footer></main>
+    <aside class="doc-toc" id="docToc">
+      <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#controls-options">Controls &amp; options</a><a href="#usage">Usage</a><a href="#notes">Notes</a><a href="#requirements-edge-cases">Requirements &amp; edge cases</a><a href="#how-it-works">How it works</a>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/apps/ae/vendor/lucide.min.js"></script>
+  <script src="/apps/ae/js/docs.js?v=14"></script>
+  <script src="/shared/js/growth-events.js" defer></script>
+</body>
+</html>

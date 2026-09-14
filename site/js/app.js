@@ -31,7 +31,10 @@
 
   function icons(root) { if (window.lucide) lucide.createIcons({ attrs: {}, root }); }
   function tileImg(s, px) {
-    if (s.icon) return `<img src="${esc(s.icon)}" alt="" width="${px}" height="${px}" loading="lazy" />`;
+    if (s.icon) {
+      const responsive = width => esc(s.icon.replace('assets/icons/', 'assets/icons/responsive/').replace(/\.webp$/, `-${width}.webp`));
+      return `<img src="${responsive(136)}" srcset="${responsive(68)} 68w, ${responsive(136)} 136w, ${responsive(224)} 224w" sizes="${px}px" alt="" width="${px}" height="${px}" loading="lazy" decoding="async" />`;
+    }
     return `<i data-lucide="${esc(s.lucide || 'square-code')}"></i>`;
   }
   function uiBadge(s, extra) {
@@ -41,7 +44,7 @@
   }
   function srcUrl(s) { return s.srcPath; }
   function jsxName(s) { return s.srcPath.split('/').pop(); }
-  function docUrl(s) { return 'docs.html?s=' + encodeURIComponent(s.id); }
+  function docUrl(s) { return 'docs/' + encodeURIComponent(s.id) + '.html'; }
 
   let toastTimer;
   function toast(msg) {
@@ -468,7 +471,9 @@ Docs & updates: ${REPO}
   $('#viewGrid').addEventListener('click', () => { view = 'grid'; setSeg(); renderLibrary(); });
   function setSeg() {
     $('#viewList').classList.toggle('active', view === 'list');
+    $('#viewList').setAttribute('aria-pressed', String(view === 'list'));
     $('#viewGrid').classList.toggle('active', view === 'grid');
+    $('#viewGrid').setAttribute('aria-pressed', String(view === 'grid'));
   }
 
   // ---------- overlays ----------

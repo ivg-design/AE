@@ -195,7 +195,7 @@
       const img = new Image();
       img.onload = () => { imgs.push(img); if (--pending === 0) start(imgs); };
       img.onerror = () => { if (--pending === 0) start(imgs); };
-      img.src = src;
+      img.src = src.replace('assets/icons/', 'assets/icons/responsive/').replace(/\.webp$/, '-224.webp');
     });
   }
   if (Array.isArray(window.__SCRIPTS__)) {
