@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2-3 IK Rigger — After Effects script documentation</title>
+  <meta name="description" content="2-3 IK Rigger for After Effects: Turns a set of existing layers into a working 2- or 3-segment IK chain." />
+  <link rel="icon" type="image/png" sizes="32x32" href="/apps/ae/assets/favicon-32.png?v=11" />
+  <link rel="icon" type="image/png" sizes="256x256" href="/apps/ae/assets/ae-toolkit.png?v=11" />
+  <link rel="apple-touch-icon" href="/apps/ae/assets/apple-touch-icon.png?v=11" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/apps/ae/css/site.css?v=11" />
+  <style>
+    [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: var(--bg-alt); padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .doc-nav .l { display: flex; align-items: center; gap: 11px; }
+    .doc-nav .mark {
+      width: 28px; height: 28px; border-radius: 8px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .doc-nav .mark .lucide { width: 15px; height: 15px; color: #fff; }
+    .doc-nav .brand { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+    .doc-nav .ver {
+      font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 3px 7px;
+    }
+    .doc-nav .r { display: flex; align-items: center; gap: 26px; }
+    .doc-nav .r a { font-size: 14px; color: var(--text-secondary); }
+    .doc-nav .r a.on { color: var(--text-primary); font-weight: 600; }
+    .doc-nav .r a:hover { color: var(--text-primary); }
+    .doc-nav .dl-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff !important;
+      border-radius: 9px; padding: 9px 16px; font-size: 13.5px; font-weight: 600;
+    }
+    .doc-nav .dl-btn .lucide { width: 15px; height: 15px; }
+
+    .doc-shell { display: flex; min-height: calc(100vh - 66px); }
+    .doc-side {
+      width: 262px; flex: none;
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 26px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+    }
+    /* styled scrollbar for the left script panel + right TOC (unstyled default stood out) */
+    .doc-side, .doc-toc { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.16) transparent; }
+    .doc-side::-webkit-scrollbar, .doc-toc::-webkit-scrollbar { width: 8px; }
+    .doc-side::-webkit-scrollbar-track, .doc-toc::-webkit-scrollbar-track { background: transparent; }
+    .doc-side::-webkit-scrollbar-thumb, .doc-toc::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+    }
+    .doc-side:hover::-webkit-scrollbar-thumb, .doc-toc:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,.26); background-clip: padding-box; }
+    .doc-side .search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 11px; margin-bottom: 14px;
+    }
+    .doc-side .search .lucide { width: 13px; height: 13px; color: var(--text-muted); }
+    .doc-side .search input {
+      border: none; background: none; outline: none; width: 100%;
+      font-family: var(--font-body); font-size: 13px; color: var(--text-primary);
+    }
+    .doc-side .search input::placeholder { color: var(--text-muted); }
+    .doc-side .grp {
+      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted);
+      padding: 14px 0 6px 2px;
+    }
+    .doc-side a {
+      display: flex; align-items: center; gap: 9px;
+      border-radius: 7px; padding: 8px 11px;
+      font-size: 13.5px; color: var(--text-secondary);
+    }
+    .doc-side a:hover { background: #ffffff08; }
+    .doc-side a.on { background: var(--accent-soft); color: var(--text-primary); font-weight: 600; }
+    .doc-side a img { width: 32px; height: 32px; object-fit: contain; }
+    .doc-side a .lucide { width: 30px; height: 30px; color: var(--text-muted); }
+
+    .doc-article { flex: 1; min-width: 0; padding: 44px 64px; max-width: 900px; }
+    .doc-bc {
+      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .doc-bc b { color: var(--accent-text); font-weight: 400; }
+    .doc-article h1 {
+      font-family: var(--font-display); font-size: 42px; font-weight: 600; letter-spacing: -1px;
+      margin: 0 0 14px;
+    }
+    .doc-badges { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .md > p:first-of-type { font-size: 17px; line-height: 1.6; }
+    .md h2 {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);
+      margin: 40px 0 14px; padding-top: 26px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .md h3 {
+      font-family: var(--font-display); font-size: 16.5px; font-weight: 600; color: var(--text-primary);
+      margin: 26px 0 10px;
+    }
+    .md p { margin: 0 0 14px; }
+    .md ul, .md ol { margin: 0 0 16px; padding-left: 22px; display: flex; flex-direction: column; gap: 7px; }
+    .md li::marker { color: var(--accent-text); }
+    .md code {
+      font-family: var(--font-mono); font-size: .86em; color: var(--accent-text);
+      background: var(--term-bg); border: 1px solid var(--border-soft);
+      border-radius: 5px; padding: 1.5px 6px;
+    }
+    .md pre {
+      background: var(--term-bg); border: 1px solid var(--border-soft); border-radius: 10px;
+      padding: 14px 16px; overflow-x: auto; margin: 0 0 16px;
+    }
+    .md pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.6; }
+    .md blockquote {
+      border-left: 3px solid var(--accent); border-radius: 2px;
+      padding: 2px 0 2px 16px; margin: 0 0 16px;
+      color: var(--text-secondary); font-size: 16px;
+    }
+    .md table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 13.5px; }
+    .md th {
+      text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: .8px;
+      color: var(--text-muted); font-weight: 500; text-transform: uppercase;
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    .md td { padding: 9px 12px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+    .md td:first-child { color: var(--text-primary); white-space: nowrap; }
+    .md strong { color: var(--text-primary); font-weight: 600; }
+    .md hr { border: none; border-top: 1px solid var(--border-soft); margin: 24px 0; }
+
+    .doc-dl {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px; margin-top: 36px;
+    }
+    .doc-dl .t { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .doc-dl .s { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+    .doc-dl .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .doc-dl .a1 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff; border-radius: 9px; padding: 10px 16px;
+      font-size: 13.5px; font-weight: 600;
+    }
+    .doc-dl .a2 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
+    }
+    .doc-dl .lucide { width: 15px; height: 15px; }
+
+    .doc-toc {
+      width: 222px; flex: none;
+      border-left: 1px solid var(--border);
+      padding: 44px 24px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+      display: flex; flex-direction: column; gap: 13px;
+    }
+    .doc-toc .h { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted); }
+    .doc-toc a { font-size: 13px; color: var(--text-muted); }
+    .doc-toc a:hover { color: var(--text-secondary); }
+    .doc-toc a.on { color: var(--accent-text); }
+
+    @media (max-width: 1100px) { .doc-toc { display: none; } }
+    @media (max-width: 860px) {
+      .doc-side { display: none; }
+      .doc-article { padding: 32px 24px; }
+      [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav { padding: 14px 20px; }
+      .doc-nav .r a:not(.dl-btn) { display: none; }
+    }
+  </style>
+  <link rel="canonical" href="https://forge.mograph.life/apps/ae/docs/2-3-ik-rigger.html" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="IVG Toolkit" />
+  <meta property="og:title" content="2-3 IK Rigger — After Effects script documentation" /><meta property="og:description" content="2-3 IK Rigger for After Effects: Turns a set of existing layers into a working 2- or 3-segment IK chain." />
+  <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs/2-3-ik-rigger.html" /><meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="2-3 IK Rigger — After Effects script documentation" />
+  <meta name="twitter:description" content="2-3 IK Rigger for After Effects: Turns a set of existing layers into a working 2- or 3-segment IK chain." /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/2-3-ik-rigger.html#page","url":"https://forge.mograph.life/apps/ae/docs/2-3-ik-rigger.html","headline":"2-3 IK Rigger — After Effects script documentation","name":"2-3 IK Rigger — After Effects script documentation","description":"2-3 IK Rigger for After Effects: Turns a set of existing layers into a working 2- or 3-segment IK chain.","inLanguage":"en","author":{"@type":"Person","name":"Ilya Gusinski","url":"https://www.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"2-3 IK Rigger","item":"https://forge.mograph.life/apps/ae/docs/2-3-ik-rigger.html"}]}]}</script>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a class="l" href="/apps/ae/">
+      <span class="mark"><i data-lucide="zap"></i></span>
+      <span class="brand">IVG Toolkit</span>
+      <span class="ver">Open source</span>
+    </a>
+    <div class="r">
+      <a href="/apps/ae/#library">Library</a>
+      <a href="/apps/ae/docs.html" class="on">Docs</a>
+      <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener">GitHub</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download><i data-lucide="download"></i>Download</a>
+    </div>
+  </nav>
+
+  <div class="doc-shell">
+    <aside class="doc-side" id="docSide">
+      <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" aria-label="Filter script documentation" placeholder="Filter scripts…" /></label>
+<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger" class="on" aria-current="page">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster">PathMaster</a>
+<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer">Verticalizer</a>
+<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron">Sync-o-tron</a>
+<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron">Valuatron</a>
+<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron">TimeWarp-a-tron</a>
+<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster">VertexMaster</a>
+<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator">Triminator</a>
+    </aside>
+    <main class="doc-article" id="docArticle">
+      <nav class="doc-bc" id="docBc" aria-label="Breadcrumb"><a href="/">IVG Design Forge</a> <span>/</span> <a href="/apps/ae/">IVG Toolkit</a> <span>/</span> <a href="/apps/ae/docs.html">Documentation</a> <span>/</span> <a href="/apps/ae/docs/2-3-ik-rigger.html">2-3 IK Rigger</a></nav>
+      <h1 id="docH1">2-3 IK Rigger</h1>
+      <div class="doc-badges" id="docBadges"><span class="chip">Animation &amp; Rigging</span><span class="chip">v1.0.0</span><span class="chip">PALETTE</span></div>
+      <div class="md" id="docMd"><blockquote>Rig a 2- or 3-segment IK chain from existing layers — pick your segments, tip, and goal null, and it parents the chain and wires the IK rotation expressions in one click.</blockquote>
+<p><strong>Category:</strong> animation · <strong>Version:</strong> 1.0.0 · <strong>UI:</strong> PALETTE</p>
+<h2 id="what-it-does">What it does</h2>
+<p>2-3 IK Rigger turns layers you have already built into a working inverse-kinematics chain. You choose a <strong>two-layer</strong> (upper + lower) or <strong>three-layer</strong> (upper + middle + lower) setup, tell it which layers are the segments, which is the <strong>Limb Tip</strong> (the end of the chain), and which is the <strong>Goal / Controller</strong> null, and it does two things: it <strong>parents</strong> the segments into a chain, and it writes a closed-form <strong>law-of-cosines IK expression</strong> onto each segment's Rotation so the whole chain bends to keep the tip reaching toward the goal.</p>
+<p>The rig is driven entirely by the <strong>Goal null</strong> — animate or drag it and the limb solves in real time. A <strong>Change IK Direction</strong> checkbox is added to the goal so you can flip which way the elbow/knee bends; in three-layer mode a <strong>Rotate Tip</strong> checkbox controls whether the tip layer rotates along with the chain.</p>
+<h2 id="how-to-set-up-the-rig">How to set up the rig</h2>
+<p>The script wires layers you provide — it does <strong>not</strong> create them. Before running it, build the pieces:</p>
+<table><thead><tr><th>Layer</th><th>What it is</th><th>Anchor point</th></tr></thead><tbody><tr><td><strong>Upper segment</strong></td><td>The first bone (upper arm / thigh).</td><td>On the <strong>root joint</strong> (shoulder / hip).</td></tr><tr><td><strong>Middle segment</strong> <em>(3-layer only)</em></td><td>The middle bone.</td><td>On its <strong>upper joint</strong>.</td></tr><tr><td><strong>Lower segment</strong></td><td>The next bone (forearm / shin).</td><td>On the <strong>elbow / knee joint</strong>.</td></tr><tr><td><strong>Limb Tip</strong></td><td>The end of the chain (hand / foot). Any layer; a null works well.</td><td>On the <strong>end joint</strong> (wrist / ankle).</td></tr><tr><td><strong>Goal / Controller</strong></td><td>A layer — usually a <strong>Null</strong> — that you animate to drive the chain.</td><td>Anywhere; you animate its <strong>Position</strong>.</td></tr></tbody></table>
+<p><strong>Anchor points are the whole game.</strong> The IK math measures distances between each layer's anchor point (in world space), so each segment's anchor must sit on the joint it rotates around. If the anchors are in the wrong place the chain will solve to the wrong lengths and bend oddly.</p>
+<p>The chain does <strong>not</strong> need to be pre-parented — the script parents it for you: lower → upper (and middle in between for 3-layer), and tip → lower. The Goal is left un-parented so it stays free to animate.</p>
+<h2 id="controls-options">Controls &amp; options</h2>
+<table><thead><tr><th>Control</th><th>Type</th><th>Role</th></tr></thead><tbody><tr><td>Inverse Kinematics Type</td><td>Dropdown</td><td><code>Two Layer IK Setup</code> or <code>Three Layer IK Setup</code>. Enables/disables the Middle Limb row.</td></tr><tr><td>Set Upper / Middle / Lower Limb</td><td>Dropdowns</td><td>The chain segments (Middle only used in 3-layer).</td></tr><tr><td>Set Limb Tip</td><td>Dropdown</td><td>The layer at the end of the chain.</td></tr><tr><td>Set Limb Controller/Goal</td><td>Dropdown</td><td>The null you animate to drive the chain.</td></tr><tr><td><strong>Refresh</strong></td><td>Button</td><td>Re-reads the active comp's layers into every dropdown (keeps your current picks where possible).</td></tr><tr><td><strong>Apply</strong></td><td>Button</td><td>Validates, parents the chain, and applies the IK expressions inside one undo group.</td></tr><tr><td><strong>Close</strong></td><td>Button</td><td>Closes the palette.</td></tr></tbody></table>
+<p><strong>Added to the Goal on Apply</strong></p>
+<table><thead><tr><th>Effect</th><th>Mode</th><th>Role</th></tr></thead><tbody><tr><td>Change IK Direction (checkbox)</td><td>both</td><td>Flip the elbow/knee bend direction.</td></tr><tr><td>Rotate Tip (checkbox, on by default)</td><td>3-layer</td><td>Whether the tip rotates with the chain.</td></tr></tbody></table>
+<h2 id="usage">Usage</h2>
+<ol>
+<li>Build the layers above and set each segment's <strong>anchor point on its joint</strong>.</li>
+<li>Run <strong>2-3 IK Rigger</strong> and choose Two- or Three-Layer IK.</li>
+<li>Assign every dropdown; set <strong>Limb Controller/Goal</strong> to your null.</li>
+<li>Click <strong>Apply</strong> — the chain is parented and the IK expressions are applied.</li>
+<li>Animate the <strong>Goal null</strong> to pose the limb. Toggle <strong>Change IK Direction</strong> on the goal if the bend flips the wrong way.</li>
+</ol>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Needs an active composition with at least 4 layers (upper, lower, tip, goal; 5 for three-layer). All chosen layers must be unlocked and distinct.</li>
+<li>Re-running <strong>Apply</strong> reuses the existing goal checkboxes rather than stacking duplicates.</li>
+<li>The toolbar rollover previews the <strong>2-layer icon on Alt</strong> and the <strong>3-layer icon on Cmd</strong>.</li>
+<li>The rig logic lives in AE expressions on each segment's Rotation (<code>length()</code>, <code>clamp()</code>, <code>radiansToDegrees()</code>, <code>toWorld()</code>), so it evaluates live as you animate the goal.</li>
+</ul></div>
+      <div class="doc-dl" id="docDl">
+        <div>
+          <div class="t" id="dlT">Get 2-3 IK Rigger</div>
+          <div class="s" id="dlS">v1.0.0 · PALETTE · MIT</div>
+        </div>
+        <div class="actions">
+          <a class="a1" id="dlBtn" href="/apps/ae/scripts/animation/2-3_IK_Rigger.jsx" download><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener"><i data-lucide="github"></i>View source</a>
+        </div>
+      </div>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design">Work with Ilya</a></footer></main>
+    <aside class="doc-toc" id="docToc">
+      <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#how-to-set-up-the-rig">How to set up the rig</a><a href="#controls-options">Controls &amp; options</a><a href="#usage">Usage</a><a href="#notes">Notes</a>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/apps/ae/vendor/lucide.min.js"></script>
+  <script src="/apps/ae/js/docs.js?v=14"></script>
+</body>
+</html>

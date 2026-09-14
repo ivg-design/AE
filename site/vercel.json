@@ -3,9 +3,437 @@
     {
       "source": "/docs/(.*).md",
       "headers": [
-        { "key": "Content-Type", "value": "text/markdown; charset=utf-8" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" }
+        {
+          "key": "Content-Type",
+          "value": "text/markdown; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
       ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "2-3-ik-rigger"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/2-3-ik-rigger.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "cambot"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/cambot.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "limb-a-tron"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/limb-a-tron.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "linearizer"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/linearizer.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "pathmaster"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/pathmaster.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "guiderator"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/guiderator.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "slidotron-16x9"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/slidotron-16x9.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "slidotron-9x16"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/slidotron-9x16.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "verticalizer"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/verticalizer.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "burstmate"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/burstmate.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "chromablenderizer"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/chromablenderizer.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "sfxmaster"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/sfxmaster.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "sync-o-tron"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/sync-o-tron.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "elast-o-matic"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/elast-o-matic.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "keybot"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/keybot.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "keyclonematic"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/keyclonematic.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "valuatron"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/valuatron.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "controllerizer"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/controllerizer.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "nullbot"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/nullbot.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "opac-o-bot"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/opac-o-bot.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "ordermaster"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/ordermaster.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "parent-o-bot"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/parent-o-bot.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "rectangulator"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/rectangulator.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "reseterator"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/reseterator.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "subtitleforge"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/subtitleforge.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "textmate"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/textmate.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "timewarp-a-tron"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/timewarp-a-tron.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "centralizer"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/centralizer.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "distributron"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/distributron.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "originator"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/originator.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "trace-o-matic"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/trace-o-matic.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "vertexmaster"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/vertexmaster.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "iteratron"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/iteratron.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "randomatic"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/randomatic.html",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "s",
+          "value": "triminator"
+        }
+      ],
+      "destination": "https://forge.mograph.life/apps/ae/docs/triminator.html",
+      "permanent": true
     }
   ]
 }

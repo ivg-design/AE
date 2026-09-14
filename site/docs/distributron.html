@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Distributron — After Effects script documentation</title>
+  <meta name="description" content="Distributron for After Effects: Spread a comp's layers evenly along a shape path, each auto-rotating to follow the curve, all steered live from one CTRL null." />
+  <link rel="icon" type="image/png" sizes="32x32" href="/apps/ae/assets/favicon-32.png?v=11" />
+  <link rel="icon" type="image/png" sizes="256x256" href="/apps/ae/assets/ae-toolkit.png?v=11" />
+  <link rel="apple-touch-icon" href="/apps/ae/assets/apple-touch-icon.png?v=11" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/apps/ae/css/site.css?v=11" />
+  <style>
+    [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: var(--bg-alt); padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .doc-nav .l { display: flex; align-items: center; gap: 11px; }
+    .doc-nav .mark {
+      width: 28px; height: 28px; border-radius: 8px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .doc-nav .mark .lucide { width: 15px; height: 15px; color: #fff; }
+    .doc-nav .brand { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+    .doc-nav .ver {
+      font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 3px 7px;
+    }
+    .doc-nav .r { display: flex; align-items: center; gap: 26px; }
+    .doc-nav .r a { font-size: 14px; color: var(--text-secondary); }
+    .doc-nav .r a.on { color: var(--text-primary); font-weight: 600; }
+    .doc-nav .r a:hover { color: var(--text-primary); }
+    .doc-nav .dl-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff !important;
+      border-radius: 9px; padding: 9px 16px; font-size: 13.5px; font-weight: 600;
+    }
+    .doc-nav .dl-btn .lucide { width: 15px; height: 15px; }
+
+    .doc-shell { display: flex; min-height: calc(100vh - 66px); }
+    .doc-side {
+      width: 262px; flex: none;
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 26px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+    }
+    /* styled scrollbar for the left script panel + right TOC (unstyled default stood out) */
+    .doc-side, .doc-toc { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.16) transparent; }
+    .doc-side::-webkit-scrollbar, .doc-toc::-webkit-scrollbar { width: 8px; }
+    .doc-side::-webkit-scrollbar-track, .doc-toc::-webkit-scrollbar-track { background: transparent; }
+    .doc-side::-webkit-scrollbar-thumb, .doc-toc::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+    }
+    .doc-side:hover::-webkit-scrollbar-thumb, .doc-toc:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,.26); background-clip: padding-box; }
+    .doc-side .search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 11px; margin-bottom: 14px;
+    }
+    .doc-side .search .lucide { width: 13px; height: 13px; color: var(--text-muted); }
+    .doc-side .search input {
+      border: none; background: none; outline: none; width: 100%;
+      font-family: var(--font-body); font-size: 13px; color: var(--text-primary);
+    }
+    .doc-side .search input::placeholder { color: var(--text-muted); }
+    .doc-side .grp {
+      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted);
+      padding: 14px 0 6px 2px;
+    }
+    .doc-side a {
+      display: flex; align-items: center; gap: 9px;
+      border-radius: 7px; padding: 8px 11px;
+      font-size: 13.5px; color: var(--text-secondary);
+    }
+    .doc-side a:hover { background: #ffffff08; }
+    .doc-side a.on { background: var(--accent-soft); color: var(--text-primary); font-weight: 600; }
+    .doc-side a img { width: 32px; height: 32px; object-fit: contain; }
+    .doc-side a .lucide { width: 30px; height: 30px; color: var(--text-muted); }
+
+    .doc-article { flex: 1; min-width: 0; padding: 44px 64px; max-width: 900px; }
+    .doc-bc {
+      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .doc-bc b { color: var(--accent-text); font-weight: 400; }
+    .doc-article h1 {
+      font-family: var(--font-display); font-size: 42px; font-weight: 600; letter-spacing: -1px;
+      margin: 0 0 14px;
+    }
+    .doc-badges { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .md > p:first-of-type { font-size: 17px; line-height: 1.6; }
+    .md h2 {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);
+      margin: 40px 0 14px; padding-top: 26px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .md h3 {
+      font-family: var(--font-display); font-size: 16.5px; font-weight: 600; color: var(--text-primary);
+      margin: 26px 0 10px;
+    }
+    .md p { margin: 0 0 14px; }
+    .md ul, .md ol { margin: 0 0 16px; padding-left: 22px; display: flex; flex-direction: column; gap: 7px; }
+    .md li::marker { color: var(--accent-text); }
+    .md code {
+      font-family: var(--font-mono); font-size: .86em; color: var(--accent-text);
+      background: var(--term-bg); border: 1px solid var(--border-soft);
+      border-radius: 5px; padding: 1.5px 6px;
+    }
+    .md pre {
+      background: var(--term-bg); border: 1px solid var(--border-soft); border-radius: 10px;
+      padding: 14px 16px; overflow-x: auto; margin: 0 0 16px;
+    }
+    .md pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.6; }
+    .md blockquote {
+      border-left: 3px solid var(--accent); border-radius: 2px;
+      padding: 2px 0 2px 16px; margin: 0 0 16px;
+      color: var(--text-secondary); font-size: 16px;
+    }
+    .md table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 13.5px; }
+    .md th {
+      text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: .8px;
+      color: var(--text-muted); font-weight: 500; text-transform: uppercase;
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    .md td { padding: 9px 12px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+    .md td:first-child { color: var(--text-primary); white-space: nowrap; }
+    .md strong { color: var(--text-primary); font-weight: 600; }
+    .md hr { border: none; border-top: 1px solid var(--border-soft); margin: 24px 0; }
+
+    .doc-dl {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px; margin-top: 36px;
+    }
+    .doc-dl .t { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .doc-dl .s { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+    .doc-dl .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .doc-dl .a1 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff; border-radius: 9px; padding: 10px 16px;
+      font-size: 13.5px; font-weight: 600;
+    }
+    .doc-dl .a2 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
+    }
+    .doc-dl .lucide { width: 15px; height: 15px; }
+
+    .doc-toc {
+      width: 222px; flex: none;
+      border-left: 1px solid var(--border);
+      padding: 44px 24px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+      display: flex; flex-direction: column; gap: 13px;
+    }
+    .doc-toc .h { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted); }
+    .doc-toc a { font-size: 13px; color: var(--text-muted); }
+    .doc-toc a:hover { color: var(--text-secondary); }
+    .doc-toc a.on { color: var(--accent-text); }
+
+    @media (max-width: 1100px) { .doc-toc { display: none; } }
+    @media (max-width: 860px) {
+      .doc-side { display: none; }
+      .doc-article { padding: 32px 24px; }
+      [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav { padding: 14px 20px; }
+      .doc-nav .r a:not(.dl-btn) { display: none; }
+    }
+  </style>
+  <link rel="canonical" href="https://forge.mograph.life/apps/ae/docs/distributron.html" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="IVG Toolkit" />
+  <meta property="og:title" content="Distributron — After Effects script documentation" /><meta property="og:description" content="Distributron for After Effects: Spread a comp's layers evenly along a shape path, each auto-rotating to follow the curve, all steered live from one CTRL null." />
+  <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs/distributron.html" /><meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="Distributron — After Effects script documentation" />
+  <meta name="twitter:description" content="Distributron for After Effects: Spread a comp's layers evenly along a shape path, each auto-rotating to follow the curve, all steered live from one CTRL null." /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/distributron.html#page","url":"https://forge.mograph.life/apps/ae/docs/distributron.html","headline":"Distributron — After Effects script documentation","name":"Distributron — After Effects script documentation","description":"Distributron for After Effects: Spread a comp's layers evenly along a shape path, each auto-rotating to follow the curve, all steered live from one CTRL null.","inLanguage":"en","author":{"@type":"Person","name":"Ilya Gusinski","url":"https://www.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"Distributron","item":"https://forge.mograph.life/apps/ae/docs/distributron.html"}]}]}</script>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a class="l" href="/apps/ae/">
+      <span class="mark"><i data-lucide="zap"></i></span>
+      <span class="brand">IVG Toolkit</span>
+      <span class="ver">Open source</span>
+    </a>
+    <div class="r">
+      <a href="/apps/ae/#library">Library</a>
+      <a href="/apps/ae/docs.html" class="on">Docs</a>
+      <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener">GitHub</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download><i data-lucide="download"></i>Download</a>
+    </div>
+  </nav>
+
+  <div class="doc-shell">
+    <aside class="doc-side" id="docSide">
+      <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" aria-label="Filter script documentation" placeholder="Filter scripts…" /></label>
+<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster">PathMaster</a>
+<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer">Verticalizer</a>
+<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron">Sync-o-tron</a>
+<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron">Valuatron</a>
+<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron">TimeWarp-a-tron</a>
+<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron" class="on" aria-current="page">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster">VertexMaster</a>
+<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator">Triminator</a>
+    </aside>
+    <main class="doc-article" id="docArticle">
+      <nav class="doc-bc" id="docBc" aria-label="Breadcrumb"><a href="/">IVG Design Forge</a> <span>/</span> <a href="/apps/ae/">IVG Toolkit</a> <span>/</span> <a href="/apps/ae/docs.html">Documentation</a> <span>/</span> <a href="/apps/ae/docs/distributron.html">Distributron</a></nav>
+      <h1 id="docH1">Distributron</h1>
+      <div class="doc-badges" id="docBadges"><span class="chip">Paths &amp; Shapes</span><span class="chip">v1.1.3</span><span class="chip">HEADLESS</span></div>
+      <div class="md" id="docMd"><blockquote>Spread a comp's layers evenly along a shape-layer path — each one auto-rotating to follow the curve — and steer the whole arrangement live from one CTRL null.</blockquote>
+<p><strong>Category:</strong> paths · <strong>Version:</strong> 1.1.2 · <strong>UI:</strong> HEADLESS (no dialog — rigs the selected path instantly)</p>
+<h2 id="what-it-does">What it does</h2>
+<p>Distributron takes one shape layer's path and arranges every other layer in the composition along it, evenly spaced, with each layer automatically rotating to point along the curve. Select the shape layer that owns the path, run the script, and it builds a compact rig: the path layer is moved to the top of the stack, a <strong>CTRL</strong> null is created and parented to it, and every other layer is re-parented to CTRL and given expressions that walk it along the path.</p>
+<p>Because the distribution is expression-driven rather than baked into keyframes, it stays <strong>live</strong> — animate or reshape the path and every distributed layer re-flows along the new shape automatically, no re-running required. All ongoing control lives on a single pseudo-effect named <strong>Distribute Along the Path</strong> on the CTRL null, where sliders and an angle dial let you jitter each layer's rotation, offset all rotations at once, trim distance off the start or end of the path, and pick which range of layer indices takes part. It's built for things like beads-on-a-string arrangements, icons or characters flowing along a hand-drawn curve, and radial or wavy layouts that keep tracking the path as it moves.</p>
+<h2 id="controls-options">Controls &amp; options</h2>
+<p>Distributron is headless. Once it runs, everything is adjusted from the <strong>Distribute Along the Path</strong> effect on the <strong>CTRL</strong> null (select CTRL and open Effect Controls). The script fills in the three index/picker controls for you; the rest are yours to animate.</p>
+<table><thead><tr><th>Control</th><th>Type</th><th>Default</th><th>Set by script</th><th>Meaning</th></tr></thead><tbody><tr><td>Randomize Rotation</td><td>Slider</td><td>0</td><td>—</td><td>Amplitude of a random per-layer rotation jitter added on top of the path-follow rotation</td></tr><tr><td>Rotation Offset</td><td>Angle</td><td>0°</td><td>—</td><td>Degrees added to every distributed layer's rotation at once</td></tr><tr><td>Start Distribution Offset</td><td>Slider</td><td>0</td><td>—</td><td>Distance trimmed off the start of the path before layers are spread</td></tr><tr><td>End Distribution Offset</td><td>Slider</td><td>0</td><td>—</td><td>Distance trimmed off the end of the path</td></tr><tr><td>Distribution setup</td><td>Group</td><td>—</td><td>—</td><td>Twirl-down section header in the panel; no value of its own</td></tr><tr><td>First Layer Index</td><td>Slider</td><td>0</td><td>Yes → path layer's index + 1</td><td>Lowest layer index treated as &quot;first along the path&quot;</td></tr><tr><td>Last Layer Index</td><td>Slider</td><td>0</td><td>Yes → total layer count</td><td>Highest layer index treated as &quot;last along the path&quot;</td></tr><tr><td>Distribution Path Layer</td><td>Layer picker</td><td>—</td><td>Yes → the shape/path layer</td><td>Points the rig at the layer whose path defines the curve</td></tr></tbody></table>
+<p>Narrow <strong>First / Last Layer Index</strong> to distribute only a subset of layers; the layers whose indices fall in that range are the ones swept onto the path. (The layer-picker control's exact name carries a trailing space — <code>Distribution Path Layer </code> — but you set it from the picker, not by typing.)</p>
+<h2 id="usage">Usage</h2>
+<ol>
+<li>Draw or place a path on a shape layer (e.g. with the Pen tool) in the target composition.</li>
+<li>Add the layers you want distributed — icons, images, text, solids — to the same comp.</li>
+<li>Select <strong>only</strong> the shape layer that owns the path (exactly one layer must be selected).</li>
+<li>Run Distributron. There is no dialog; it executes immediately.</li>
+<li>The script moves the shape layer to the top if needed, links a mask to its path, creates and configures the CTRL null, and parents plus expression-drives every other layer along the path.</li>
+<li>Select <strong>CTRL</strong> and open Effect Controls to adjust Randomize Rotation, Rotation Offset, Start/End Distribution Offset, and the First/Last Layer Index range.</li>
+</ol>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Distribution is fully live: animating the path, or animating its shape over time, makes every distributed layer re-flow along the new curve automatically.</li>
+<li>There is no per-layer picker for what gets distributed — every layer in the comp except the path layer and the newly created CTRL null is swept in and re-parented. Worth knowing before running it in a comp that already holds backgrounds, adjustment layers, or cameras; narrow the First/Last Layer Index range afterward to exclude them.</li>
+<li>All distributed layers are parented to CTRL, so moving, scaling, or rotating CTRL moves the whole arrangement as a group.</li>
+<li>The rig links a mask on the shape layer to the shape's own path and reads that mask by its actual created name, so a shape layer that already carries other masks still distributes correctly.</li>
+<li>The rig follows the path in 2D; per-layer Z depth isn't part of the distribution, which is inherent to building on a mask path.</li>
+</ul>
+<h2 id="requirements-edge-cases">Requirements &amp; edge cases</h2>
+<ul>
+<li>Adobe After Effects CS6 or later; nothing in the tool requires a newer version.</li>
+<li>Needs an open composition as the active item and exactly one selected layer — otherwise it alerts <code>Please select exactly one shape layer with a path.</code> and exits cleanly.</li>
+<li>The selected layer should be a shape layer whose path is the first path in its first group (the default structure when you draw directly on a shape layer with the Pen tool). Other layer types, or shapes with the path reordered behind other content, won't bind a valid curve.</li>
+<li>Needs at least one other layer besides the shape layer to have anything to distribute; with none, CTRL and the mask are still created but nothing is placed.</li>
+<li>With exactly one distributable layer, First Layer Index equals Last Layer Index and that single layer's position/rotation expression can't resolve a spacing fraction. Give it at least two layers to distribute.</li>
+</ul>
+<h2 id="how-it-works">How it works</h2>
+<p>Everything runs inside <code>main()</code> under an <code>app.beginUndoGroup(&quot;Distributron&quot;)</code>. It reads <code>app.project.activeItem</code> and its <code>selectedLayers</code>, requires exactly one selection, and moves that shape layer to the top with <code>moveToBeginning()</code> if it isn't already there. It then adds a mask to the shape layer and drives the mask path from the layer's own first path via the expression <code>thisLayer.content(1).content(1).path</code>, so the mask always mirrors the live shape.</p>
+<p>A null named <strong>CTRL</strong> is created (<code>comp.layers.addNull()</code>), parented to the shape layer, and placed at the shape's anchor point. The <strong>Distribute Along the Path</strong> pseudo-effect — a RIFX/FFX binary embedded in the script — is installed onto CTRL through the bundled <code>ApplyFFX</code> module (write to temp file, <code>applyPreset()</code>). The script then sets three of its controls from the scripting DOM using the callable property-group shorthand: <code>Distribution Path Layer </code> to the shape layer's index, <code>First Layer Index</code> to that index + 1, and <code>Last Layer Index</code> to the total layer count.</p>
+<p>Finally it loops over the comp, and for every layer whose index falls in the First–Last range it sets <code>layer.parent = ctrlLayer</code> and assigns the same expression string to both <strong>Position</strong> and <strong>Rotation</strong>. That expression walks the mask's point array to measure total path length (<code>points()</code> plus a segment-length sum), reads the CTRL effect's controls with the expression-side <code>effect(name)(name)</code> accessor, computes each layer's arc-length target from its index relative to First/Last (offset by Start/End Distribution Offset), and samples <code>pointOnPath()</code> for position and <code>normalOnPath()</code> for the tangent. Rotation is <code>atan2</code> of the tangent in degrees, plus 90°, plus Rotation Offset, plus a Randomize Rotation jitter term; the shared string returns position or rotation by branching on <code>thisProperty.name</code>.</p></div>
+      <div class="doc-dl" id="docDl">
+        <div>
+          <div class="t" id="dlT">Get Distributron</div>
+          <div class="s" id="dlS">v1.1.3 · HEADLESS · MIT</div>
+        </div>
+        <div class="actions">
+          <a class="a1" id="dlBtn" href="/apps/ae/scripts/paths/Distributron.jsx" download><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener"><i data-lucide="github"></i>View source</a>
+        </div>
+      </div>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design">Work with Ilya</a></footer></main>
+    <aside class="doc-toc" id="docToc">
+      <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#controls-options">Controls &amp; options</a><a href="#usage">Usage</a><a href="#notes">Notes</a><a href="#requirements-edge-cases">Requirements &amp; edge cases</a><a href="#how-it-works">How it works</a>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/apps/ae/vendor/lucide.min.js"></script>
+  <script src="/apps/ae/js/docs.js?v=14"></script>
+</body>
+</html>

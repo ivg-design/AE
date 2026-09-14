@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sfxMaster — After Effects script documentation</title>
+  <meta name="description" content="sfxMaster for After Effects: Mix Voice Over, Sound Effects, and Music from three master sliders — audio layers auto-categorized by marker comments and wired in…" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/apps/ae/assets/favicon-32.png?v=11" />
+  <link rel="icon" type="image/png" sizes="256x256" href="/apps/ae/assets/ae-toolkit.png?v=11" />
+  <link rel="apple-touch-icon" href="/apps/ae/assets/apple-touch-icon.png?v=11" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/apps/ae/css/site.css?v=11" />
+  <style>
+    [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: var(--bg-alt); padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .doc-nav .l { display: flex; align-items: center; gap: 11px; }
+    .doc-nav .mark {
+      width: 28px; height: 28px; border-radius: 8px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .doc-nav .mark .lucide { width: 15px; height: 15px; color: #fff; }
+    .doc-nav .brand { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+    .doc-nav .ver {
+      font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 3px 7px;
+    }
+    .doc-nav .r { display: flex; align-items: center; gap: 26px; }
+    .doc-nav .r a { font-size: 14px; color: var(--text-secondary); }
+    .doc-nav .r a.on { color: var(--text-primary); font-weight: 600; }
+    .doc-nav .r a:hover { color: var(--text-primary); }
+    .doc-nav .dl-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff !important;
+      border-radius: 9px; padding: 9px 16px; font-size: 13.5px; font-weight: 600;
+    }
+    .doc-nav .dl-btn .lucide { width: 15px; height: 15px; }
+
+    .doc-shell { display: flex; min-height: calc(100vh - 66px); }
+    .doc-side {
+      width: 262px; flex: none;
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 26px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+    }
+    /* styled scrollbar for the left script panel + right TOC (unstyled default stood out) */
+    .doc-side, .doc-toc { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.16) transparent; }
+    .doc-side::-webkit-scrollbar, .doc-toc::-webkit-scrollbar { width: 8px; }
+    .doc-side::-webkit-scrollbar-track, .doc-toc::-webkit-scrollbar-track { background: transparent; }
+    .doc-side::-webkit-scrollbar-thumb, .doc-toc::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+    }
+    .doc-side:hover::-webkit-scrollbar-thumb, .doc-toc:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,.26); background-clip: padding-box; }
+    .doc-side .search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 11px; margin-bottom: 14px;
+    }
+    .doc-side .search .lucide { width: 13px; height: 13px; color: var(--text-muted); }
+    .doc-side .search input {
+      border: none; background: none; outline: none; width: 100%;
+      font-family: var(--font-body); font-size: 13px; color: var(--text-primary);
+    }
+    .doc-side .search input::placeholder { color: var(--text-muted); }
+    .doc-side .grp {
+      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted);
+      padding: 14px 0 6px 2px;
+    }
+    .doc-side a {
+      display: flex; align-items: center; gap: 9px;
+      border-radius: 7px; padding: 8px 11px;
+      font-size: 13.5px; color: var(--text-secondary);
+    }
+    .doc-side a:hover { background: #ffffff08; }
+    .doc-side a.on { background: var(--accent-soft); color: var(--text-primary); font-weight: 600; }
+    .doc-side a img { width: 32px; height: 32px; object-fit: contain; }
+    .doc-side a .lucide { width: 30px; height: 30px; color: var(--text-muted); }
+
+    .doc-article { flex: 1; min-width: 0; padding: 44px 64px; max-width: 900px; }
+    .doc-bc {
+      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .doc-bc b { color: var(--accent-text); font-weight: 400; }
+    .doc-article h1 {
+      font-family: var(--font-display); font-size: 42px; font-weight: 600; letter-spacing: -1px;
+      margin: 0 0 14px;
+    }
+    .doc-badges { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .md > p:first-of-type { font-size: 17px; line-height: 1.6; }
+    .md h2 {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);
+      margin: 40px 0 14px; padding-top: 26px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .md h3 {
+      font-family: var(--font-display); font-size: 16.5px; font-weight: 600; color: var(--text-primary);
+      margin: 26px 0 10px;
+    }
+    .md p { margin: 0 0 14px; }
+    .md ul, .md ol { margin: 0 0 16px; padding-left: 22px; display: flex; flex-direction: column; gap: 7px; }
+    .md li::marker { color: var(--accent-text); }
+    .md code {
+      font-family: var(--font-mono); font-size: .86em; color: var(--accent-text);
+      background: var(--term-bg); border: 1px solid var(--border-soft);
+      border-radius: 5px; padding: 1.5px 6px;
+    }
+    .md pre {
+      background: var(--term-bg); border: 1px solid var(--border-soft); border-radius: 10px;
+      padding: 14px 16px; overflow-x: auto; margin: 0 0 16px;
+    }
+    .md pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.6; }
+    .md blockquote {
+      border-left: 3px solid var(--accent); border-radius: 2px;
+      padding: 2px 0 2px 16px; margin: 0 0 16px;
+      color: var(--text-secondary); font-size: 16px;
+    }
+    .md table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 13.5px; }
+    .md th {
+      text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: .8px;
+      color: var(--text-muted); font-weight: 500; text-transform: uppercase;
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    .md td { padding: 9px 12px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+    .md td:first-child { color: var(--text-primary); white-space: nowrap; }
+    .md strong { color: var(--text-primary); font-weight: 600; }
+    .md hr { border: none; border-top: 1px solid var(--border-soft); margin: 24px 0; }
+
+    .doc-dl {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px; margin-top: 36px;
+    }
+    .doc-dl .t { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .doc-dl .s { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+    .doc-dl .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .doc-dl .a1 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff; border-radius: 9px; padding: 10px 16px;
+      font-size: 13.5px; font-weight: 600;
+    }
+    .doc-dl .a2 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
+    }
+    .doc-dl .lucide { width: 15px; height: 15px; }
+
+    .doc-toc {
+      width: 222px; flex: none;
+      border-left: 1px solid var(--border);
+      padding: 44px 24px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+      display: flex; flex-direction: column; gap: 13px;
+    }
+    .doc-toc .h { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted); }
+    .doc-toc a { font-size: 13px; color: var(--text-muted); }
+    .doc-toc a:hover { color: var(--text-secondary); }
+    .doc-toc a.on { color: var(--accent-text); }
+
+    @media (max-width: 1100px) { .doc-toc { display: none; } }
+    @media (max-width: 860px) {
+      .doc-side { display: none; }
+      .doc-article { padding: 32px 24px; }
+      [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav { padding: 14px 20px; }
+      .doc-nav .r a:not(.dl-btn) { display: none; }
+    }
+  </style>
+  <link rel="canonical" href="https://forge.mograph.life/apps/ae/docs/sfxmaster.html" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="IVG Toolkit" />
+  <meta property="og:title" content="sfxMaster — After Effects script documentation" /><meta property="og:description" content="sfxMaster for After Effects: Mix Voice Over, Sound Effects, and Music from three master sliders — audio layers auto-categorized by marker comments and wired in…" />
+  <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs/sfxmaster.html" /><meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="sfxMaster — After Effects script documentation" />
+  <meta name="twitter:description" content="sfxMaster for After Effects: Mix Voice Over, Sound Effects, and Music from three master sliders — audio layers auto-categorized by marker comments and wired in…" /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/sfxmaster.html#page","url":"https://forge.mograph.life/apps/ae/docs/sfxmaster.html","headline":"sfxMaster — After Effects script documentation","name":"sfxMaster — After Effects script documentation","description":"sfxMaster for After Effects: Mix Voice Over, Sound Effects, and Music from three master sliders — audio layers auto-categorized by marker comments and wired in…","inLanguage":"en","author":{"@type":"Person","name":"Ilya Gusinski","url":"https://www.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"sfxMaster","item":"https://forge.mograph.life/apps/ae/docs/sfxmaster.html"}]}]}</script>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a class="l" href="/apps/ae/">
+      <span class="mark"><i data-lucide="zap"></i></span>
+      <span class="brand">IVG Toolkit</span>
+      <span class="ver">Open source</span>
+    </a>
+    <div class="r">
+      <a href="/apps/ae/#library">Library</a>
+      <a href="/apps/ae/docs.html" class="on">Docs</a>
+      <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener">GitHub</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download><i data-lucide="download"></i>Download</a>
+    </div>
+  </nav>
+
+  <div class="doc-shell">
+    <aside class="doc-side" id="docSide">
+      <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" aria-label="Filter script documentation" placeholder="Filter scripts…" /></label>
+<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster">PathMaster</a>
+<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer">Verticalizer</a>
+<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster" class="on" aria-current="page">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron">Sync-o-tron</a>
+<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron">Valuatron</a>
+<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron">TimeWarp-a-tron</a>
+<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster">VertexMaster</a>
+<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator">Triminator</a>
+    </aside>
+    <main class="doc-article" id="docArticle">
+      <nav class="doc-bc" id="docBc" aria-label="Breadcrumb"><a href="/">IVG Design Forge</a> <span>/</span> <a href="/apps/ae/">IVG Toolkit</a> <span>/</span> <a href="/apps/ae/docs.html">Documentation</a> <span>/</span> <a href="/apps/ae/docs/sfxmaster.html">sfxMaster</a></nav>
+      <h1 id="docH1">sfxMaster</h1>
+      <div class="doc-badges" id="docBadges"><span class="chip">Effects &amp; Audio</span><span class="chip">v2.0.1</span><span class="chip">HEADLESS</span></div>
+      <div class="md" id="docMd"><blockquote>Mix all your Voice Over, Sound Effects, and Music from three master sliders — audio layers are auto-categorized by marker comments and wired up in one pass.</blockquote>
+<p><strong>Category:</strong> effects · <strong>Version:</strong> 2.0.1 · <strong>UI:</strong> HEADLESS (no dialog; alert/confirm prompts only)</p>
+<h2 id="what-it-does">What it does</h2>
+<p>sfxMaster turns a composition's scattered audio layers into a centrally mixable session. Select one or more compositions in the Project panel and run it: the script builds a null named <strong>&quot;SFX CTRL&quot;</strong> holding three Slider Control effects — <strong>Voice Over</strong>, <strong>Sound Effects</strong>, and <strong>Music</strong> — that act as master volume knobs. It then walks every layer in each comp (recursing into precomps), finds all audio-only footage layers, and buckets each one into a category by reading the layer's <strong>first marker comment</strong>.</p>
+<p>Every audio layer gets a Stereo Mixer effect whose Left/Right Level parameters are expression-linked to the matching master slider, so nudging one slider scales every layer in that category at once — &quot;duck the music&quot;, &quot;boost the VO&quot;, &quot;mute all SFX&quot; without hand-wiring dozens of layers. Because it recurses into nested comps and can process several selected comps in one run, it's a one-shot pass that standardizes audio control across an entire project structure.</p>
+<h2 id="controls-options">Controls &amp; options</h2>
+<h3>Marker-based categorization (the routing surface)</h3>
+<p>The category is decided by the <strong>first marker</strong> on each audio layer. The comment is lowercased and substring-matched:</p>
+<table><thead><tr><th>First marker comment contains</th><th>Category slider</th></tr></thead><tbody><tr><td><code>voice over</code></td><td>Voice Over</td></tr><tr><td><code>music</code></td><td>Music</td></tr><tr><td>anything else, or no marker at all</td><td>Sound Effects</td></tr></tbody></table>
+<p>Example: a marker comment of <code>Voice Over - intro narration</code> routes that layer to the Voice Over slider. Matching is case-insensitive; only the first marker is read — later markers are ignored.</p>
+<h3>What it builds</h3>
+<table><thead><tr><th>Control</th><th>Location</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td>Voice Over (Slider Control)</td><td>&quot;SFX CTRL&quot; null → Effects</td><td>0</td><td>Master level for voice-over layers</td></tr><tr><td>Sound Effects (Slider Control)</td><td>&quot;SFX CTRL&quot; null → Effects</td><td>0</td><td>Master level for uncategorized/SFX layers</td></tr><tr><td>Music (Slider Control)</td><td>&quot;SFX CTRL&quot; null → Effects</td><td>0</td><td>Master level for music layers</td></tr><tr><td>Overwrite prompt</td><td>confirm dialog</td><td>—</td><td>Appears only when some layer already has an expression-linked Stereo Mixer; your yes/no applies to every selected comp in one shot</td></tr></tbody></table>
+<p>The Stereo Mixer levels are set equal to the slider value, and they behave as percentages — so <strong>raise each slider to 100 for original volume</strong>; the sliders start at 0 (silent).</p>
+<h2 id="usage">Usage</h2>
+<ol>
+<li>Tag audio layers with a layer marker whose comment contains &quot;voice over&quot; or &quot;music&quot; where you want those buckets; leave the rest unmarked to route them to Sound Effects.</li>
+<li>Select one or more compositions in the <strong>Project panel</strong> (not layers in the Timeline).</li>
+<li>Run sfxMaster.</li>
+<li>If prompted about existing linked Stereo Mixers, choose whether to overwrite them.</li>
+<li>In each processed comp, adjust the Voice Over / Sound Effects / Music sliders on the &quot;SFX CTRL&quot; null to mix. Start by setting them to 100 (unity), then ride them from there.</li>
+</ol>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>The generated expressions reference the comp and control layer <strong>by name</strong>: <code>comp('&lt;comp name&gt;').layer('SFX CTRL').effect('&lt;slider&gt;')('Slider')</code>. Renaming the comp, the &quot;SFX CTRL&quot; null, or the sliders afterward breaks the links.</li>
+<li>Precomp layers are wired back to the <strong>top-level</strong> comp's SFX CTRL, not to a control inside the precomp — one console rules the whole nested structure.</li>
+<li>If a layer already had a linked Stereo Mixer and you decline to overwrite, a second Stereo Mixer is added alongside it, leaving the original's expressions intact.</li>
+<li>An existing layer named &quot;SFX CTRL&quot; is reused as-is; its sliders are not re-created or repaired.</li>
+<li>Everything runs in a single undo group.</li>
+</ul>
+<h2 id="requirements-edge-cases">Requirements &amp; edge cases</h2>
+<ul>
+<li>After Effects CC 2019 or later.</li>
+<li>At least one item selected in the Project panel, and every selected item must be a composition — otherwise the script alerts and stops.</li>
+<li>Only footage layers with <strong>no video</strong> count as audio (e.g. imported <code>.wav</code>/<code>.mp3</code>). A video file that also carries audio is skipped entirely — its audio is not wired to the console.</li>
+<li>The overwrite decision is one global yes/no for the whole run; there is no per-layer choice.</li>
+<li>Nested comps are walked with unlimited depth; a precomp used in several places is processed once per appearance.</li>
+</ul>
+<h2 id="how-it-works">How it works</h2>
+<p>A single self-invoking <code>main()</code>. It reads <code>app.project.selection</code>, opens the &quot;Apply Stereo Mixer&quot; undo group, and makes two passes over the selected comps. Pass one ensures each comp has an &quot;SFX CTRL&quot; null (<code>comp.layers.addNull()</code> plus three <code>ADBE Slider Control</code> effects renamed Voice Over / Sound Effects / Music) and runs <code>processComp()</code> in check-only mode, OR-accumulating whether any layer anywhere already carries an expression-linked Stereo Mixer — if so, a single <code>confirm()</code> asks about overwriting. Pass two runs <code>processComp()</code> in apply mode with that answer.</p>
+<p><code>processComp()</code> iterates layers 1-based; audio-only footage layers (<code>FootageItem</code> with <code>hasVideo === false</code>) get categorized and wired, precomp layers recurse with the same top-level <code>mainCompName</code>, and everything else is skipped. <code>determineSlider()</code> lowercases the first marker's comment and checks <code>indexOf('voice over')</code> / <code>indexOf('music')</code>, defaulting to Sound Effects. <code>applyStereoMixer()</code> finds the layer's &quot;Stereo Mixer&quot; by display name, adds one when missing (or adds a second when the user declined overwrite), then assigns the slider-reference expression to both Left Level and Right Level.</p></div>
+      <div class="doc-dl" id="docDl">
+        <div>
+          <div class="t" id="dlT">Get sfxMaster</div>
+          <div class="s" id="dlS">v2.0.1 · HEADLESS · MIT</div>
+        </div>
+        <div class="actions">
+          <a class="a1" id="dlBtn" href="/apps/ae/scripts/effects/sfxMaster.jsx" download><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener"><i data-lucide="github"></i>View source</a>
+        </div>
+      </div>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design">Work with Ilya</a></footer></main>
+    <aside class="doc-toc" id="docToc">
+      <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#controls-options">Controls &amp; options</a><a href="#usage">Usage</a><a href="#notes">Notes</a><a href="#requirements-edge-cases">Requirements &amp; edge cases</a><a href="#how-it-works">How it works</a>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/apps/ae/vendor/lucide.min.js"></script>
+  <script src="/apps/ae/js/docs.js?v=14"></script>
+</body>
+</html>

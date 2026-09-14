@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Docs — IVG Toolkit</title>
-  <meta name="description" content="Full documentation for all 33 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements." />
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=11" />
-  <link rel="icon" type="image/png" sizes="256x256" href="assets/ae-toolkit.png?v=11" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=11" />
+  <title>After Effects script documentation — IVG Toolkit</title>
+  <meta name="description" content="Documentation for 35 free IVG Toolkit After Effects scripts. Browse setup, controls, examples, requirements, and individual JSX downloads." />
+  <link rel="icon" type="image/png" sizes="32x32" href="/apps/ae/assets/favicon-32.png?v=11" />
+  <link rel="icon" type="image/png" sizes="256x256" href="/apps/ae/assets/ae-toolkit.png?v=11" />
+  <link rel="apple-touch-icon" href="/apps/ae/assets/apple-touch-icon.png?v=11" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/site.css?v=11" />
+  <link rel="stylesheet" href="/apps/ae/css/site.css?v=11" />
   <style>
+    [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
     .doc-nav {
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
       background: var(--bg-alt); padding: 16px 40px;
@@ -85,6 +87,7 @@
 
     .doc-article { flex: 1; min-width: 0; padding: 44px 64px; max-width: 900px; }
     .doc-bc {
+      flex-wrap: wrap;
       display: flex; align-items: center; gap: 8px;
       font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
       margin-bottom: 18px;
@@ -172,53 +175,88 @@
     @media (max-width: 860px) {
       .doc-side { display: none; }
       .doc-article { padding: 32px 24px; }
-      .doc-nav { padding: 14px 20px; }
+      [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav { padding: 14px 20px; }
       .doc-nav .r a:not(.dl-btn) { display: none; }
     }
   </style>
-  <!-- ae-seo:start -->
   <link rel="canonical" href="https://forge.mograph.life/apps/ae/docs.html" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="IVG Toolkit" />
-  <meta property="og:title" content="Docs — IVG Toolkit After Effects scripts" />
-  <meta property="og:description" content="Full documentation for all 33 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements." />
-  <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs.html" />
-  <meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Docs — IVG Toolkit After Effects scripts" />
-  <meta name="twitter:description" content="Full documentation for all 33 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements." />
-  <meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
-  <meta name="theme-color" content="#0b0b0f" />
-  <link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt (AI overview)" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","@id":"https://forge.mograph.life/apps/ae/docs.html#page","url":"https://forge.mograph.life/apps/ae/docs.html","name":"Docs — IVG Toolkit After Effects scripts","description":"Full documentation for all 33 IVG Toolkit After Effects scripts: what each does, its controls, usage, notes, and requirements.","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Docs","item":"https://forge.mograph.life/apps/ae/docs.html"}]}]}</script>
-  <!-- ae-seo:end -->
+  <meta property="og:title" content="After Effects script documentation — IVG Toolkit" /><meta property="og:description" content="Documentation for 35 free IVG Toolkit After Effects scripts. Browse setup, controls, examples, requirements, and individual JSX downloads." />
+  <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs.html" /><meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="After Effects script documentation — IVG Toolkit" />
+  <meta name="twitter:description" content="Documentation for 35 free IVG Toolkit After Effects scripts. Browse setup, controls, examples, requirements, and individual JSX downloads." /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","@id":"https://forge.mograph.life/apps/ae/docs.html#page","url":"https://forge.mograph.life/apps/ae/docs.html","headline":"After Effects script documentation — IVG Toolkit","name":"After Effects script documentation — IVG Toolkit","description":"Documentation for 35 free IVG Toolkit After Effects scripts. Browse setup, controls, examples, requirements, and individual JSX downloads.","inLanguage":"en","author":{"@type":"Person","name":"Ilya Gusinski","url":"https://www.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"},"mainEntity":{"@type":"ItemList","itemListElement":[{"@type":"ListItem","position":1,"name":"2-3 IK Rigger","url":"https://forge.mograph.life/apps/ae/docs/2-3-ik-rigger.html"},{"@type":"ListItem","position":2,"name":"CamBot","url":"https://forge.mograph.life/apps/ae/docs/cambot.html"},{"@type":"ListItem","position":3,"name":"Limb-a-tron","url":"https://forge.mograph.life/apps/ae/docs/limb-a-tron.html"},{"@type":"ListItem","position":4,"name":"Linearizer","url":"https://forge.mograph.life/apps/ae/docs/linearizer.html"},{"@type":"ListItem","position":5,"name":"PathMaster","url":"https://forge.mograph.life/apps/ae/docs/pathmaster.html"},{"@type":"ListItem","position":6,"name":"Guiderator","url":"https://forge.mograph.life/apps/ae/docs/guiderator.html"},{"@type":"ListItem","position":7,"name":"Slidotron_16x9","url":"https://forge.mograph.life/apps/ae/docs/slidotron-16x9.html"},{"@type":"ListItem","position":8,"name":"Slidotron_9x16","url":"https://forge.mograph.life/apps/ae/docs/slidotron-9x16.html"},{"@type":"ListItem","position":9,"name":"Verticalizer","url":"https://forge.mograph.life/apps/ae/docs/verticalizer.html"},{"@type":"ListItem","position":10,"name":"BurstMate","url":"https://forge.mograph.life/apps/ae/docs/burstmate.html"},{"@type":"ListItem","position":11,"name":"ChromaBlenderizer","url":"https://forge.mograph.life/apps/ae/docs/chromablenderizer.html"},{"@type":"ListItem","position":12,"name":"sfxMaster","url":"https://forge.mograph.life/apps/ae/docs/sfxmaster.html"},{"@type":"ListItem","position":13,"name":"Sync-o-tron","url":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html"},{"@type":"ListItem","position":14,"name":"Elast-o-matic","url":"https://forge.mograph.life/apps/ae/docs/elast-o-matic.html"},{"@type":"ListItem","position":15,"name":"KeyBot","url":"https://forge.mograph.life/apps/ae/docs/keybot.html"},{"@type":"ListItem","position":16,"name":"KeyCloneMatic","url":"https://forge.mograph.life/apps/ae/docs/keyclonematic.html"},{"@type":"ListItem","position":17,"name":"Valuatron","url":"https://forge.mograph.life/apps/ae/docs/valuatron.html"},{"@type":"ListItem","position":18,"name":"Controllerizer","url":"https://forge.mograph.life/apps/ae/docs/controllerizer.html"},{"@type":"ListItem","position":19,"name":"NullBot","url":"https://forge.mograph.life/apps/ae/docs/nullbot.html"},{"@type":"ListItem","position":20,"name":"Opac-o-bot","url":"https://forge.mograph.life/apps/ae/docs/opac-o-bot.html"},{"@type":"ListItem","position":21,"name":"OrderMaster","url":"https://forge.mograph.life/apps/ae/docs/ordermaster.html"},{"@type":"ListItem","position":22,"name":"Parent-o-bot","url":"https://forge.mograph.life/apps/ae/docs/parent-o-bot.html"},{"@type":"ListItem","position":23,"name":"Rectangulator","url":"https://forge.mograph.life/apps/ae/docs/rectangulator.html"},{"@type":"ListItem","position":24,"name":"Reseterator","url":"https://forge.mograph.life/apps/ae/docs/reseterator.html"},{"@type":"ListItem","position":25,"name":"SubtitleForge","url":"https://forge.mograph.life/apps/ae/docs/subtitleforge.html"},{"@type":"ListItem","position":26,"name":"TextMate","url":"https://forge.mograph.life/apps/ae/docs/textmate.html"},{"@type":"ListItem","position":27,"name":"TimeWarp-a-tron","url":"https://forge.mograph.life/apps/ae/docs/timewarp-a-tron.html"},{"@type":"ListItem","position":28,"name":"Centralizer","url":"https://forge.mograph.life/apps/ae/docs/centralizer.html"},{"@type":"ListItem","position":29,"name":"Distributron","url":"https://forge.mograph.life/apps/ae/docs/distributron.html"},{"@type":"ListItem","position":30,"name":"Originator","url":"https://forge.mograph.life/apps/ae/docs/originator.html"},{"@type":"ListItem","position":31,"name":"Trace-o-matic","url":"https://forge.mograph.life/apps/ae/docs/trace-o-matic.html"},{"@type":"ListItem","position":32,"name":"VertexMaster","url":"https://forge.mograph.life/apps/ae/docs/vertexmaster.html"},{"@type":"ListItem","position":33,"name":"Iteratron","url":"https://forge.mograph.life/apps/ae/docs/iteratron.html"},{"@type":"ListItem","position":34,"name":"RandoMatic","url":"https://forge.mograph.life/apps/ae/docs/randomatic.html"},{"@type":"ListItem","position":35,"name":"Triminator","url":"https://forge.mograph.life/apps/ae/docs/triminator.html"}]}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"}]}]}</script>
 </head>
 <body>
   <nav class="doc-nav">
-    <a class="l" href="index.html">
+    <a class="l" href="/apps/ae/">
       <span class="mark"><i data-lucide="zap"></i></span>
       <span class="brand">IVG Toolkit</span>
-      <span class="ver">v1.0.1</span>
+      <span class="ver">Open source</span>
     </a>
     <div class="r">
-      <a href="index.html#library">Library</a>
-      <a href="#" class="on">Docs</a>
+      <a href="/apps/ae/#library">Library</a>
+      <a href="/apps/ae/docs.html" class="on">Docs</a>
       <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
       <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener">GitHub</a>
-      <a class="dl-btn" href="download/ae-scripts.zip" download><i data-lucide="download"></i>Download</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download><i data-lucide="download"></i>Download</a>
     </div>
   </nav>
 
   <div class="doc-shell">
     <aside class="doc-side" id="docSide">
-      <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" placeholder="Filter scripts…" /></label>
+      <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" aria-label="Filter script documentation" placeholder="Filter scripts…" /></label>
+<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster">PathMaster</a>
+<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer">Verticalizer</a>
+<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron">Sync-o-tron</a>
+<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron">Valuatron</a>
+<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron">TimeWarp-a-tron</a>
+<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster">VertexMaster</a>
+<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator">Triminator</a>
     </aside>
     <main class="doc-article" id="docArticle">
-      <div class="doc-bc" id="docBc"></div>
-      <h1 id="docH1">Loading…</h1>
-      <div class="doc-badges" id="docBadges"></div>
-      <div class="md" id="docMd"></div>
+      <nav class="doc-bc" id="docBc" aria-label="Breadcrumb"><a href="/">IVG Design Forge</a> <span>/</span> <a href="/apps/ae/">IVG Toolkit</a> <span>/</span> <a href="/apps/ae/docs.html">Documentation</a></nav>
+      <h1 id="docH1">IVG Toolkit documentation</h1>
+
+      <div class="md" id="docMd"><p>Documentation for 35 free IVG Toolkit After Effects scripts. Browse setup, controls, examples, requirements, and individual JSX downloads.</p><p>Choose a script by the task you need to complete. Each guide includes usage instructions and a direct script download.</p><h2 id="animation">Animation &amp; Rigging</h2><ul><li><a href="/apps/ae/docs/2-3-ik-rigger.html">2-3 IK Rigger</a> — Turns a set of existing layers into a working 2- or 3-segment IK chain.</li>
+<li><a href="/apps/ae/docs/cambot.html">CamBot</a> — Build a fully-rigged 3D camera you steer from one panel — dial from free-fly to locked tracking, blend multiple targets, and play 26 procedural moves off a single slider.</li>
+<li><a href="/apps/ae/docs/limb-a-tron.html">Limb-a-tron</a> — Rig a two-segment IK/FK limb in seconds — drag one null to bend it, tune everything from one Limb Control effect, and bake it when done.</li>
+<li><a href="/apps/ae/docs/linearizer.html">Linearizer</a> — Drive existing keyframed animation from any slider, position, or rotation — scrubbing the driver scrubs the animation.</li>
+<li><a href="/apps/ae/docs/pathmaster.html">PathMaster</a> — Animate a layer's Position along any shape-layer path — retime, re-ease, trim, loop or ping-pong it afterwards from a single layer marker.</li></ul>
+<h2 id="composition">Composition</h2><ul><li><a href="/apps/ae/docs/guiderator.html">Guiderator</a> — Drop exact ruler guides by typing a number — or a formula like 1920/2 — into a dockable panel, then click H or V.</li>
+<li><a href="/apps/ae/docs/slidotron-16x9.html">Slidotron_16x9</a> — Build a horizontal slide-reveal rig in one click — two nested 4K comps, mirrored alpha mattes, and one 0–100 &quot;CTRL&quot; slider plays the transition.</li>
+<li><a href="/apps/ae/docs/slidotron-9x16.html">Slidotron_9x16</a> — Build a vertical 9:16 slide-reveal rig in one click — two nested 1080×1920 comps, mirrored mattes, and one 0–100 &quot;CTRL&quot; slider plays the transition.</li>
+<li><a href="/apps/ae/docs/verticalizer.html">Verticalizer</a> — One click turns a landscape clip into a rigged, resolution-agnostic split-screen portrait comp — each window framed, styled, and timed independently, with a keyframeable morph into picture-in-picture.</li></ul>
+<h2 id="effects">Effects &amp; Audio</h2><ul><li><a href="/apps/ae/docs/burstmate.html">BurstMate</a> — Drop a fully rigged radial stroke burst into your comp — every color, length, density, and dash tuned from one StrokeBurst control panel.</li>
+<li><a href="/apps/ae/docs/chromablenderizer.html">ChromaBlenderizer</a> — Ramp a color range across selected fills, strokes, and effect colors — pick Start/End, then apply a linear blend or random scatter in one click.</li>
+<li><a href="/apps/ae/docs/sfxmaster.html">sfxMaster</a> — Mix Voice Over, Sound Effects, and Music from three master sliders — audio layers auto-categorized by marker comments and wired in one pass.</li>
+<li><a href="/apps/ae/docs/sync-o-tron.html">Sync-o-tron</a> — Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio Reactor template.</li></ul>
+<h2 id="keyframes">Keyframes</h2><ul><li><a href="/apps/ae/docs/elast-o-matic.html">Elast-o-matic</a> — Add elastic overshoot or gravity bounce after any keyframe — hold Cmd/Ctrl at launch to switch variants, tune everything in Effect Controls.</li>
+<li><a href="/apps/ae/docs/keybot.html">KeyBot</a> — Batch-edit selected keyframe values with =, +, −, ×, ÷ per axis — timing, easing, and interpolation stay untouched.</li>
+<li><a href="/apps/ae/docs/keyclonematic.html">KeyCloneMatic</a> — Repeat a hand-tuned keyframe set down the timeline at a fixed or decaying interval — values, easing, and spatial tangents cloned faithfully.</li>
+<li><a href="/apps/ae/docs/valuatron.html">Valuatron</a> — Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo.</li></ul>
+<h2 id="layers">Layers</h2><ul><li><a href="/apps/ae/docs/controllerizer.html">Controllerizer</a> — Gather any selected properties from any layers onto one Controller Null as matching expression controls, pre-set to current values.</li>
+<li><a href="/apps/ae/docs/nullbot.html">NullBot</a> — Parent a group of layers to one master null at their average position — move, scale, or rotate the whole group from a single handle.</li>
+<li><a href="/apps/ae/docs/opac-o-bot.html">Opac-o-bot</a> — Parenting for Opacity — selected layers' Opacity follows their parent via expression, the one property AE parenting ignores.</li>
+<li><a href="/apps/ae/docs/ordermaster.html">OrderMaster</a> — Reverse or shuffle the stacking order of a contiguous run of selected layers, or the contiguous shape groups inside one shape layer.</li>
+<li><a href="/apps/ae/docs/parent-o-bot.html">Parent-o-bot</a> — Blend a layer's Position, Scale, Rotation, and Opacity toward up to two parent layers, each with its own 0–100% influence slider.</li>
+<li><a href="/apps/ae/docs/rectangulator.html">Rectangulator</a> — Convert a parametric rectangle into a bezier shape with independent per-corner rounding and a 9-point anchor grid, driven by one effect.</li>
+<li><a href="/apps/ae/docs/reseterator.html">Reseterator</a> — Zero the transform origin of selected layers — layer anchor to [0,0,0], every nested shape-group anchor and position to [0,0].</li>
+<li><a href="/apps/ae/docs/subtitleforge.html">SubtitleForge</a> — Build a full caption rig in one run — text plus a self-sizing box with stroke and drop shadow, all driven from one Subtitle Setup effect.</li>
+<li><a href="/apps/ae/docs/textmate.html">TextMate</a> — Type a word and highlight every case-sensitive occurrence of it in a text layer, each with its own Range Selector on a new animator.</li>
+<li><a href="/apps/ae/docs/timewarp-a-tron.html">TimeWarp-a-tron</a> — Drive a layer's Time Remap from a 0–100 slider that scrubs a user-defined in/out frame range, framerate-correct and keyframe-free.</li></ul>
+<h2 id="paths">Paths &amp; Shapes</h2><ul><li><a href="/apps/ae/docs/centralizer.html">Centralizer</a> — Drop center and bounding-box guides around anything — one shape, a multiselected group of shapes, text, footage or a precomp.</li>
+<li><a href="/apps/ae/docs/distributron.html">Distributron</a> — Spread a comp's layers evenly along a shape path, each auto-rotating to follow the curve, all steered live from one CTRL null.</li>
+<li><a href="/apps/ae/docs/originator.html">Originator</a> — Recenter a shape layer's bezier path origin on (0,0) so it scales and rotates predictably — instantly for one path, via a picker for several.</li>
+<li><a href="/apps/ae/docs/trace-o-matic.html">Trace-o-matic</a> — Convert a layer's masks into a new shape layer with hold-keyframed paths and opacity, all styled at once by five master fill/stroke controls.</li>
+<li><a href="/apps/ae/docs/vertexmaster.html">VertexMaster</a> — Turn a bezier path's vertices and tangents into null-object handles you can keyframe and parent, or flip to Follow mode to track an animated path.</li></ul>
+<h2 id="utilities">Utilities</h2><ul><li><a href="/apps/ae/docs/iteratron.html">Iteratron</a> — Spread a property evenly across a layer stack — link a start value and an end value, and every layer in between gets its interpolated step.</li>
+<li><a href="/apps/ae/docs/randomatic.html">RandoMatic</a> — Replace every selected keyframe's value with a fresh uniform-random number inside a per-axis range you type in — timing and easing untouched.</li>
+<li><a href="/apps/ae/docs/triminator.html">Triminator</a> — Add a Trim Paths effect — pre-keyframed 0→100% for an instant reveal — to a shape layer's contents or to the specific shape groups you select.</li></ul></div>
       <div class="doc-dl" id="docDl" hidden>
         <div>
           <div class="t" id="dlT"></div>
@@ -229,14 +267,14 @@
           <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener"><i data-lucide="github"></i>View source</a>
         </div>
       </div>
-    </main>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design">Work with Ilya</a></footer></main>
     <aside class="doc-toc" id="docToc">
-      <span class="h">ON THIS PAGE</span>
+      <span class="h">ON THIS PAGE</span><a href="#animation">Animation &amp; Rigging</a><a href="#composition">Composition</a><a href="#effects">Effects &amp; Audio</a><a href="#keyframes">Keyframes</a><a href="#layers">Layers</a><a href="#paths">Paths &amp; Shapes</a><a href="#utilities">Utilities</a>
     </aside>
   </div>
 
   <div class="toast" id="toast" role="status"></div>
-  <script src="vendor/lucide.min.js"></script>
-  <script src="js/docs.js?v=11"></script>
+  <script src="/apps/ae/vendor/lucide.min.js"></script>
+  <script src="/apps/ae/js/docs.js?v=14"></script>
 </body>
 </html>

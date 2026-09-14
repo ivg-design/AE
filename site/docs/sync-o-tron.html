@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sync-o-tron — After Effects script documentation</title>
+  <meta name="description" content="Sync-o-tron for After Effects: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/apps/ae/assets/favicon-32.png?v=11" />
+  <link rel="icon" type="image/png" sizes="256x256" href="/apps/ae/assets/ae-toolkit.png?v=11" />
+  <link rel="apple-touch-icon" href="/apps/ae/assets/apple-touch-icon.png?v=11" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/apps/ae/css/site.css?v=11" />
+  <style>
+    [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      background: var(--bg-alt); padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .doc-nav .l { display: flex; align-items: center; gap: 11px; }
+    .doc-nav .mark {
+      width: 28px; height: 28px; border-radius: 8px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .doc-nav .mark .lucide { width: 15px; height: 15px; color: #fff; }
+    .doc-nav .brand { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+    .doc-nav .ver {
+      font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 3px 7px;
+    }
+    .doc-nav .r { display: flex; align-items: center; gap: 26px; }
+    .doc-nav .r a { font-size: 14px; color: var(--text-secondary); }
+    .doc-nav .r a.on { color: var(--text-primary); font-weight: 600; }
+    .doc-nav .r a:hover { color: var(--text-primary); }
+    .doc-nav .dl-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff !important;
+      border-radius: 9px; padding: 9px 16px; font-size: 13.5px; font-weight: 600;
+    }
+    .doc-nav .dl-btn .lucide { width: 15px; height: 15px; }
+
+    .doc-shell { display: flex; min-height: calc(100vh - 66px); }
+    .doc-side {
+      width: 262px; flex: none;
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 26px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+    }
+    /* styled scrollbar for the left script panel + right TOC (unstyled default stood out) */
+    .doc-side, .doc-toc { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.16) transparent; }
+    .doc-side::-webkit-scrollbar, .doc-toc::-webkit-scrollbar { width: 8px; }
+    .doc-side::-webkit-scrollbar-track, .doc-toc::-webkit-scrollbar-track { background: transparent; }
+    .doc-side::-webkit-scrollbar-thumb, .doc-toc::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+    }
+    .doc-side:hover::-webkit-scrollbar-thumb, .doc-toc:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,.26); background-clip: padding-box; }
+    .doc-side .search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px 11px; margin-bottom: 14px;
+    }
+    .doc-side .search .lucide { width: 13px; height: 13px; color: var(--text-muted); }
+    .doc-side .search input {
+      border: none; background: none; outline: none; width: 100%;
+      font-family: var(--font-body); font-size: 13px; color: var(--text-primary);
+    }
+    .doc-side .search input::placeholder { color: var(--text-muted); }
+    .doc-side .grp {
+      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted);
+      padding: 14px 0 6px 2px;
+    }
+    .doc-side a {
+      display: flex; align-items: center; gap: 9px;
+      border-radius: 7px; padding: 8px 11px;
+      font-size: 13.5px; color: var(--text-secondary);
+    }
+    .doc-side a:hover { background: #ffffff08; }
+    .doc-side a.on { background: var(--accent-soft); color: var(--text-primary); font-weight: 600; }
+    .doc-side a img { width: 32px; height: 32px; object-fit: contain; }
+    .doc-side a .lucide { width: 30px; height: 30px; color: var(--text-muted); }
+
+    .doc-article { flex: 1; min-width: 0; padding: 44px 64px; max-width: 900px; }
+    .doc-bc {
+      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .doc-bc b { color: var(--accent-text); font-weight: 400; }
+    .doc-article h1 {
+      font-family: var(--font-display); font-size: 42px; font-weight: 600; letter-spacing: -1px;
+      margin: 0 0 14px;
+    }
+    .doc-badges { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .md > p:first-of-type { font-size: 17px; line-height: 1.6; }
+    .md h2 {
+      display: flex; align-items: center; gap: 9px;
+      font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);
+      margin: 40px 0 14px; padding-top: 26px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .md h3 {
+      font-family: var(--font-display); font-size: 16.5px; font-weight: 600; color: var(--text-primary);
+      margin: 26px 0 10px;
+    }
+    .md p { margin: 0 0 14px; }
+    .md ul, .md ol { margin: 0 0 16px; padding-left: 22px; display: flex; flex-direction: column; gap: 7px; }
+    .md li::marker { color: var(--accent-text); }
+    .md code {
+      font-family: var(--font-mono); font-size: .86em; color: var(--accent-text);
+      background: var(--term-bg); border: 1px solid var(--border-soft);
+      border-radius: 5px; padding: 1.5px 6px;
+    }
+    .md pre {
+      background: var(--term-bg); border: 1px solid var(--border-soft); border-radius: 10px;
+      padding: 14px 16px; overflow-x: auto; margin: 0 0 16px;
+    }
+    .md pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.6; }
+    .md blockquote {
+      border-left: 3px solid var(--accent); border-radius: 2px;
+      padding: 2px 0 2px 16px; margin: 0 0 16px;
+      color: var(--text-secondary); font-size: 16px;
+    }
+    .md table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 13.5px; }
+    .md th {
+      text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: .8px;
+      color: var(--text-muted); font-weight: 500; text-transform: uppercase;
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    .md td { padding: 9px 12px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+    .md td:first-child { color: var(--text-primary); white-space: nowrap; }
+    .md strong { color: var(--text-primary); font-weight: 600; }
+    .md hr { border: none; border-top: 1px solid var(--border-soft); margin: 24px 0; }
+
+    .doc-dl {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px; margin-top: 36px;
+    }
+    .doc-dl .t { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .doc-dl .s { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+    .doc-dl .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .doc-dl .a1 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff; border-radius: 9px; padding: 10px 16px;
+      font-size: 13.5px; font-weight: 600;
+    }
+    .doc-dl .a2 {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
+    }
+    .doc-dl .lucide { width: 15px; height: 15px; }
+
+    .doc-toc {
+      width: 222px; flex: none;
+      border-left: 1px solid var(--border);
+      padding: 44px 24px;
+      position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto;
+      display: flex; flex-direction: column; gap: 13px;
+    }
+    .doc-toc .h { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-muted); }
+    .doc-toc a { font-size: 13px; color: var(--text-muted); }
+    .doc-toc a:hover { color: var(--text-secondary); }
+    .doc-toc a.on { color: var(--accent-text); }
+
+    @media (max-width: 1100px) { .doc-toc { display: none; } }
+    @media (max-width: 860px) {
+      .doc-side { display: none; }
+      .doc-article { padding: 32px 24px; }
+      [hidden] { display: none !important; }
+    .doc-related { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); line-height: 2; }
+    .doc-nav { padding: 14px 20px; }
+      .doc-nav .r a:not(.dl-btn) { display: none; }
+    }
+  </style>
+  <link rel="canonical" href="https://forge.mograph.life/apps/ae/docs/sync-o-tron.html" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="IVG Toolkit" />
+  <meta property="og:title" content="Sync-o-tron — After Effects script documentation" /><meta property="og:description" content="Sync-o-tron for After Effects: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…" />
+  <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs/sync-o-tron.html" /><meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="Sync-o-tron — After Effects script documentation" />
+  <meta name="twitter:description" content="Sync-o-tron for After Effects: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…" /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html#page","url":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html","headline":"Sync-o-tron — After Effects script documentation","name":"Sync-o-tron — After Effects script documentation","description":"Sync-o-tron for After Effects: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…","inLanguage":"en","author":{"@type":"Person","name":"Ilya Gusinski","url":"https://www.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"Sync-o-tron","item":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html"}]}]}</script>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a class="l" href="/apps/ae/">
+      <span class="mark"><i data-lucide="zap"></i></span>
+      <span class="brand">IVG Toolkit</span>
+      <span class="ver">Open source</span>
+    </a>
+    <div class="r">
+      <a href="/apps/ae/#library">Library</a>
+      <a href="/apps/ae/docs.html" class="on">Docs</a>
+      <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener">GitHub</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download><i data-lucide="download"></i>Download</a>
+    </div>
+  </nav>
+
+  <div class="doc-shell">
+    <aside class="doc-side" id="docSide">
+      <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" aria-label="Filter script documentation" placeholder="Filter scripts…" /></label>
+<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster">PathMaster</a>
+<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer">Verticalizer</a>
+<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron" class="on" aria-current="page">Sync-o-tron</a>
+<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron">Valuatron</a>
+<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron">TimeWarp-a-tron</a>
+<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster">VertexMaster</a>
+<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator">Triminator</a>
+    </aside>
+    <main class="doc-article" id="docArticle">
+      <nav class="doc-bc" id="docBc" aria-label="Breadcrumb"><a href="/">IVG Design Forge</a> <span>/</span> <a href="/apps/ae/">IVG Toolkit</a> <span>/</span> <a href="/apps/ae/docs.html">Documentation</a> <span>/</span> <a href="/apps/ae/docs/sync-o-tron.html">Sync-o-tron</a></nav>
+      <h1 id="docH1">Sync-o-tron</h1>
+      <div class="doc-badges" id="docBadges"><span class="chip">Effects &amp; Audio</span><span class="chip">v2.1.4</span><span class="chip">DIALOG</span></div>
+      <div class="md" id="docMd"><blockquote>Make any property audio-reactive in one click — select it, hit TuneSync, and get auto-built Easing/Min/Max controls wired to your AUDIO REACTOR comp.</blockquote>
+<p><strong>Category:</strong> effects · <strong>Version:</strong> 2.1.4 · <strong>UI:</strong> DIALOG (main window is a floating palette; the 2D/3D axis choosers are modal dialogs)</p>
+<h2 id="what-it-does">What it does</h2>
+<p>Sync-o-tron wires an arbitrary property on an arbitrary layer — Opacity, Position, Scale, a color, even a slider inside a nested pseudo effect — to an audio-amplitude value, without you hand-writing the linking expression or building the range controls. It ships <strong>with its Audio Reactor template project</strong> (<code>Sync-o-tron.aep</code>, in the bundle's <code>ivg-scripts/projects/</code> folder): a comp whose name contains &quot;AUDIO REACTOR&quot; that measures amplitude and exposes it on a layer named &quot;Select Frequency&quot; via an &quot;Audio Reactor&quot; effect's &quot;Output Power&quot; slider. On launch (and again on TuneSync), if the current project has no AUDIO REACTOR comp, the script offers to import the template for you.</p>
+<p>The workflow: open the palette, pick the reactor comp from the dropdown, select a layer and one property on it in the Timeline, click <strong>TuneSync</strong>. The script detects whether the property is 1D (Opacity, Rotation, a slider), 2D or 3D (Position/Scale/Anchor Point), or a Color. For 2D/3D it pops a follow-up dialog asking which axes should react and whether they share one Min/Max pair (&quot;Unify Properties&quot;) or get independent per-axis sliders. It then adds the matching expression controls to the layer — an Easing Type dropdown plus Min/Max sliders, or Start/End color swatches — and writes an expression on the property that reads the audio value, runs it through <code>linear</code>/<code>easeIn</code>/<code>easeOut</code>/<code>ease</code>, and outputs between your Min and Max (or blends Start→End color).</p>
+<p>It's built to be re-run per property: each TuneSync adds an independent, property-named control set without touching previously wired properties.</p>
+<h2 id="controls-options">Controls &amp; options</h2>
+<h3>The naming contract (what the template must provide)</h3>
+<p>The generated expression always reads:</p>
+<pre><code>comp(&quot;&lt;reactor comp&gt;&quot;).layer(&quot;Select Frequency&quot;).effect(&quot;Audio Reactor&quot;)(&quot;Output Power&quot;)</code></pre>
+<table><thead><tr><th>Name</th><th>What it must be</th></tr></thead><tbody><tr><td>Comp name containing <code>AUDIO REACTOR</code></td><td>How the dropdown finds reactor comps (substring match, exact case)</td></tr><tr><td>Layer <code>Select Frequency</code></td><td>Layer inside the reactor comp exposing the audio value</td></tr><tr><td>Effect <code>Audio Reactor</code>, property <code>Output Power</code></td><td>The amplitude output the expression reads (expected range 0–100)</td></tr></tbody></table>
+<p>These names come from the companion template and are not validated — if they don't match, the generated expression errors at evaluation time.</p>
+<h3>Main palette</h3>
+<table><thead><tr><th>Control</th><th>Notes</th></tr></thead><tbody><tr><td>Pick Reactor</td><td>Dropdown of every comp whose name contains &quot;AUDIO REACTOR&quot;; first match auto-selected</td></tr><tr><td>↺ (refresh)</td><td>Re-scans the project (use after adding/renaming a reactor comp)</td></tr><tr><td>TuneSync</td><td>Wires the currently selected property</td></tr></tbody></table>
+<h3>Axis dialog (2D and 3D properties only)</h3>
+<table><thead><tr><th>Control</th><th>Meaning</th></tr></thead><tbody><tr><td>X / Y (/ Z) checkboxes</td><td>Which axes react to audio</td></tr><tr><td>Unify Properties</td><td>One shared Min/Max pair for all checked axes instead of per-axis sliders</td></tr><tr><td>OK / Cancel</td><td>Apply or abort</td></tr></tbody></table>
+<h3>Generated controls on the target layer</h3>
+<p>Controls are named <code>&lt;property prefix&gt;_&lt;suffix&gt;</code>:</p>
+<table><thead><tr><th>Suffix</th><th>Effect type</th><th>Created for</th></tr></thead><tbody><tr><td><code>_Easing Type</code></td><td>Dropdown: Linear, EaseIn, EaseOut, EaseInOut</td><td>All property types</td></tr><tr><td><code>_Min Output</code> / <code>_Max Output</code></td><td>Sliders</td><td>1D properties; 2D/3D with Unify checked</td></tr><tr><td><code>_Min Output X/Y/Z</code> / <code>_Max Output X/Y/Z</code></td><td>Sliders</td><td>2D/3D without Unify — one pair per axis</td></tr><tr><td><code>_Start</code> / <code>_End</code></td><td>Color controls (defaults Green → Blue)</td><td>Color properties</td></tr></tbody></table>
+<h2 id="usage">Usage</h2>
+<ol>
+<li>Launch Sync-o-tron. If the project has no &quot;AUDIO REACTOR&quot; comp yet, accept the offer to import the bundled template (it looks for <code>Sync-o-tron.aep</code> next to the script, then in <code>ivg-scripts/projects/</code>; you can also point at it manually). Put your audio track inside the imported AUDIO REACTOR comp.</li>
+<li>Run Sync-o-tron; the reactor comp should already be selected in the dropdown (↺ if you added it after opening the palette).</li>
+<li>In your working comp, select the layer, then select the <strong>single</strong> property to make reactive.</li>
+<li>Click <strong>TuneSync</strong>. 1D and Color properties wire immediately; 2D/3D properties show the axis dialog first — check the axes, optionally Unify, OK.</li>
+<li>Open Effect Controls on the layer and shape the reaction with the new Easing Type and Min/Max (or Start/End color) controls.</li>
+<li>Repeat from step 3 for more properties or layers.</li>
+</ol>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>The reactor dropdown finds AUDIO REACTOR comps nested in folders (case-insensitive), so the imported template inside its &quot;Sync-o-tron.aep&quot; folder shows up. Hit ↺ to rescan after importing.</li>
+<li>After a successful TuneSync the floating palette closes itself (a docked panel stays open — panels can't self-close).</li>
+<li>Rigging additional properties on the same layer is instant now; the old version froze for a few seconds per additional property (expression-probe type detection).</li>
+</ul>
+<ul>
+<li>Controls inside pseudo effects are fully supported — the script resolves the deepest selected property, so clicking a control inside a pseudo-effect group targets that control, not the group.</li>
+<li>For 1D/2D controls inside pseudo effects, the generated control names are prefixed with the parent effect's name (with &quot;Vertex&quot; rewritten to &quot;Property-Vert&quot;) so multiple same-named controls stay distinguishable; 3D and Color properties use the raw property name.</li>
+<li>In 3D non-unified mode all six per-axis sliders are created even for unchecked axes — the unchecked axes' sliders are simply never read by the expression. Harmless clutter; delete them if you like.</li>
+<li>Re-running TuneSync on the same property adds a second control set rather than reusing the first — remove old sets manually if you re-wire.</li>
+<li>Only the first selected layer is used; extra selected layers are ignored.</li>
+</ul>
+<h2 id="requirements-edge-cases">Requirements &amp; edge cases</h2>
+<ul>
+<li>Needs an active comp, a selected layer, and a selected property — each missing piece gets its own alert.</li>
+<li>With no &quot;AUDIO REACTOR&quot; comp present, TuneSync no longer writes a broken expression — it offers the template import and stops cleanly if declined.</li>
+<li>The selected property must accept expressions; non-expressible selections (and property groups) fall through to the 1D handler, which may not be what you want — select a leaf property.</li>
+<li>Renaming the reactor comp, the &quot;Select Frequency&quot; layer, the generated control effects, or the layer itself breaks the name-bound expressions.</li>
+</ul>
+<h2 id="how-it-works">How it works</h2>
+<p>Two modules. <strong>PropQuery</strong> resolves and classifies the selection: <code>showDeepestSelectedProperty()</code> picks the entry with the greatest property depth (pseudo effects report both the group and its child as selected); <code>getPropertyType()</code> detects dimensionality by <em>temporarily assigning</em> probe expressions (<code>value</code>, <code>[value[0],value[1]]</code>, …) to the live property and checking <code>expressionError</code>, then restoring the original; <code>collectPropertyHierarchyInfo()</code>/<code>constructPropertyPath()</code> walk <code>parentProperty</code> up to the layer and serialize a <code>layer(&quot;…&quot;).property(&quot;…&quot;)…</code> address used later to re-find the property. Hand-rolled <code>indexOf</code>/<code>isArray</code> helpers stand in for the ES5 methods ExtendScript lacks.</p>
+<p><strong>MainUI</strong> builds the palette and dropdown (scanning <code>app.project</code> items for the &quot;AUDIO REACTOR&quot; substring), offering to <code>importFile()</code> the bundled template when none is found. TuneSync runs its guards first, classifies the property by value length plus the layer's 3D toggle (a 2D-layer Scale, which AE pads with an unused Z, uses the 2D handler so only X/Y controls are made; no expression probing — the old probe forced whole-comp expression re-evaluation through the audio chain and stalled for seconds on layers that already had a rigged property), then opens the &quot;Create Controls&quot; undo group and dispatches: 1D and Color wire immediately; 2D/3D route through the modal axis dialogs into their handlers. Each handler adds <code>ADBE Dropdown Control</code>/<code>ADBE Slider Control</code>/<code>ADBE Color Control</code> effects (the dropdown's items set via <code>setPropertyParameters</code>, which also renames the effect), then assembles the expression string: read Output Power from the reactor comp, branch on the Easing Type menu value to pick <code>linear</code>/<code>easeIn</code>/<code>easeOut</code>/<code>ease</code> over an input range of 0–100, and output between the Min/Max sliders (per axis or unified) or <code>linear</code>-blend the Start/End colors.</p></div>
+      <div class="doc-dl" id="docDl">
+        <div>
+          <div class="t" id="dlT">Get Sync-o-tron</div>
+          <div class="s" id="dlS">v2.1.4 · DIALOG · MIT</div>
+        </div>
+        <div class="actions">
+          <a class="a1" id="dlBtn" href="/apps/ae/scripts/effects/Sync-o-tron.jsx" download><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener"><i data-lucide="github"></i>View source</a>
+        </div>
+      </div>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design">Work with Ilya</a></footer></main>
+    <aside class="doc-toc" id="docToc">
+      <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#controls-options">Controls &amp; options</a><a href="#usage">Usage</a><a href="#notes">Notes</a><a href="#requirements-edge-cases">Requirements &amp; edge cases</a><a href="#how-it-works">How it works</a>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/apps/ae/vendor/lucide.min.js"></script>
+  <script src="/apps/ae/js/docs.js?v=14"></script>
+</body>
+</html>

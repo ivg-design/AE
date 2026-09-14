@@ -10,13 +10,14 @@
   "scripts": {
     "dev": "yarn workspace @jsx-workspace/frame-navigator dev",
     "build": "yarn workspaces run build",
-    "build:catalog": "node site/tools/build-data.mjs && node site/tools/build-bundle.mjs && node site/tools/build-data.mjs",
+    "build:catalog": "node site/tools/build-data.mjs && node site/tools/build-bundle.mjs && node site/tools/build-data.mjs && node site/tools/build-docs.mjs",
     "clean": "yarn workspaces run clean",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "typecheck": "yarn workspaces run typecheck"
+    "typecheck": "yarn workspaces run typecheck",
+    "build:docs": "node site/tools/build-docs.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.7.0",

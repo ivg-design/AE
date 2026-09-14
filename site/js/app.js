@@ -41,7 +41,7 @@
   }
   function srcUrl(s) { return s.srcPath; }
   function jsxName(s) { return s.srcPath.split('/').pop(); }
-  function docUrl(s) { return 'docs.html?s=' + encodeURIComponent(s.id); }
+  function docUrl(s) { return 'docs/' + encodeURIComponent(s.id) + '.html'; }
 
   let toastTimer;
   function toast(msg) {
