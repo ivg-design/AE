@@ -200,8 +200,8 @@
       <a href="/apps/ae/#library">Library</a>
       <a href="/apps/ae/docs.html" class="on">Docs</a>
       <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
-      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener">GitHub</a>
-      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download><i data-lucide="download"></i>Download</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository">GitHub</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download data-forge-action="download_intent"><i data-lucide="download"></i>Download</a>
     </div>
   </nav>
 
@@ -261,11 +261,11 @@
           <div class="s" id="dlS">v2.0.1 · HEADLESS · MIT</div>
         </div>
         <div class="actions">
-          <a class="a1" id="dlBtn" href="/apps/ae/scripts/paths/Trace-o-matic.jsx" download><i data-lucide="download"></i>Download .jsx</a>
-          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener"><i data-lucide="github"></i>View source</a>
+          <a class="a1" id="dlBtn" href="/apps/ae/scripts/paths/Trace-o-matic.jsx" download data-forge-action="download_intent"><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository"><i data-lucide="github"></i>View source</a>
         </div>
       </div>
-    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design">Work with Ilya</a></footer></main>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design" data-forge-action="service_outbound">Work with Ilya</a> · <a href="/services/">Creative services</a></footer></main>
     <aside class="doc-toc" id="docToc">
       <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#controls-options">Controls &amp; options</a><a href="#usage">Usage</a><a href="#notes">Notes</a><a href="#requirements-edge-cases">Requirements &amp; edge cases</a><a href="#how-it-works">How it works</a>
     </aside>
@@ -274,5 +274,6 @@
   <div class="toast" id="toast" role="status"></div>
   <script src="/apps/ae/vendor/lucide.min.js"></script>
   <script src="/apps/ae/js/docs.js?v=14"></script>
+  <script src="/shared/js/growth-events.js" defer></script>
 </body>
 </html>

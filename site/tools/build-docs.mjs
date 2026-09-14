@@ -71,7 +71,7 @@ function generate(current) {
     .replace('<div class="t" id="dlT"></div>', `<div class="t" id="dlT">Get ${esc(titleOf(current))}</div>`)
     .replace('<div class="s" id="dlS"></div>', `<div class="s" id="dlS">v${esc(current.version)} · ${esc(current.ui)} · MIT</div>`)
     .replace('id="dlBtn" href="#" download', `id="dlBtn" href="${PREFIX}${esc(current.srcPath)}" download`);
-  html = html.replace('</main>', `<footer class="doc-related"><a href="${PREFIX}docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design">Work with Ilya</a></footer></main>`);
+  html = html.replace('</main>', `<footer class="doc-related"><a href="${PREFIX}docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design" data-forge-action="service_outbound">Work with Ilya</a> · <a href="/services/">Creative services</a></footer></main>`);
   fs.writeFileSync(path.join(SITE, relative), html.replace(/[ \t]+$/gm, ''));
 }
 

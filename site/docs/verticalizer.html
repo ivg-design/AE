@@ -200,8 +200,8 @@
       <a href="/apps/ae/#library">Library</a>
       <a href="/apps/ae/docs.html" class="on">Docs</a>
       <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
-      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener">GitHub</a>
-      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download><i data-lucide="download"></i>Download</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository">GitHub</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download data-forge-action="download_intent"><i data-lucide="download"></i>Download</a>
     </div>
   </nav>
 
@@ -503,11 +503,11 @@ var winCy = sCy + (pCy - sCy) * t;</code></pre>
           <div class="s" id="dlS">v1.9.4 · PANEL · MIT</div>
         </div>
         <div class="actions">
-          <a class="a1" id="dlBtn" href="/apps/ae/scripts/composition/Verticalizer.jsx" download><i data-lucide="download"></i>Download .jsx</a>
-          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener"><i data-lucide="github"></i>View source</a>
+          <a class="a1" id="dlBtn" href="/apps/ae/scripts/composition/Verticalizer.jsx" download data-forge-action="download_intent"><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository"><i data-lucide="github"></i>View source</a>
         </div>
       </div>
-    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design">Work with Ilya</a></footer></main>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design" data-forge-action="service_outbound">Work with Ilya</a> · <a href="/services/">Creative services</a></footer></main>
     <aside class="doc-toc" id="docToc">
       <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#how-the-rig-works">How the rig works</a><a href="#the-control-panel-verticalizer-effect-on-ctrl-verticalizer">The control panel — `Verticalizer` effect (on `[CTRL] Verticalizer`)</a><a href="#the-verticalizer-caption-effect-1-6-0-marker-source-fade-added-1-7-0">The `Verticalizer Caption` effect (1.6.0, marker source + fade added 1.7.0)</a><a href="#per-card-time-remapping">Per-card time remapping</a><a href="#picture-in-picture-morph-1-5-0-shadow-fixed-in-1-6-0">Picture-in-picture morph (1.5.0, shadow fixed in 1.6.0)</a><a href="#keyable-aspect-1-8-0">Keyable aspect (1.8.0)</a><a href="#repairing-or-upgrading-a-rig-1-9-0">Repairing or upgrading a rig (1.9.0)</a><a href="#on-canvas-handle-reference">On-canvas handle reference</a><a href="#safe-zone-numbers-as-fractions-of-the-comp-px-values-shown-at-the-1080-1920-default-rig-size">Safe-zone numbers (as fractions of the comp; px values shown at the 1080×1920 default Rig Size)</a><a href="#usage">Usage</a><a href="#requirements">Requirements</a><a href="#notes-limitations">Notes &amp; limitations</a>
     </aside>
@@ -516,5 +516,6 @@ var winCy = sCy + (pCy - sCy) * t;</code></pre>
   <div class="toast" id="toast" role="status"></div>
   <script src="/apps/ae/vendor/lucide.min.js"></script>
   <script src="/apps/ae/js/docs.js?v=14"></script>
+  <script src="/shared/js/growth-events.js" defer></script>
 </body>
 </html>

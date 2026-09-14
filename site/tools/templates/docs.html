@@ -208,8 +208,8 @@
       <a href="index.html#library">Library</a>
       <a href="#" class="on">Docs</a>
       <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
-      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener">GitHub</a>
-      <a class="dl-btn" href="download/ae-scripts.zip" download><i data-lucide="download"></i>Download</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository">GitHub</a>
+      <a class="dl-btn" href="download/ae-scripts.zip" download data-forge-action="download_intent"><i data-lucide="download"></i>Download</a>
     </div>
   </nav>
 
@@ -228,8 +228,8 @@
           <div class="s" id="dlS"></div>
         </div>
         <div class="actions">
-          <a class="a1" id="dlBtn" href="#" download><i data-lucide="download"></i>Download .jsx</a>
-          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener"><i data-lucide="github"></i>View source</a>
+          <a class="a1" id="dlBtn" href="#" download data-forge-action="download_intent"><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository"><i data-lucide="github"></i>View source</a>
         </div>
       </div>
     </main>
@@ -241,5 +241,6 @@
   <div class="toast" id="toast" role="status"></div>
   <script src="vendor/lucide.min.js"></script>
   <script src="js/docs.js?v=11"></script>
+  <script src="/shared/js/growth-events.js" defer></script>
 </body>
 </html>

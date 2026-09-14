@@ -200,8 +200,8 @@
       <a href="/apps/ae/#library">Library</a>
       <a href="/apps/ae/docs.html" class="on">Docs</a>
       <a href="https://github.com/ivg-design/ae/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
-      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener">GitHub</a>
-      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download><i data-lucide="download"></i>Download</a>
+      <a href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository">GitHub</a>
+      <a class="dl-btn" href="/apps/ae/download/ae-scripts.zip" download data-forge-action="download_intent"><i data-lucide="download"></i>Download</a>
     </div>
   </nav>
 
@@ -328,11 +328,11 @@
           <div class="s" id="dlS">v3.15.1 · HEADLESS · MIT</div>
         </div>
         <div class="actions">
-          <a class="a1" id="dlBtn" href="/apps/ae/scripts/animation/CamBot.jsx" download><i data-lucide="download"></i>Download .jsx</a>
-          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener"><i data-lucide="github"></i>View source</a>
+          <a class="a1" id="dlBtn" href="/apps/ae/scripts/animation/CamBot.jsx" download data-forge-action="download_intent"><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository"><i data-lucide="github"></i>View source</a>
         </div>
       </div>
-    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design">Work with Ilya</a></footer></main>
+    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design" data-forge-action="service_outbound">Work with Ilya</a> · <a href="/services/">Creative services</a></footer></main>
     <aside class="doc-toc" id="docToc">
       <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#how-it-works">How it works</a><a href="#the-control-panel-cambot-effect-on-cambot-n-target">The control panel — `CamBot` effect (on `CamBot N Target`)</a><a href="#targets-multi-target-blending-the-cambot-target-controller">Targets &amp; multi‑target blending — the `CamBot Target` controller</a><a href="#the-move-catalog-26-moves">The Move catalog (26 moves)</a><a href="#usage">Usage</a><a href="#key-concepts-tips">Key concepts &amp; tips</a><a href="#requirements-edge-cases">Requirements &amp; edge cases</a>
     </aside>
@@ -341,5 +341,6 @@
   <div class="toast" id="toast" role="status"></div>
   <script src="/apps/ae/vendor/lucide.min.js"></script>
   <script src="/apps/ae/js/docs.js?v=14"></script>
+  <script src="/shared/js/growth-events.js" defer></script>
 </body>
 </html>
