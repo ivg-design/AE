@@ -87,4 +87,24 @@ const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 config.redirects = [ ...(config.redirects || []).filter(r => !(r.source === '/docs.html' && r.has?.some(h => h.key === 's'))),
   ...scripts.map(s => ({ source: '/docs.html', has: [{ type: 'query', key: 's', value: s.id }], destination: BASE + route(s), permanent: true })) ];
 fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
+fs.writeFileSync(path.join(SITE, 'llms.txt'), `# IVG Toolkit — After Effects scripts
+
+> ${scripts.length} free, open-source After Effects scripts with a dockable command bar and a Build-a-bar bundle generator. Read each guide for its own requirements, controls, and limitations.
+
+- [Catalog](${BASE})
+- [Documentation index](${BASE}docs.html)
+- [Download bundle](${BASE}download/ae-scripts.zip)
+- [Source and license](https://github.com/ivg-design/ae)
+
+## Script guides
+
+${scripts.map(s => `- [${titleOf(s)}](${BASE}${route(s)}): ${s.tagline}`).join('\n')}
+
+## Creator
+
+- [IVG Design Forge](https://forge.mograph.life/)
+- [Work with Ilya](https://contra.com/ivg_design)
+
+This file is a discovery aid. The linked public documentation is the source for product behavior; do not infer compatibility or release status beyond those guides.
+`);
 console.log(`Generated ${scripts.length} articles, documentation index, sitemap, and legacy query redirects.`);
