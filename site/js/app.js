@@ -419,6 +419,7 @@ Docs & updates: ${REPO}
     const cat = catByKey[activeCat];
     $('#cHeadTitle').textContent = query ? `Search “${query}”` : cat.label.replace(' & Rigging', '').replace(' & Audio', '').replace(' & Shapes', '');
     $('#cHeadCount').textContent = `${list.length} script${list.length === 1 ? '' : 's'}`;
+    $('#cHeadSort').textContent = 'sorted by name';
 
     const listEl = $('#scriptList');
     const gridEl = $('#scriptGrid');
@@ -427,7 +428,7 @@ Docs & updates: ${REPO}
 
     if (view === 'list') {
       listEl.innerHTML = list.map(s => `
-        <button class="script-row" data-script="${s.id}">
+        <a class="script-row" href="${docUrl(s)}" data-script="${s.id}">
           <span class="tile">${tileImg(s, 48)}</span>
           <span class="nc">
             <span class="n">${esc(s.name)}</span>
@@ -437,12 +438,12 @@ Docs & updates: ${REPO}
           <span class="v">v${esc(s.version || '1.0')}</span>
           ${uiBadge(s)}
           <i class="chev" data-lucide="chevron-right"></i>
-        </button>`).join('') ||
+        </a>`).join('') ||
         `<div style="padding:40px;text-align:center;color:var(--text-muted);font-size:14px">No scripts match “${esc(query)}”.</div>`;
       icons(listEl);
     } else {
       gridEl.innerHTML = list.map(s => `
-        <button class="script-card" data-script="${s.id}">
+        <a class="script-card" href="${docUrl(s)}" data-script="${s.id}">
           <span class="top">
             <span class="hd">
               <span class="tile">${tileImg(s, 56)}</span>
@@ -454,11 +455,12 @@ Docs & updates: ${REPO}
             <span class="d">${esc(s.tagline)}</span>
           </span>
           <span class="dl"><i data-lucide="download"></i>Download .jsx</span>
-        </button>`).join('') ||
+        </a>`).join('') ||
         `<div style="padding:40px;text-align:center;color:var(--text-muted);font-size:14px;grid-column:1/-1">No scripts match “${esc(query)}”.</div>`;
       icons(gridEl);
       $$('.script-card .dl', gridEl).forEach(dl => {
         dl.addEventListener('click', e => {
+          e.preventDefault();
           e.stopPropagation();
           downloadScript(byId[dl.closest('[data-script]').dataset.script]);
         });
@@ -504,7 +506,12 @@ Docs & updates: ${REPO}
       return;
     }
     const sBtn = e.target.closest('[data-script]');
-    if (sBtn) { openDetail(sBtn.dataset.script); return; }
+    if (sBtn) {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      openDetail(sBtn.dataset.script);
+      return;
+    }
     // click on overlay backdrop closes
     if (e.target.classList && e.target.classList.contains('overlay')) closeAll();
   });

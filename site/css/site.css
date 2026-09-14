@@ -266,6 +266,7 @@ i[data-lucide] { display: inline-block; width: 1em; height: 1em; flex: none; }
    after the first render, so filtered/smaller categories don't keep the
    reserve and leave a gap. Heights match the default (list, first category). */
 html.pre-render .win-body { min-height: 1049px; }
+html.pre-render .content { max-height: 1049px; overflow-y: auto; scroll-behavior: smooth; }
 .sidebar {
   width: 284px; flex: none;
   display: flex; flex-direction: column; gap: 3px;
@@ -315,6 +316,15 @@ html.pre-render .win-body { min-height: 1049px; }
 .c-head .sort { font-size: 11.5px; }
 
 .script-list { display: flex; flex-direction: column; }
+.static-guide-category { scroll-margin-top: 12px; }
+.static-guide-category h3 {
+  position: sticky; top: 0; z-index: 1;
+  padding: 9px 18px;
+  background: color-mix(in srgb, var(--bg-alt) 94%, transparent);
+  border-bottom: 1px solid var(--border-soft);
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
+}
 .script-row {
   display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
   padding: 13px 18px; border-bottom: 1px solid var(--border-soft);
@@ -339,6 +349,8 @@ html.pre-render .win-body { min-height: 1049px; }
 .script-row .v { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
 .script-row .chev { width: 18px; height: 18px; color: var(--text-muted); flex: none; }
 .script-row:hover .chev, .script-row.active .chev { color: var(--accent-text); }
+.script-row .guide-arrow { width: 18px; color: var(--text-muted); font-size: 17px; line-height: 1; flex: none; }
+.script-row:hover .guide-arrow { color: var(--accent-text); transform: translateX(2px); }
 
 /* grid view */
 .script-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 20px; }
@@ -738,6 +750,7 @@ body.modal-open { overflow: hidden; }
   .kbar-row { grid-template-columns: repeat(5, 1fr); }
   .builder .kbar-grid { min-height: 936px; }   /* 5 cols -> 8 tile-lines */
   html.pre-render .win-body { min-height: 1503px; }   /* sidebar stacks on top */
+  html.pre-render .content { max-height: 1049px; }
   .win-body { flex-direction: column; }
   .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
   .script-grid { grid-template-columns: 1fr; }
