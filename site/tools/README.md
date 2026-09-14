@@ -1,6 +1,12 @@
 # Site generation
 
-Run `node site/tools/build-docs.mjs` from the repository root after published catalog or Markdown guide updates. This generates the 35 static guides, directory, sitemap, redirect map, and llms.txt. Native app builds are separate.
+Run `node site/tools/build-docs.mjs` from the repository root after published catalog or Markdown guide updates. This generates the 35 static guides, directory, sitemap, redirect map, llms.txt, and the crawlable guide links inside the landing-page tool browser. Native app builds are separate.
+
+When only `site/data/scripts.json` or the landing-page markup changes, refresh that browser fallback without rebuilding every guide:
+
+```sh
+node site/tools/render-library-fallback.mjs
+```
 
 For icon updates, run `yarn --cwd site/tools install --frozen-lockfile`, then `yarn --cwd site/tools build:images`. The committed 68/136/224px WebP variants preserve original artwork, which remains available for packaging. The hero uses 224px icons; interactive tiles use responsive sources.
 

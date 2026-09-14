@@ -91,6 +91,10 @@ ${rows}
     '<!-- STATIC_LIBRARY_GUIDES:END -->',
     guides
   );
+  html = html
+    .replace(/(id="cHeadCount">)\d+( scripts<\/span>)/, `$1${scripts.length}$2`)
+    .replace(/(id="builderCount">0 of )\d+( selected<\/span>)/, `$1${scripts.length}$2`)
+    .replace(/(full \.zip of all )\d+/, `$1${scripts.length}`);
   // Remove the legacy SEO directory that was appended after the real footer.
   return html.replace(
     /\n  <section class="script-documentation"[\s\S]*?<\/section>(?=\n  <script src="vendor\/lucide)/,

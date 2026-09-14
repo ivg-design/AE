@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderMd } from './render-markdown.mjs';
+import { renderLibraryFallback } from './render-library-fallback.mjs';
 
 const SITE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BASE = 'https://forge.mograph.life/apps/ae/';
@@ -81,6 +82,8 @@ for (const script of scripts) {
   generate(script);
 }
 generate(null);
+const indexPath = path.join(SITE, 'index.html');
+fs.writeFileSync(indexPath, renderLibraryFallback(fs.readFileSync(indexPath, 'utf8'), scripts));
 fs.writeFileSync(path.join(SITE, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${['', 'docs.html', ...scripts.map(route)].map(p => `  <url><loc>${BASE}${p}</loc></url>`).join('\n')}\n</urlset>\n`);
 const configPath = path.join(SITE, 'vercel.json');
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
