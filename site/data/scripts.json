@@ -1055,15 +1055,16 @@
       "Organizes all parameters into logical groups for efficient workflow"
     ],
     "usage": [
-      "Select a text layer or create a new composition for subtitle work",
-      "Run the script - no user interface required",
-      "The script applies the \"Subtitle Setup\" effect with default parameters",
-      "Customize subtitle appearance using the effect controls panel: - Font: Adjust size, color, and opacity - Box: Configure background color, roundness, and opacity - Position: Set X and Y offsets for precise placement - Stroke: Control width and color for text outlines - Shadow: Fine-tune color, opacity, distance, spread, size, and angle"
+      "Open the composition to caption and make it active.",
+      "Run SubtitleForge once to create SUBTITLE and TXTBox.",
+      "Edit the SUBTITLE layer markers: the comment supplies the caption, and marker time plus duration supplies its visible window.",
+      "Style font, box, stroke and shadow through Subtitle Setup. Enable Type On optionally adds a typewriter reveal.",
+      "Add line breaks and adjust font size to fit the composition; automatic box sizing does not wrap or transcribe text."
     ],
     "requirements": [
-      "Adobe After Effects CS6 or later",
-      "A text layer or composition must be selected",
-      "Uses embedded Subtitle Setup FFX binary data"
+      "Use a current After Effects release with the JavaScript expression engine. Text Style expressions require AE 17.0 (2020) or later; this API minimum is not a complete compatibility certification.",
+      "An active composition; current layer selection is not used.",
+      "Uses the embedded Subtitle Setup FFX preset. Run once per composition because expressions reference SUBTITLE by name."
     ],
     "notes": [
       "Effect uses embedded FFX preset data for consistent subtitle styling",
