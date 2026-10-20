@@ -96,7 +96,7 @@
       margin: 0 0 14px;
     }
     .doc-badges { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
-    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
     .md > p:first-of-type { font-size: 17px; line-height: 1.6; }
     .md h2 {
       display: flex; align-items: center; gap: 9px;
@@ -126,7 +126,9 @@
       padding: 2px 0 2px 16px; margin: 0 0 16px;
       color: var(--text-secondary); font-size: 16px;
     }
-    .md table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 13.5px; }
+    .md .table-scroll { max-width: 100%; overflow-x: auto; margin: 0 0 18px; }
+    .md .table-scroll:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+    .md table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
     .md th {
       text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: .8px;
       color: var(--text-muted); font-weight: 500; text-transform: uppercase;
@@ -156,6 +158,13 @@
       border-radius: 9px; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
     }
     .doc-dl .lucide { width: 15px; height: 15px; }
+    .doc-related ul { padding-left: 20px; margin-top: 8px; }
+    .doc-related a:hover { color: var(--accent-text); }
+    @media (max-width: 600px) {
+      .doc-dl { flex-direction: column; align-items: stretch; }
+      .doc-dl .actions { margin-top: 4px; }
+      .doc-dl .a1, .doc-dl .a2 { justify-content: center; }
+    }
 
     .doc-toc {
       width: 222px; flex: none;

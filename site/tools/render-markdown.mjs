@@ -40,9 +40,9 @@ const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g,
       tableBuf = [];
       if (rows.length < 2) return;
       const head = rows[0], body = rows.slice(2);
-      out.push('<table><thead><tr>' + head.map(h => `<th>${inline(h)}</th>`).join('') + '</tr></thead><tbody>'
+      out.push('<div class="table-scroll" role="region" aria-label="Documentation table" tabindex="0"><table><thead><tr>' + head.map(h => `<th>${inline(h)}</th>`).join('') + '</tr></thead><tbody>'
         + body.map(r => '<tr>' + r.map(c => `<td>${inline(c)}</td>`).join('') + '</tr>').join('')
-        + '</tbody></table>');
+        + '</tbody></table></div>');
     };
 
     for (; i < lines.length; i++) {

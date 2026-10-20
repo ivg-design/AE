@@ -1,7 +1,7 @@
 # Parent-o-bot
 > Blend a layer's Position, Scale, Rotation, and Opacity toward up to two "parent" layers, each with its own 0–100% influence slider — a multi-parent rig you can animate after the fact.
 
-**Category:** layers · **Version:** 2.0.2 · **UI:** DIALOG (multi-select layer list, OK / Cancel)
+**Category:** layers · **Version:** 2.0.3 · **UI:** DIALOG (multi-select layer list, OK / Cancel)
 
 ## What it does
 

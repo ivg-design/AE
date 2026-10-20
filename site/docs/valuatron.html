@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Valuatron — After Effects script documentation</title>
-  <meta name="description" content="Valuatron for After Effects: Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo." />
+  <title>Keyframe selected properties at once in After Effects — Valuatron</title>
+  <meta name="description" content="Free After Effects script: Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo.…" />
   <link rel="icon" type="image/png" sizes="32x32" href="/apps/ae/assets/favicon-32.png?v=11" />
   <link rel="icon" type="image/png" sizes="256x256" href="/apps/ae/assets/ae-toolkit.png?v=11" />
   <link rel="apple-touch-icon" href="/apps/ae/assets/apple-touch-icon.png?v=11" />
@@ -96,7 +96,7 @@
       margin: 0 0 14px;
     }
     .doc-badges { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
-    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
     .md > p:first-of-type { font-size: 17px; line-height: 1.6; }
     .md h2 {
       display: flex; align-items: center; gap: 9px;
@@ -126,7 +126,9 @@
       padding: 2px 0 2px 16px; margin: 0 0 16px;
       color: var(--text-secondary); font-size: 16px;
     }
-    .md table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 13.5px; }
+    .md .table-scroll { max-width: 100%; overflow-x: auto; margin: 0 0 18px; }
+    .md .table-scroll:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+    .md table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
     .md th {
       text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: .8px;
       color: var(--text-muted); font-weight: 500; text-transform: uppercase;
@@ -156,6 +158,13 @@
       border-radius: 9px; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
     }
     .doc-dl .lucide { width: 15px; height: 15px; }
+    .doc-related ul { padding-left: 20px; margin-top: 8px; }
+    .doc-related a:hover { color: var(--accent-text); }
+    @media (max-width: 600px) {
+      .doc-dl { flex-direction: column; align-items: stretch; }
+      .doc-dl .actions { margin-top: 4px; }
+      .doc-dl .a1, .doc-dl .a2 { justify-content: center; }
+    }
 
     .doc-toc {
       width: 222px; flex: none;
@@ -183,11 +192,11 @@
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="IVG Toolkit" />
-  <meta property="og:title" content="Valuatron — After Effects script documentation" /><meta property="og:description" content="Valuatron for After Effects: Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo." />
+  <meta property="og:title" content="Keyframe selected properties at once in After Effects — Valuatron" /><meta property="og:description" content="Free After Effects script: Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo.…" />
   <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs/valuatron.html" /><meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
-  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="Valuatron — After Effects script documentation" />
-  <meta name="twitter:description" content="Valuatron for After Effects: Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo." /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/valuatron.html#page","url":"https://forge.mograph.life/apps/ae/docs/valuatron.html","headline":"Valuatron — After Effects script documentation","name":"Valuatron — After Effects script documentation","description":"Valuatron for After Effects: Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo.","inLanguage":"en","author":{"@type":"Person","name":"Ilya Gusinski","url":"https://www.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"Valuatron","item":"https://forge.mograph.life/apps/ae/docs/valuatron.html"}]}]}</script>
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="Keyframe selected properties at once in After Effects — Valuatron" />
+  <meta name="twitter:description" content="Free After Effects script: Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo.…" /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/valuatron.html#page","url":"https://forge.mograph.life/apps/ae/docs/valuatron.html","headline":"Keyframe selected properties at once in After Effects — Valuatron","name":"Keyframe selected properties at once in After Effects — Valuatron","description":"Free After Effects script: Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo.…","inLanguage":"en","author":{"@type":"Person","@id":"https://forge.mograph.life/#creator","name":"Ilya Gusinski","url":"https://services.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"},"about":{"@type":"SoftwareApplication","@id":"https://forge.mograph.life/apps/ae/docs/valuatron.html#script","name":"Valuatron","description":"Stamp a keyframe at the playhead for every selected property at once — capturing current values, expressions included — in one undo.","url":"https://forge.mograph.life/apps/ae/docs/valuatron.html","applicationCategory":"MultimediaApplication","softwareRequirements":"Adobe After Effects; see the guide for script-specific requirements.","softwareVersion":"2.0.1","isAccessibleForFree":true,"license":"https://opensource.org/license/mit","downloadUrl":"https://forge.mograph.life/apps/ae/scripts/keyframes/Valuatron.jsx","offers":{"@type":"Offer","price":"0","priceCurrency":"USD","url":"https://forge.mograph.life/apps/ae/docs/valuatron.html"}}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"Valuatron","item":"https://forge.mograph.life/apps/ae/docs/valuatron.html"}]}]}</script>
 </head>
 <body>
   <nav class="doc-nav">
@@ -208,13 +217,13 @@
   <div class="doc-shell">
     <aside class="doc-side" id="docSide">
       <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" aria-label="Filter script documentation" placeholder="Filter scripts…" /></label>
-<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster">PathMaster</a>
-<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer">Verticalizer</a>
-<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron">Sync-o-tron</a>
-<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron" class="on" aria-current="page">Valuatron</a>
-<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron">TimeWarp-a-tron</a>
-<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster">VertexMaster</a>
-<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator">Triminator</a>
+<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger 2- and 3-segment ik rigging">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot 3d camera rig and procedural moves">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron two-segment ik/fk limb rigging">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer control keyframed animation with a slider">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster animate a layer along a shape path">PathMaster</a>
+<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator position ruler guides precisely">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9 horizontal slide-reveal transitions">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16 vertical slide-reveal transitions">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer portrait split-screen and picture-in-picture">Verticalizer</a>
+<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate radial stroke burst animation">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer blend colors across fills and strokes">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster mix voice, sound effects and music">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron audio-reactive animation">Sync-o-tron</a>
+<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic keyframe overshoot and bounce">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot batch-edit keyframe values">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic repeat keyframes with easing intact">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron keyframe selected properties at once" class="on" aria-current="page">Valuatron</a>
+<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer build an expression-control null">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot parent layers to a centered null">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot parent layer opacity">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster reverse or shuffle layer order">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot blend between two parent layers">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator round rectangle corners independently">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator reset layer and shape transform origins">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge marker-driven subtitles and caption boxes">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate highlight words in a text layer">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron control time remapping with a slider">TimeWarp-a-tron</a>
+<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer center and bounding-box guides">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron distribute layers along a shape path">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator recenter a bezier path origin">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic convert animated masks to shape paths">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster control path vertices with nulls">VertexMaster</a>
+<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron distribute property values across layers">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic randomize keyframe values">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator animate a trim paths reveal">Triminator</a>
     </aside>
     <main class="doc-article" id="docArticle">
       <nav class="doc-bc" id="docBc" aria-label="Breadcrumb"><a href="/">IVG Design Forge</a> <span>/</span> <a href="/apps/ae/">IVG Toolkit</a> <span>/</span> <a href="/apps/ae/docs.html">Documentation</a> <span>/</span> <a href="/apps/ae/docs/valuatron.html">Valuatron</a></nav>
@@ -228,7 +237,7 @@
 <p>No dialog, no options. One immediate action wrapped in a single undo step, so one Cmd+Z / Ctrl+Z reverses the whole batch.</p>
 <h2 id="controls-options">Controls &amp; options</h2>
 <p>There is no dialog and no settings — the inputs are the state of the AE UI when you run it:</p>
-<table><thead><tr><th>Input</th><th>Where it comes from</th><th>Requirement</th></tr></thead><tbody><tr><td>Target time</td><td>Current time indicator</td><td>Position the playhead before running</td></tr><tr><td>Target layers</td><td>Selected layers</td><td>Select one or more layers</td></tr><tr><td>Target properties</td><td>Selected property rows</td><td>Highlight the specific properties in the Timeline panel (selecting a parent group like &quot;Transform&quot; is not enough)</td></tr><tr><td>Value written</td><td>The property's current evaluated value</td><td>Automatic — not user-editable</td></tr></tbody></table>
+<div class="table-scroll" role="region" aria-label="Documentation table" tabindex="0"><table><thead><tr><th>Input</th><th>Where it comes from</th><th>Requirement</th></tr></thead><tbody><tr><td>Target time</td><td>Current time indicator</td><td>Position the playhead before running</td></tr><tr><td>Target layers</td><td>Selected layers</td><td>Select one or more layers</td></tr><tr><td>Target properties</td><td>Selected property rows</td><td>Highlight the specific properties in the Timeline panel (selecting a parent group like &quot;Transform&quot; is not enough)</td></tr><tr><td>Value written</td><td>The property's current evaluated value</td><td>Automatic — not user-editable</td></tr></tbody></table></div>
 <h2 id="usage">Usage</h2>
 <ol>
 <li>Move the playhead to the exact time you want the keyframe.</li>
@@ -257,14 +266,14 @@
       <div class="doc-dl" id="docDl">
         <div>
           <div class="t" id="dlT">Get Valuatron</div>
-          <div class="s" id="dlS">v2.0.1 · HEADLESS · MIT</div>
+          <div class="s" id="dlS">Free · v2.0.1 · HEADLESS · MIT</div>
         </div>
         <div class="actions">
           <a class="a1" id="dlBtn" href="/apps/ae/scripts/keyframes/Valuatron.jsx" download data-forge-action="download_intent"><i data-lucide="download"></i>Download .jsx</a>
           <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository"><i data-lucide="github"></i>View source</a>
         </div>
       </div>
-    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design" data-forge-action="service_outbound">Work with Ilya</a> · <a href="/services/">Creative services</a></footer></main>
+    <footer class="doc-related">Scripts by <a href="https://services.mograph.life/">Ilya Gusinski / IVG Design</a> · <a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://services.mograph.life/" data-forge-action="service_outbound">Work with me</a></footer></main>
     <aside class="doc-toc" id="docToc">
       <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#controls-options">Controls &amp; options</a><a href="#usage">Usage</a><a href="#notes">Notes</a><a href="#requirements-edge-cases">Requirements &amp; edge cases</a><a href="#how-it-works">How it works</a>
     </aside>
