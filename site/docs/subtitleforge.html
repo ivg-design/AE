@@ -233,7 +233,7 @@
 <p><strong>Category:</strong> layers · <strong>Version:</strong> 2.0.2 · <strong>UI:</strong> HEADLESS (no dialog — builds the rig instantly in the active comp)</p>
 <h2 id="what-it-does">What it does</h2>
 <p>SubtitleForge builds a complete, reusable subtitle rig in a single run so you can caption a comp without hand-keyframing anything. It creates a text layer named <strong>SUBTITLE</strong> and a shape layer named <strong>TXTBox</strong> that automatically grows and positions itself as a rounded background box behind the text. The two layers are wired together entirely with expressions, so once the rig exists you only ever touch two things: the <strong>layer markers</strong> on SUBTITLE (each marker's comment becomes the on-screen line, and its time + duration decide when that line is visible) and a single custom effect called <strong>Subtitle Setup</strong> on the SUBTITLE layer.</p>
-<p>Every visual choice — font size and color, box color/roundness/opacity, padding around the text, an optional outline, and a full drop shadow — is exposed as sliders, color swatches, checkboxes, and an angle dial in the Subtitle Setup effect. The background box reads the text's live bounds and reshapes itself as you edit, so captions of any length stay wrapped in a readable panel. An optional typewriter reveal is available through a separate <strong>Enable Type On</strong> checkbox. Because every parameter is a real, keyframeable control, the whole rig doubles as an animatable template you can copy from comp to comp.</p>
+<p>Font size and color, box color/roundness/opacity, padding, an optional outline, and a drop shadow are exposed as sliders, color swatches, checkboxes, and an angle dial in the Subtitle Setup effect. The background box reads the text's live bounds and resizes as you edit. Add your own line breaks and keep the result inside the composition; automatic box sizing does not fit long captions to the frame. An optional typewriter reveal is available through a separate <strong>Enable Type On</strong> checkbox. The controls can also be keyframed.</p>
 <h2 id="controls-options">Controls &amp; options</h2>
 <h3>Subtitle text — the layer markers on SUBTITLE</h3>
 <p>You author caption lines by editing <strong>layer markers</strong> on the SUBTITLE layer. The text expression finds the marker under the current time and puts its comment on screen for the marker's duration window; outside every marker window the text is empty.</p>
@@ -254,15 +254,15 @@
 </ol>
 <h2 id="notes">Notes</h2>
 <ul>
-<li>The background box sizes itself from the text's live bounding box plus the <strong>Offset X / Offset Y</strong> padding, so it re-wraps automatically as line length changes — no manual box resizing.</li>
+<li>The background box sizes itself from the text's live bounding box plus the <strong>Offset X / Offset Y</strong> padding. It resizes the box; it does not transcribe audio or automatically wrap the caption to the composition width.</li>
 <li>The box's position and anchor follow SUBTITLE through the parent relationship, but its roundness, fill, stroke, and shadow expressions reference the text layer by the name <strong>SUBTITLE</strong>. Keep that layer named &quot;SUBTITLE&quot;; renaming it makes those expressions show the expression-error marker.</li>
 <li><strong>Enable Type On</strong> and <strong>Subtitle Setup</strong> are separate controllers — toggling the Subtitle Setup effect off/on in the Effects panel does not affect the typewriter reveal.</li>
-<li>Running the script again in the same comp creates a second, independent SUBTITLE/TXTBox pair rather than updating the existing rig.</li>
+<li>Run it once per composition. Running it again adds another SUBTITLE/TXTBox pair; the expressions reference layers by name, so duplicate names can make a box read the wrong subtitle layer. Use a separate precomposition for another independent rig.</li>
 <li>The text layer is created with the font <strong>Inter-Medium</strong> at size 50; you can restyle it from Font Size / Font Color or the Character panel afterward.</li>
 </ul>
 <h2 id="requirements-edge-cases">Requirements &amp; edge cases</h2>
 <ul>
-<li>Adobe After Effects CS6 or later. Some text-document properties are applied only on newer versions (gated by AE version) and degrade gracefully on older builds.</li>
+<li>Use a current After Effects release with the <strong>JavaScript expression engine</strong>. The caption expression uses <code>text.sourceText.style</code>, introduced in <strong>After Effects 17.0 (2020)</strong>; CS6 is not compatible with that API. This API minimum is not a claim that every older version has been tested with the complete script and embedded preset. See <a href="https://helpx.adobe.com/after-effects/desktop/work-with-expressions/expressions-to-edit-and-access-text-properties/expressions-text-properties.html" target="_blank" rel="noopener">Adobe's text-style expression guidance</a>.</li>
 <li>Needs an active composition — otherwise it alerts <code>Please select a composition first</code> and exits without creating anything. There is no dependence on the current layer selection; it always adds the two new layers.</li>
 <li>The drop shadow is added as a Layer Style, which relies on Layer Styles being available in your AE version.</li>
 <li>With the typewriter reveal off (the default), captions are fully visible for their entire marker window with no reveal animation.</li>

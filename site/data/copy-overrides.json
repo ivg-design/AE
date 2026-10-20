@@ -77,7 +77,19 @@
   },
   "subtitleforge": {
     "tagline": "Build a full caption rig in one run — text plus a self-sizing box with stroke and drop shadow, all driven from one Subtitle Setup effect.",
-    "description": "SubtitleForge builds a complete subtitle rig in a single headless run: a SUBTITLE text layer plus an auto-sizing TXTBox background box wired together with expressions. Each caption line is authored by editing layer markers on SUBTITLE (the marker's comment becomes the on-screen text, its time+duration the visibility window), while all styling comes from one Subtitle Setup pseudo-effect grouped into Font (Font Color/Size/Opacity), Box (Offset X/Y, Box Roundness/Box Color/Opacity), Stroke (Stroke/Stroke Width/Stroke Color), and Shadow (Shadow/Shadow Color/Shadow Opacity, Distance, Spread, Size, Angle). A separate Enable Type On checkbox adds an optional per-character typewriter reveal."
+    "description": "SubtitleForge builds a complete subtitle rig in a single headless run: a SUBTITLE text layer plus an auto-sizing TXTBox background box wired together with expressions. Each caption line is authored by editing layer markers on SUBTITLE (the marker's comment becomes the on-screen text, its time+duration the visibility window), while all styling comes from one Subtitle Setup pseudo-effect grouped into Font (Font Color/Size/Opacity), Box (Offset X/Y, Box Roundness/Box Color/Opacity), Stroke (Stroke/Stroke Width/Stroke Color), and Shadow (Shadow/Shadow Color/Shadow Opacity, Distance, Spread, Size, Angle). A separate Enable Type On checkbox adds an optional per-character typewriter reveal.",
+    "requirements": [
+      "Use a current After Effects release with the JavaScript expression engine. Text Style expressions require AE 17.0 (2020) or later; this API minimum is not a complete compatibility certification.",
+      "An active composition; current layer selection is not used.",
+      "Uses the embedded Subtitle Setup FFX preset. Run once per composition because expressions reference SUBTITLE by name."
+    ],
+    "usage": [
+      "Open the composition to caption and make it active.",
+      "Run SubtitleForge once to create SUBTITLE and TXTBox.",
+      "Edit the SUBTITLE layer markers: the comment supplies the caption, and marker time plus duration supplies its visible window.",
+      "Style font, box, stroke and shadow through Subtitle Setup. Enable Type On optionally adds a typewriter reveal.",
+      "Add line breaks and adjust font size to fit the composition; automatic box sizing does not wrap or transcribe text."
+    ]
   },
   "textmate": {
     "tagline": "Type a word and highlight every case-sensitive occurrence of it in a text layer, each with its own Range Selector on a new animator.",

@@ -368,8 +368,8 @@ function main() {
   }
 
   // Curated copy overrides (site/data/copy-overrides.json): hand-written,
-  // purpose-first taglines/descriptions that take precedence over the
-  // frontmatter-derived text. Keyed by slug id.
+  // purpose-first copy and source-verified usage/requirements that take
+  // precedence over stale frontmatter text. Keyed by slug id.
   try {
     const ovPath = path.join(SITE_DATA_DIR, "copy-overrides.json");
     const overrides = JSON.parse(fs.readFileSync(ovPath, "utf8"));
@@ -378,6 +378,11 @@ function main() {
       if (ov) {
         if (ov.tagline) e.tagline = ov.tagline;
         if (ov.description) e.description = ov.description;
+        for (const field of ["usage", "requirements"]) {
+          if (Array.isArray(ov[field]) && ov[field].every(value => typeof value === "string")) {
+            e[field] = ov[field];
+          }
+        }
       }
     }
   } catch (err) { /* no overrides file — fine */ }

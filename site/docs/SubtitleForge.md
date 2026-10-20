@@ -7,7 +7,7 @@
 
 SubtitleForge builds a complete, reusable subtitle rig in a single run so you can caption a comp without hand-keyframing anything. It creates a text layer named **SUBTITLE** and a shape layer named **TXTBox** that automatically grows and positions itself as a rounded background box behind the text. The two layers are wired together entirely with expressions, so once the rig exists you only ever touch two things: the **layer markers** on SUBTITLE (each marker's comment becomes the on-screen line, and its time + duration decide when that line is visible) and a single custom effect called **Subtitle Setup** on the SUBTITLE layer.
 
-Every visual choice — font size and color, box color/roundness/opacity, padding around the text, an optional outline, and a full drop shadow — is exposed as sliders, color swatches, checkboxes, and an angle dial in the Subtitle Setup effect. The background box reads the text's live bounds and reshapes itself as you edit, so captions of any length stay wrapped in a readable panel. An optional typewriter reveal is available through a separate **Enable Type On** checkbox. Because every parameter is a real, keyframeable control, the whole rig doubles as an animatable template you can copy from comp to comp.
+Font size and color, box color/roundness/opacity, padding, an optional outline, and a drop shadow are exposed as sliders, color swatches, checkboxes, and an angle dial in the Subtitle Setup effect. The background box reads the text's live bounds and resizes as you edit. Add your own line breaks and keep the result inside the composition; automatic box sizing does not fit long captions to the frame. An optional typewriter reveal is available through a separate **Enable Type On** checkbox. The controls can also be keyframed.
 
 ## Controls & options
 
@@ -62,15 +62,15 @@ A standalone **Enable Type On** checkbox (default off) turns on a per-character 
 
 ## Notes
 
-- The background box sizes itself from the text's live bounding box plus the **Offset X / Offset Y** padding, so it re-wraps automatically as line length changes — no manual box resizing.
+- The background box sizes itself from the text's live bounding box plus the **Offset X / Offset Y** padding. It resizes the box; it does not transcribe audio or automatically wrap the caption to the composition width.
 - The box's position and anchor follow SUBTITLE through the parent relationship, but its roundness, fill, stroke, and shadow expressions reference the text layer by the name **SUBTITLE**. Keep that layer named "SUBTITLE"; renaming it makes those expressions show the expression-error marker.
 - **Enable Type On** and **Subtitle Setup** are separate controllers — toggling the Subtitle Setup effect off/on in the Effects panel does not affect the typewriter reveal.
-- Running the script again in the same comp creates a second, independent SUBTITLE/TXTBox pair rather than updating the existing rig.
+- Run it once per composition. Running it again adds another SUBTITLE/TXTBox pair; the expressions reference layers by name, so duplicate names can make a box read the wrong subtitle layer. Use a separate precomposition for another independent rig.
 - The text layer is created with the font **Inter-Medium** at size 50; you can restyle it from Font Size / Font Color or the Character panel afterward.
 
 ## Requirements & edge cases
 
-- Adobe After Effects CS6 or later. Some text-document properties are applied only on newer versions (gated by AE version) and degrade gracefully on older builds.
+- Use a current After Effects release with the **JavaScript expression engine**. The caption expression uses `text.sourceText.style`, introduced in **After Effects 17.0 (2020)**; CS6 is not compatible with that API. This API minimum is not a claim that every older version has been tested with the complete script and embedded preset. See [Adobe's text-style expression guidance](https://helpx.adobe.com/after-effects/desktop/work-with-expressions/expressions-to-edit-and-access-text-properties/expressions-text-properties.html).
 - Needs an active composition — otherwise it alerts `Please select a composition first` and exits without creating anything. There is no dependence on the current layer selection; it always adds the two new layers.
 - The drop shadow is added as a Layer Style, which relies on Layer Styles being available in your AE version.
 - With the typewriter reveal off (the default), captions are fully visible for their entire marker window with no reveal animation.
