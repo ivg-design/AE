@@ -1,7 +1,7 @@
 # BurstMate
 > Drop a fully rigged radial stroke-burst into your comp — two animated stroke layers driven entirely from one "StrokeBurst" control panel on a hidden BURST CTRL layer.
 
-**Category:** effects · **Version:** 2.0.1 · **UI:** HEADLESS (no dialog — all tuning happens afterward in Effect Controls)
+**Category:** effects · **Version:** 2.0.2 · **UI:** HEADLESS (no dialog — all tuning happens afterward in Effect Controls)
 
 ## What it does
 

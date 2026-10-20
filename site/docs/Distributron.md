@@ -1,7 +1,7 @@
 # Distributron
 > Spread a comp's layers evenly along a shape-layer path — each one auto-rotating to follow the curve — and steer the whole arrangement live from one CTRL null.
 
-**Category:** paths · **Version:** 1.1.2 · **UI:** HEADLESS (no dialog — rigs the selected path instantly)
+**Category:** paths · **Version:** 1.1.3 · **UI:** HEADLESS (no dialog — rigs the selected path instantly)
 
 ## What it does
 

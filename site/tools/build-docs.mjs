@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderMd } from './render-markdown.mjs';
 import { renderLibraryFallback } from './render-library-fallback.mjs';
+import { tasks, related } from './discovery.mjs';
 
 const SITE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BASE = 'https://forge.mograph.life/apps/ae/';
@@ -15,20 +16,21 @@ const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').re
 const categories = { animation: 'Animation & Rigging', composition: 'Composition', effects: 'Effects & Audio', keyframes: 'Keyframes', layers: 'Layers', paths: 'Paths & Shapes', utilities: 'Utilities' };
 const titleOf = s => s.displayName || s.name;
 const route = s => `docs/${s.id}.html`;
+const downloadOf = s => s.id === 'sync-o-tron' ? 'download/ae-scripts.zip' : s.srcPath;
 const descriptionOf = s => {
-  const text = `${titleOf(s)} for After Effects: ${s.tagline || s.description}`.replace(/\s+/g, ' ').trim();
+  const text = `Free After Effects script: ${s.tagline || s.description} ${titleOf(s)} includes a usage guide and MIT-licensed source.`.replace(/\s+/g, ' ').trim();
   return text.length <= 165 ? text : text.slice(0, 162).replace(/\s+\S*$/, '') + '…';
 };
 const sidebar = current => Object.entries(categories).map(([key, label]) =>
   `<span class="grp">${esc(label)}</span>` + scripts.filter(s => s.category === key).map(s =>
-    `<a href="${PREFIX}${route(s)}" data-script-name="${esc(titleOf(s).toLowerCase())}"${s.id === current?.id ? ' class="on" aria-current="page"' : ''}>${esc(titleOf(s))}</a>`).join('')).join('\n');
+    `<a href="${PREFIX}${route(s)}" data-script-name="${esc(`${titleOf(s)} ${tasks[s.id]}`.toLowerCase())}"${s.id === current?.id ? ' class="on" aria-current="page"' : ''}>${esc(titleOf(s))}</a>`).join('')).join('\n');
 const directory = Object.entries(categories).map(([key, label]) => `<h2 id="${key}">${esc(label)}</h2><ul>` + scripts.filter(s => s.category === key).map(s =>
   `<li><a href="${PREFIX}${route(s)}">${esc(titleOf(s))}</a> — ${esc(s.tagline)}</li>`).join('\n') + '</ul>').join('\n');
 
 function generate(current) {
   const relative = current ? route(current) : 'docs.html';
   const url = BASE + relative;
-  const name = current ? `${titleOf(current)} — After Effects script documentation` : 'After Effects script documentation — IVG Toolkit';
+  const name = current ? `${tasks[current.id]} in After Effects — ${titleOf(current)}` : `${scripts.length} Free After Effects Scripts: Guides & Downloads — IVG Toolkit`;
   const description = current ? descriptionOf(current) : `Documentation for ${scripts.length} free IVG Toolkit After Effects scripts. Browse setup, controls, examples, requirements, and individual JSX downloads.`;
   let rendered = current ? renderMd(fs.readFileSync(path.join(SITE, current.docPath), 'utf8')) : { html: `<p>${esc(description)}</p><p>Choose a script by the task you need to complete. Each guide includes usage instructions and a direct script download.</p>${directory}`, toc: Object.entries(categories).map(([id, t]) => ({ id, t })) };
   // Existing Markdown cross-links use source filenames; publish them as article links.
@@ -38,9 +40,17 @@ function generate(current) {
   const schema = {
     '@context': 'https://schema.org', '@graph': [
       { '@type': current ? 'TechArticle' : 'CollectionPage', '@id': url + '#page', url, headline: name, name, description, inLanguage: 'en',
-        author: { '@type': 'Person', name: 'Ilya Gusinski', url: 'https://www.mograph.life/' },
+        author: { '@type': 'Person', '@id': 'https://forge.mograph.life/#creator', name: 'Ilya Gusinski', url: 'https://services.mograph.life/' },
         isPartOf: { '@type': 'WebSite', name: 'IVG Toolkit', url: BASE },
-        ...(current ? {} : { mainEntity: { '@type': 'ItemList', itemListElement: scripts.map((s, i) => ({ '@type': 'ListItem', position: i + 1, name: titleOf(s), url: BASE + route(s) })) } }) },
+        ...(current ? { about: {
+          '@type': 'SoftwareApplication', '@id': url + '#script', name: titleOf(current),
+          description: current.tagline, url, applicationCategory: 'MultimediaApplication',
+          softwareRequirements: 'Adobe After Effects; see the guide for script-specific requirements.',
+          softwareVersion: current.version, isAccessibleForFree: true,
+          license: 'https://opensource.org/license/mit',
+          downloadUrl: BASE + downloadOf(current),
+          offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', url },
+        } } : { mainEntity: { '@type': 'ItemList', itemListElement: scripts.map((s, i) => ({ '@type': 'ListItem', position: i + 1, name: titleOf(s), url: BASE + route(s) })) } }) },
       { '@type': 'BreadcrumbList', itemListElement: crumbs.map(([name, item], i) => ({ '@type': 'ListItem', position: i + 1, name, item })) }
     ]
   };
@@ -70,15 +80,22 @@ function generate(current) {
     .replace(/href="index.html/g, `href="${PREFIX}`);
   if (current) html = html.replace('id="docDl" hidden', 'id="docDl"')
     .replace('<div class="t" id="dlT"></div>', `<div class="t" id="dlT">Get ${esc(titleOf(current))}</div>`)
-    .replace('<div class="s" id="dlS"></div>', `<div class="s" id="dlS">v${esc(current.version)} · ${esc(current.ui)} · MIT</div>`)
-    .replace('id="dlBtn" href="#" download', `id="dlBtn" href="${PREFIX}${esc(current.srcPath)}" download`);
-  html = html.replace('</main>', `<footer class="doc-related"><a href="${PREFIX}docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design" data-forge-action="service_outbound">Work with Ilya</a> · <a href="/services/">Creative services</a></footer></main>`);
+    .replace('<div class="s" id="dlS"></div>', `<div class="s" id="dlS">Free · v${esc(current.version)} · ${esc(current.ui)} · MIT${current.id === 'sync-o-tron' ? ' · Full bundle includes the required Audio Reactor template' : ''}</div>`)
+    .replace('id="dlBtn" href="#" download', `id="dlBtn" href="${PREFIX}${esc(downloadOf(current))}" download`);
+  if (current?.id === 'sync-o-tron') html = html.replace('>Download .jsx</a>', '>Download bundle</a>');
+  const next = (related[current?.id] || []).map(id => {
+    const script = scripts.find(s => s.id === id);
+    if (!script) throw new Error(`Unknown related script: ${id}`);
+    return `<a href="${PREFIX}${route(script)}">${esc(tasks[id])} — ${esc(titleOf(script))}</a>`;
+  });
+  html = html.replace('</main>', `${next.length ? `<nav class="doc-related" aria-label="Related workflows"><strong>Related workflows</strong><ul>${next.map(link => `<li>${link}</li>`).join('')}</ul></nav>` : ''}<footer class="doc-related">Scripts by <a href="https://services.mograph.life/">Ilya Gusinski / IVG Design</a> · <a href="${PREFIX}docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://services.mograph.life/" data-forge-action="service_outbound">Work with me</a></footer></main>`);
   fs.writeFileSync(path.join(SITE, relative), html.replace(/[ \t]+$/gm, ''));
 }
 
 if (new Set(scripts.map(s => s.id)).size !== scripts.length) throw new Error('Duplicate script IDs');
 for (const script of scripts) {
   if (!/^[a-z0-9-]+$/.test(script.id)) throw new Error('Invalid script route');
+  if (!tasks[script.id]) throw new Error(`Missing task name: ${script.id}`);
   generate(script);
 }
 generate(null);
@@ -106,7 +123,7 @@ ${scripts.map(s => `- [${titleOf(s)}](${BASE}${route(s)}): ${s.tagline}`).join('
 ## Creator
 
 - [IVG Design Forge](https://forge.mograph.life/)
-- [Work with Ilya](https://contra.com/ivg_design)
+- [Work with me](https://services.mograph.life/)
 
 This file is a discovery aid. The linked public documentation is the source for product behavior; do not infer compatibility or release status beyond those guides.
 `);

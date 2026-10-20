@@ -1,7 +1,7 @@
 # Rectangulator
 > Convert a parametric (Rectangle tool) rectangle into a bezier shape with independent per-corner rounding and a 9-point anchor grid — all driven by a "Rectangulator Controls" effect.
 
-**Category:** layers · **Version:** 2.1.5 · **UI:** HEADLESS (no dialog — runs immediately on the selected shape layer)
+**Category:** layers · **Version:** 2.1.7 · **UI:** HEADLESS (no dialog — runs immediately on the selected shape layer)
 
 ## What it does
 

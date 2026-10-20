@@ -1,7 +1,7 @@
 # Elast-o-matic
 > Give any keyframed property physical follow-through in one click — springy elastic overshoot by default, or gravity bounces when you hold Cmd/Ctrl at launch.
 
-**Category:** keyframes · **Version:** 1.1.1 · **UI:** HEADLESS (variant chosen by the modifier key held at launch)
+**Category:** keyframes · **Version:** 1.1.3 · **UI:** HEADLESS (variant chosen by the modifier key held at launch)
 
 ## What it does
 

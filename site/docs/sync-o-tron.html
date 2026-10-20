@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sync-o-tron — After Effects script documentation</title>
-  <meta name="description" content="Sync-o-tron for After Effects: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…" />
+  <title>Audio-reactive animation in After Effects — Sync-o-tron</title>
+  <meta name="description" content="Free After Effects script: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…" />
   <link rel="icon" type="image/png" sizes="32x32" href="/apps/ae/assets/favicon-32.png?v=11" />
   <link rel="icon" type="image/png" sizes="256x256" href="/apps/ae/assets/ae-toolkit.png?v=11" />
   <link rel="apple-touch-icon" href="/apps/ae/assets/apple-touch-icon.png?v=11" />
@@ -96,7 +96,7 @@
       margin: 0 0 14px;
     }
     .doc-badges { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
-    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+    .md { color: var(--text-secondary); font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
     .md > p:first-of-type { font-size: 17px; line-height: 1.6; }
     .md h2 {
       display: flex; align-items: center; gap: 9px;
@@ -126,7 +126,9 @@
       padding: 2px 0 2px 16px; margin: 0 0 16px;
       color: var(--text-secondary); font-size: 16px;
     }
-    .md table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 13.5px; }
+    .md .table-scroll { max-width: 100%; overflow-x: auto; margin: 0 0 18px; }
+    .md .table-scroll:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+    .md table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
     .md th {
       text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: .8px;
       color: var(--text-muted); font-weight: 500; text-transform: uppercase;
@@ -156,6 +158,13 @@
       border-radius: 9px; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
     }
     .doc-dl .lucide { width: 15px; height: 15px; }
+    .doc-related ul { padding-left: 20px; margin-top: 8px; }
+    .doc-related a:hover { color: var(--accent-text); }
+    @media (max-width: 600px) {
+      .doc-dl { flex-direction: column; align-items: stretch; }
+      .doc-dl .actions { margin-top: 4px; }
+      .doc-dl .a1, .doc-dl .a2 { justify-content: center; }
+    }
 
     .doc-toc {
       width: 222px; flex: none;
@@ -183,11 +192,11 @@
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="IVG Toolkit" />
-  <meta property="og:title" content="Sync-o-tron — After Effects script documentation" /><meta property="og:description" content="Sync-o-tron for After Effects: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…" />
+  <meta property="og:title" content="Audio-reactive animation in After Effects — Sync-o-tron" /><meta property="og:description" content="Free After Effects script: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…" />
   <meta property="og:url" content="https://forge.mograph.life/apps/ae/docs/sync-o-tron.html" /><meta property="og:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
-  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="Sync-o-tron — After Effects script documentation" />
-  <meta name="twitter:description" content="Sync-o-tron for After Effects: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…" /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html#page","url":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html","headline":"Sync-o-tron — After Effects script documentation","name":"Sync-o-tron — After Effects script documentation","description":"Sync-o-tron for After Effects: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…","inLanguage":"en","author":{"@type":"Person","name":"Ilya Gusinski","url":"https://www.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"Sync-o-tron","item":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html"}]}]}</script>
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="Audio-reactive animation in After Effects — Sync-o-tron" />
+  <meta name="twitter:description" content="Free After Effects script: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…" /><meta name="twitter:image" content="https://forge.mograph.life/apps/ae/assets/ae-toolkit.png" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html#page","url":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html","headline":"Audio-reactive animation in After Effects — Sync-o-tron","name":"Audio-reactive animation in After Effects — Sync-o-tron","description":"Free After Effects script: Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio…","inLanguage":"en","author":{"@type":"Person","@id":"https://forge.mograph.life/#creator","name":"Ilya Gusinski","url":"https://services.mograph.life/"},"isPartOf":{"@type":"WebSite","name":"IVG Toolkit","url":"https://forge.mograph.life/apps/ae/"},"about":{"@type":"SoftwareApplication","@id":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html#script","name":"Sync-o-tron","description":"Make any property audio-reactive in one click — TuneSync builds the Easing/Min/Max controls and wires them to the bundled Audio Reactor template.","url":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html","applicationCategory":"MultimediaApplication","softwareRequirements":"Adobe After Effects; see the guide for script-specific requirements.","softwareVersion":"2.1.4","isAccessibleForFree":true,"license":"https://opensource.org/license/mit","downloadUrl":"https://forge.mograph.life/apps/ae/download/ae-scripts.zip","offers":{"@type":"Offer","price":"0","priceCurrency":"USD","url":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html"}}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"IVG Design Forge","item":"https://forge.mograph.life/"},{"@type":"ListItem","position":2,"name":"IVG Toolkit","item":"https://forge.mograph.life/apps/ae/"},{"@type":"ListItem","position":3,"name":"Documentation","item":"https://forge.mograph.life/apps/ae/docs.html"},{"@type":"ListItem","position":4,"name":"Sync-o-tron","item":"https://forge.mograph.life/apps/ae/docs/sync-o-tron.html"}]}]}</script>
 </head>
 <body>
   <nav class="doc-nav">
@@ -208,13 +217,13 @@
   <div class="doc-shell">
     <aside class="doc-side" id="docSide">
       <label class="search"><i data-lucide="search"></i><input id="docSearch" type="search" aria-label="Filter script documentation" placeholder="Filter scripts…" /></label>
-<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster">PathMaster</a>
-<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer">Verticalizer</a>
-<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron" class="on" aria-current="page">Sync-o-tron</a>
-<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron">Valuatron</a>
-<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron">TimeWarp-a-tron</a>
-<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster">VertexMaster</a>
-<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator">Triminator</a>
+<span class="grp">Animation &amp; Rigging</span><a href="/apps/ae/docs/2-3-ik-rigger.html" data-script-name="2-3 ik rigger 2- and 3-segment ik rigging">2-3 IK Rigger</a><a href="/apps/ae/docs/cambot.html" data-script-name="cambot 3d camera rig and procedural moves">CamBot</a><a href="/apps/ae/docs/limb-a-tron.html" data-script-name="limb-a-tron two-segment ik/fk limb rigging">Limb-a-tron</a><a href="/apps/ae/docs/linearizer.html" data-script-name="linearizer control keyframed animation with a slider">Linearizer</a><a href="/apps/ae/docs/pathmaster.html" data-script-name="pathmaster animate a layer along a shape path">PathMaster</a>
+<span class="grp">Composition</span><a href="/apps/ae/docs/guiderator.html" data-script-name="guiderator position ruler guides precisely">Guiderator</a><a href="/apps/ae/docs/slidotron-16x9.html" data-script-name="slidotron_16x9 horizontal slide-reveal transitions">Slidotron_16x9</a><a href="/apps/ae/docs/slidotron-9x16.html" data-script-name="slidotron_9x16 vertical slide-reveal transitions">Slidotron_9x16</a><a href="/apps/ae/docs/verticalizer.html" data-script-name="verticalizer portrait split-screen and picture-in-picture">Verticalizer</a>
+<span class="grp">Effects &amp; Audio</span><a href="/apps/ae/docs/burstmate.html" data-script-name="burstmate radial stroke burst animation">BurstMate</a><a href="/apps/ae/docs/chromablenderizer.html" data-script-name="chromablenderizer blend colors across fills and strokes">ChromaBlenderizer</a><a href="/apps/ae/docs/sfxmaster.html" data-script-name="sfxmaster mix voice, sound effects and music">sfxMaster</a><a href="/apps/ae/docs/sync-o-tron.html" data-script-name="sync-o-tron audio-reactive animation" class="on" aria-current="page">Sync-o-tron</a>
+<span class="grp">Keyframes</span><a href="/apps/ae/docs/elast-o-matic.html" data-script-name="elast-o-matic keyframe overshoot and bounce">Elast-o-matic</a><a href="/apps/ae/docs/keybot.html" data-script-name="keybot batch-edit keyframe values">KeyBot</a><a href="/apps/ae/docs/keyclonematic.html" data-script-name="keyclonematic repeat keyframes with easing intact">KeyCloneMatic</a><a href="/apps/ae/docs/valuatron.html" data-script-name="valuatron keyframe selected properties at once">Valuatron</a>
+<span class="grp">Layers</span><a href="/apps/ae/docs/controllerizer.html" data-script-name="controllerizer build an expression-control null">Controllerizer</a><a href="/apps/ae/docs/nullbot.html" data-script-name="nullbot parent layers to a centered null">NullBot</a><a href="/apps/ae/docs/opac-o-bot.html" data-script-name="opac-o-bot parent layer opacity">Opac-o-bot</a><a href="/apps/ae/docs/ordermaster.html" data-script-name="ordermaster reverse or shuffle layer order">OrderMaster</a><a href="/apps/ae/docs/parent-o-bot.html" data-script-name="parent-o-bot blend between two parent layers">Parent-o-bot</a><a href="/apps/ae/docs/rectangulator.html" data-script-name="rectangulator round rectangle corners independently">Rectangulator</a><a href="/apps/ae/docs/reseterator.html" data-script-name="reseterator reset layer and shape transform origins">Reseterator</a><a href="/apps/ae/docs/subtitleforge.html" data-script-name="subtitleforge marker-driven subtitles and caption boxes">SubtitleForge</a><a href="/apps/ae/docs/textmate.html" data-script-name="textmate highlight words in a text layer">TextMate</a><a href="/apps/ae/docs/timewarp-a-tron.html" data-script-name="timewarp-a-tron control time remapping with a slider">TimeWarp-a-tron</a>
+<span class="grp">Paths &amp; Shapes</span><a href="/apps/ae/docs/centralizer.html" data-script-name="centralizer center and bounding-box guides">Centralizer</a><a href="/apps/ae/docs/distributron.html" data-script-name="distributron distribute layers along a shape path">Distributron</a><a href="/apps/ae/docs/originator.html" data-script-name="originator recenter a bezier path origin">Originator</a><a href="/apps/ae/docs/trace-o-matic.html" data-script-name="trace-o-matic convert animated masks to shape paths">Trace-o-matic</a><a href="/apps/ae/docs/vertexmaster.html" data-script-name="vertexmaster control path vertices with nulls">VertexMaster</a>
+<span class="grp">Utilities</span><a href="/apps/ae/docs/iteratron.html" data-script-name="iteratron distribute property values across layers">Iteratron</a><a href="/apps/ae/docs/randomatic.html" data-script-name="randomatic randomize keyframe values">RandoMatic</a><a href="/apps/ae/docs/triminator.html" data-script-name="triminator animate a trim paths reveal">Triminator</a>
     </aside>
     <main class="doc-article" id="docArticle">
       <nav class="doc-bc" id="docBc" aria-label="Breadcrumb"><a href="/">IVG Design Forge</a> <span>/</span> <a href="/apps/ae/">IVG Toolkit</a> <span>/</span> <a href="/apps/ae/docs.html">Documentation</a> <span>/</span> <a href="/apps/ae/docs/sync-o-tron.html">Sync-o-tron</a></nav>
@@ -230,15 +239,15 @@
 <h3>The naming contract (what the template must provide)</h3>
 <p>The generated expression always reads:</p>
 <pre><code>comp(&quot;&lt;reactor comp&gt;&quot;).layer(&quot;Select Frequency&quot;).effect(&quot;Audio Reactor&quot;)(&quot;Output Power&quot;)</code></pre>
-<table><thead><tr><th>Name</th><th>What it must be</th></tr></thead><tbody><tr><td>Comp name containing <code>AUDIO REACTOR</code></td><td>How the dropdown finds reactor comps (substring match, exact case)</td></tr><tr><td>Layer <code>Select Frequency</code></td><td>Layer inside the reactor comp exposing the audio value</td></tr><tr><td>Effect <code>Audio Reactor</code>, property <code>Output Power</code></td><td>The amplitude output the expression reads (expected range 0–100)</td></tr></tbody></table>
+<div class="table-scroll" role="region" aria-label="Documentation table" tabindex="0"><table><thead><tr><th>Name</th><th>What it must be</th></tr></thead><tbody><tr><td>Comp name containing <code>AUDIO REACTOR</code></td><td>How the dropdown finds reactor comps (substring match, exact case)</td></tr><tr><td>Layer <code>Select Frequency</code></td><td>Layer inside the reactor comp exposing the audio value</td></tr><tr><td>Effect <code>Audio Reactor</code>, property <code>Output Power</code></td><td>The amplitude output the expression reads (expected range 0–100)</td></tr></tbody></table></div>
 <p>These names come from the companion template and are not validated — if they don't match, the generated expression errors at evaluation time.</p>
 <h3>Main palette</h3>
-<table><thead><tr><th>Control</th><th>Notes</th></tr></thead><tbody><tr><td>Pick Reactor</td><td>Dropdown of every comp whose name contains &quot;AUDIO REACTOR&quot;; first match auto-selected</td></tr><tr><td>↺ (refresh)</td><td>Re-scans the project (use after adding/renaming a reactor comp)</td></tr><tr><td>TuneSync</td><td>Wires the currently selected property</td></tr></tbody></table>
+<div class="table-scroll" role="region" aria-label="Documentation table" tabindex="0"><table><thead><tr><th>Control</th><th>Notes</th></tr></thead><tbody><tr><td>Pick Reactor</td><td>Dropdown of every comp whose name contains &quot;AUDIO REACTOR&quot;; first match auto-selected</td></tr><tr><td>↺ (refresh)</td><td>Re-scans the project (use after adding/renaming a reactor comp)</td></tr><tr><td>TuneSync</td><td>Wires the currently selected property</td></tr></tbody></table></div>
 <h3>Axis dialog (2D and 3D properties only)</h3>
-<table><thead><tr><th>Control</th><th>Meaning</th></tr></thead><tbody><tr><td>X / Y (/ Z) checkboxes</td><td>Which axes react to audio</td></tr><tr><td>Unify Properties</td><td>One shared Min/Max pair for all checked axes instead of per-axis sliders</td></tr><tr><td>OK / Cancel</td><td>Apply or abort</td></tr></tbody></table>
+<div class="table-scroll" role="region" aria-label="Documentation table" tabindex="0"><table><thead><tr><th>Control</th><th>Meaning</th></tr></thead><tbody><tr><td>X / Y (/ Z) checkboxes</td><td>Which axes react to audio</td></tr><tr><td>Unify Properties</td><td>One shared Min/Max pair for all checked axes instead of per-axis sliders</td></tr><tr><td>OK / Cancel</td><td>Apply or abort</td></tr></tbody></table></div>
 <h3>Generated controls on the target layer</h3>
 <p>Controls are named <code>&lt;property prefix&gt;_&lt;suffix&gt;</code>:</p>
-<table><thead><tr><th>Suffix</th><th>Effect type</th><th>Created for</th></tr></thead><tbody><tr><td><code>_Easing Type</code></td><td>Dropdown: Linear, EaseIn, EaseOut, EaseInOut</td><td>All property types</td></tr><tr><td><code>_Min Output</code> / <code>_Max Output</code></td><td>Sliders</td><td>1D properties; 2D/3D with Unify checked</td></tr><tr><td><code>_Min Output X/Y/Z</code> / <code>_Max Output X/Y/Z</code></td><td>Sliders</td><td>2D/3D without Unify — one pair per axis</td></tr><tr><td><code>_Start</code> / <code>_End</code></td><td>Color controls (defaults Green → Blue)</td><td>Color properties</td></tr></tbody></table>
+<div class="table-scroll" role="region" aria-label="Documentation table" tabindex="0"><table><thead><tr><th>Suffix</th><th>Effect type</th><th>Created for</th></tr></thead><tbody><tr><td><code>_Easing Type</code></td><td>Dropdown: Linear, EaseIn, EaseOut, EaseInOut</td><td>All property types</td></tr><tr><td><code>_Min Output</code> / <code>_Max Output</code></td><td>Sliders</td><td>1D properties; 2D/3D with Unify checked</td></tr><tr><td><code>_Min Output X/Y/Z</code> / <code>_Max Output X/Y/Z</code></td><td>Sliders</td><td>2D/3D without Unify — one pair per axis</td></tr><tr><td><code>_Start</code> / <code>_End</code></td><td>Color controls (defaults Green → Blue)</td><td>Color properties</td></tr></tbody></table></div>
 <h2 id="usage">Usage</h2>
 <ol>
 <li>Launch Sync-o-tron. If the project has no &quot;AUDIO REACTOR&quot; comp yet, accept the offer to import the bundled template (it looks for <code>Sync-o-tron.aep</code> next to the script, then in <code>ivg-scripts/projects/</code>; you can also point at it manually). Put your audio track inside the imported AUDIO REACTOR comp.</li>
@@ -274,14 +283,14 @@
       <div class="doc-dl" id="docDl">
         <div>
           <div class="t" id="dlT">Get Sync-o-tron</div>
-          <div class="s" id="dlS">v2.1.4 · DIALOG · MIT</div>
+          <div class="s" id="dlS">Free · v2.1.4 · DIALOG · MIT · Full bundle includes the required Audio Reactor template</div>
         </div>
         <div class="actions">
-          <a class="a1" id="dlBtn" href="/apps/ae/scripts/effects/Sync-o-tron.jsx" download data-forge-action="download_intent"><i data-lucide="download"></i>Download .jsx</a>
+          <a class="a1" id="dlBtn" href="/apps/ae/download/ae-scripts.zip" download data-forge-action="download_intent"><i data-lucide="download"></i>Download bundle</a>
           <a class="a2" href="https://github.com/ivg-design/ae" target="_blank" rel="noopener" data-forge-action="repository"><i data-lucide="github"></i>View source</a>
         </div>
       </div>
-    <footer class="doc-related"><a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://contra.com/ivg_design" data-forge-action="service_outbound">Work with Ilya</a> · <a href="/services/">Creative services</a></footer></main>
+    <nav class="doc-related" aria-label="Related workflows"><strong>Related workflows</strong><ul><li><a href="/apps/ae/docs/sfxmaster.html">Mix voice, sound effects and music — sfxMaster</a></li><li><a href="/apps/ae/docs/linearizer.html">Control keyframed animation with a slider — Linearizer</a></li></ul></nav><footer class="doc-related">Scripts by <a href="https://services.mograph.life/">Ilya Gusinski / IVG Design</a> · <a href="/apps/ae/docs.html">All script guides</a> · <a href="/">Explore Forge</a> · <a href="https://services.mograph.life/" data-forge-action="service_outbound">Work with me</a></footer></main>
     <aside class="doc-toc" id="docToc">
       <span class="h">ON THIS PAGE</span><a href="#what-it-does">What it does</a><a href="#controls-options">Controls &amp; options</a><a href="#usage">Usage</a><a href="#notes">Notes</a><a href="#requirements-edge-cases">Requirements &amp; edge cases</a><a href="#how-it-works">How it works</a>
     </aside>

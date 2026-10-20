@@ -1,7 +1,7 @@
 # SubtitleForge
 > Drop a ready-to-style caption rig into any comp — a text layer plus a self-sizing background box with stroke and drop shadow — then author each line by typing it into a layer marker, and restyle everything from one "Subtitle Setup" effect.
 
-**Category:** layers · **Version:** 2.0.1 · **UI:** HEADLESS (no dialog — builds the rig instantly in the active comp)
+**Category:** layers · **Version:** 2.0.2 · **UI:** HEADLESS (no dialog — builds the rig instantly in the active comp)
 
 ## What it does
 
