@@ -61,10 +61,7 @@
   async function downloadScript(s) {
     const extras = BUNDLE_EXTRAS[s.id];
     if (!extras || !extras.length) {
-      const a = document.createElement('a');
-      a.href = srcUrl(s);
-      a.download = jsxName(s);
-      document.body.appendChild(a); a.click(); a.remove();
+      triggerDownload(srcUrl(s), jsxName(s));
       toast(`Downloading ${jsxName(s)}`);
       return;
     }
@@ -160,6 +157,7 @@
       </div>`;
     document.body.appendChild(pop);
     icons(pop);
+    // Keep the picker anchored to the tile as the visitor scrolls to Select.
     const r = tile.getBoundingClientRect();
     const pw = 280;
     let left = r.left + r.width / 2 - pw / 2;
@@ -186,7 +184,6 @@
     if (infoOpenId) closeInfo();
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && infoOpenId) closeInfo(); });
-  window.addEventListener('scroll', () => { if (infoOpenId) closeInfo(); }, { passive: true });
   $('#selAll') && $('#selAll').addEventListener('click', () => { scripts.forEach(s => selected.add(s.id)); renderBuilder(); });
   $('#selNone') && $('#selNone').addEventListener('click', () => { selected.clear(); renderBuilder(); });
 
@@ -249,12 +246,16 @@ Docs & updates: ${REPO}
     });
   }
 
-  function triggerDownload(blob, name) {
+  function triggerDownload(file, name) {
+    const objectURL = file instanceof Blob ? URL.createObjectURL(file) : null;
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
+    a.href = objectURL || file;
     a.download = name;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    a.dataset.forgeAction = 'download_intent';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    if (objectURL) setTimeout(() => URL.revokeObjectURL(objectURL), 4000);
   }
   async function fetchText(url, label) {
     const r = await fetch(url); if (!r.ok) throw new Error(label || url); return r.text();
